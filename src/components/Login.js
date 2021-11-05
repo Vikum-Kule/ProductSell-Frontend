@@ -6,6 +6,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import { pink } from '@mui/material/colors';
 import Validation from './Validation';
 import {userLogin} from '../services/Auth';
+import { useHistory } from 'react-router';
 // import { Link } from 'react-router-dom';
 
 
@@ -29,7 +30,7 @@ const useStyles = makeStyles({
 })
 
 function Login(props) {
-
+    const history = useHistory();
     const [showError, setShowError] = useState("");
 
     const [values, setValues] = useState({
@@ -49,10 +50,16 @@ function Login(props) {
     const hanldeFormSubmit = async(event)=>{
         event.preventDefault();
         setErrors(Validation(values));
-        // if(!errors || errors !== {} || errors.length !== 0){ 
-        //     let result = await userLogin(values.email, values.password);
-        //     console.log(result);
-        // }
+        if(!errors || errors !== {} || errors.length !== 0){ 
+            let result = await userLogin(values.email, values.password);
+            console.log("result--",result);
+            if(result === 'done'){
+                history.push('/template/home')
+            }
+            else{
+                setShowError(result);
+            }
+        }
     }
 
     const resetError = (event)=>{

@@ -12,32 +12,73 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
-import { Collapse, ListItemButton } from '@mui/material';
+import { Collapse, IconButton, ListItemButton } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { makeStyles } from '@mui/styles';
+import { useHistory } from 'react-router';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import Badge from '@mui/material/Badge';
+import MenuItem from '@mui/material/MenuItem';
+import Menu from '@mui/material/Menu';
+import AccountCircle from '@mui/icons-material/AccountCircle';
 
 const drawerWidth = 240;
 
 const useStyles = makeStyles({
-  appbar: {
-    backgroundColor: "red"
+  page:{
+    backgroundColor:"#f6f6f6",
+    marginTop:"8vh"
   }
+
 
 });
 
-function Template() {
-
+function Template({children}) {
+  const history = useHistory();
   const classes = useStyles();
+  const menuId = 'primary-search-account-menu';
   const [openExport, setOpenExport] = React.useState(false);
   const [openImport, setOpenImport] = React.useState(false);
-  const [selectedIndex, setSelectedIndex] = React.useState(1);
+  const [selectedIndex, setSelectedIndex] = React.useState(0);
 
-  const handleListItemClick = (event, index) => {
+  const handleProfileMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const isMenuOpen = Boolean(anchorEl);
+  const renderMenu = (
+    <Menu
+      anchorEl={anchorEl}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      id={menuId}
+      keepMounted
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      open={isMenuOpen}
+      onClose={handleMenuClose}
+    >
+      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+    </Menu>
+  );
+
+  const handleListItemClick = (event, index,path) => {
     setSelectedIndex(index);
+    history.push(path);
     if(index===1){
       handleClickImport();
     }
@@ -72,8 +113,37 @@ function Template() {
           <Typography variant="h6" noWrap component="div">
             Clipped drawer
           </Typography>
+          <Box sx={{ flexGrow: 1 }} />
+          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+            <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+              <Badge badgeContent={4} color="error">
+                <MailIcon />
+              </Badge>
+            </IconButton>
+            <IconButton
+              size="large"
+              aria-label="show 17 new notifications"
+              color="inherit"
+            >
+              <Badge badgeContent={17} color="error">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+            <IconButton
+              size="large"
+              edge="end"
+              aria-label="account of current user"
+              aria-controls={menuId}
+              aria-haspopup="true"
+              onClick={handleProfileMenuOpen}
+              color="inherit"
+            >
+              <AccountCircle />
+            </IconButton>
+          </Box>
         </Toolbar>
       </AppBar>
+      {renderMenu}
       <Drawer
         variant="permanent"
         sx={{
@@ -93,7 +163,7 @@ function Template() {
             <ListItemButton
               classes={{ selected: classes.active }}
               selected={selectedIndex==0}
-              onClick={(event) => handleListItemClick(event, 0)}
+              onClick={(event) => handleListItemClick(event, 0,"/template/home")}
               style={
                 {
                   backgroundColor:selectedIndex==0?"#15285c":"#2f3c66"
@@ -108,7 +178,7 @@ function Template() {
             <ListItemButton 
             // onClick={handleClickImport}
             selected={selectedIndex==1}
-              onClick={(event) => handleListItemClick(event, 1)}
+              onClick={(event) => handleListItemClick(event, 1,"/template/im_items")}
               style={
                 {
                   backgroundColor:selectedIndex==1?"#15285c":"#2f3c66"
@@ -145,7 +215,7 @@ function Template() {
             </Collapse>
             <ListItemButton 
             selected={selectedIndex==2}
-            onClick={(event) => handleListItemClick(event, 2)}
+            onClick={(event) => handleListItemClick(event, 2,"/template/export")}
             style={
               {
                 backgroundColor:selectedIndex==2?"#15285c":"#2f3c66"
@@ -188,8 +258,8 @@ function Template() {
           </List>
         </Box>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        
+      <Box className={classes.page} component="main" sx={{ flexGrow: 1, p: 3 }}>
+        {children}
       </Box>
     </Box>
     )

@@ -5,7 +5,7 @@ const userLogin =async(email, password)=>{
     console.log(email+" "+password);
     let apiResponse="Not";
 
-    axios.post("/api/users/login",{
+    return axios.post("/api/users/login",{
         "email":email,
         "password":password
     },
@@ -13,12 +13,40 @@ const userLogin =async(email, password)=>{
         headers: { 
             "Content-Type": "application/json",
       }}
+    ).then( async response=>{
+        console.log(response);
+        console.log("Response--",response.data.jwtToken);
+        return await getUserData(response.data.jwtToken, email);
+        // setUserSession(response.data.token, response.data.user)
+        
+    })
+    .catch(error =>{
+        // return error.response.data.message.toString;
+         console.log(error.response.status );
+        if (error.response.status == 403 || error.response.status == 400) {
+            return "Invalid credentials."
+        } else {
+          return "Something went wrong..."
+        }
+    });
+
+    // return apiResponse;
+}
+
+const getUserData = async(token, email)=>{
+    return axios.get("/api/users/find/email/"+email,
+    {
+        headers: { 
+            "Content-Type": "application/json",
+            "Authorization": "Bearer "+token
+      }}
     ).then(response=>{
         console.log(response);
-        setUserSession(response.data.token, response.data.user)
+        console.log("Response user--",response.data);
+        setUserSession(token, response.data);
         return "done";
     }).catch(error =>{
-        return error.response.data.message.toString;
+        return "Something went wrong...";
         //  console.log(error);
         // if (error.response.statuscode == 403) {
         //     console.log(error);
@@ -26,8 +54,6 @@ const userLogin =async(email, password)=>{
         //   console.log("something else");
         // }
     });
-
-    // return apiResponse;
 }
 
 
