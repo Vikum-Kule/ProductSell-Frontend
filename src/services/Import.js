@@ -1,7 +1,7 @@
 import axios from "axios";
 import {getToken} from "../Utils/Common"
 
-const getImportData = async(offset, pageSize)=>{
+const getImportData = async (offset, pageSize)=>{
     let token = getToken();
     return axios.get("/api/import/all/"+ offset +"/"+pageSize,
     {
@@ -11,8 +11,8 @@ const getImportData = async(offset, pageSize)=>{
       }}
     ).then(response=>{
         console.log(response);
-        console.log("Response --",response.data);
-        return "done";
+        console.log("Response --",response.data.content);
+        return response.data.content;
     }).catch(error =>{
         return "Something went wrong...";
         //  console.log(error);
