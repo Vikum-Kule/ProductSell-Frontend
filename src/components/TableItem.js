@@ -7,6 +7,9 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import IconButton from '@mui/material/IconButton';
 
 function TableItem({columns, rows, page, setPage, rowsPerPage, setRowsPerPage}) {
     
@@ -19,6 +22,8 @@ function TableItem({columns, rows, page, setPage, rowsPerPage, setRowsPerPage}) 
       setRowsPerPage(+event.target.value);
       setPage(0);
     };
+
+    const [open, setOpen] = React.useState(false);
   
     return (
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
@@ -26,6 +31,9 @@ function TableItem({columns, rows, page, setPage, rowsPerPage, setRowsPerPage}) 
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
+                  <TableCell>
+                  </TableCell>
+                  
                 {columns.map((column) => (
                   <TableCell
                     key={column.id}
@@ -42,11 +50,20 @@ function TableItem({columns, rows, page, setPage, rowsPerPage, setRowsPerPage}) 
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row) => {
                   return (
-                    <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
+                    <TableRow  hover role="checkbox" tabIndex={-1} key={row.code}>
+                      <TableCell>
+                        <IconButton
+                          aria-label="expand row"
+                          size="small"
+                          onClick={() => setOpen(!open)}
+                        >
+                          {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                        </IconButton>
+                      </TableCell>
                       {columns.map((column) => {
                         const value = row[column.id];
                         return (
-                          <TableCell key={column.id} align={column.align}>
+                          <TableCell key={column.id} align={column.align}  onClick={() => console.log(row.im_id)}>
                             {column.format && typeof value === 'number'
                               ? column.format(value)
                               : value}
