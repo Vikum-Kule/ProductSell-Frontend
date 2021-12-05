@@ -4,7 +4,7 @@ import { Grid, Paper, Avatar, TextField, Button, Stack, Typography, Link } from 
 import { makeStyles } from '@mui/styles';
 import LockIcon from '@mui/icons-material/Lock';
 import { pink } from '@mui/material/colors';
-import Validation from './Validation';
+import Validation from '../Validation/Validation';
 import {userLogin} from '../services/Auth';
 import { useHistory } from 'react-router';
 // import { Link } from 'react-router-dom';

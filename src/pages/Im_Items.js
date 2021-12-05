@@ -1,9 +1,10 @@
-import { Divider, Grid, IconButton, InputBase, Paper } from '@mui/material';
+import { Button, Divider, Grid, IconButton, InputBase, Paper } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import TableItem from '../components/TableItem';
 import React, {useEffect} from 'react'
 import {getImportData} from '../services/Import';
+import ImportFrom from '../components/ImportFrom';
 
 
 const useStyles = makeStyles({
@@ -14,26 +15,27 @@ const useStyles = makeStyles({
   });
 
   
-
+// import items all functionalties..
 function Im_Items() {
     const classes = useStyles();
     useEffect(async () => {
+      //get import items data when page loading...
       let importSet = await getImportData(0,10);
         const newSet = []
         
         for(let x=0; x< importSet.length; x++){
           let category_list = importSet[x].im_category;
-          if(category_list){
-            console.log("category--",category_list.category);
-          }  
+          //set data in new set list to display in the table
           newSet.push( createData(importSet[x].itemName, importSet[x].brand, category_list.category, importSet[x].qty, 2));
         }
-        console.log("ImportSet",newSet);
+        // console.log("ImportSet",newSet);
+        // set rows to table
         setRows(newSet);
     }, [])
 
     const [rows, setRows]= React.useState([]);
 
+    //columns for table
     const columns = [
         { id: 'item', label: 'Item', minWidth: 100 },
         { id: 'brand', label: 'Brand', minWidth: 100 },
@@ -57,11 +59,16 @@ function Im_Items() {
 
       const [page, setPage] = React.useState(0);
       const [rowsPerPage, setRowsPerPage] = React.useState(10);
+      const [openForm, setOpenForm]= React.useState(true);
+
     return (
         
             <Paper className={classes.container} elevation={8}>
+
+              {/* import list or import from */}
+              {openForm ? <ImportFrom/>:
                 <Grid container spacing={5}>
-                    <Grid item>
+                    <Grid item xs={12} sm={9} sx={12}>
                           <Paper
                             component="form"
                             sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 400 }}
@@ -76,11 +83,15 @@ function Im_Items() {
                             </IconButton>
                         </Paper>
                     </Grid>
+                    <Grid item xs={12} sm={3} sx={12}>
+                      <Button variant="contained">Add Import</Button>
+                    </Grid>
                     <Grid item xs={12} sm={12} sx={12}>
                         <TableItem columns={columns} rows={rows} page={page} setPage={setPage} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage}/>
                     </Grid>
 
                 </Grid>
+              }
             </Paper>
     )
 }
