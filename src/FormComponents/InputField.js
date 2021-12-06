@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import {FormValidation} from '../Validation/FormValidation';
 import { TextField } from '@mui/material';
 
-function InputField({params,value,inputProps, isRequired, label, type, placeholder, validators, defaultValue, onChange}) {
+function InputField({multiline,value,inputProps, isRequired, label, type, placeholder, validators, defaultValue, onChange}) {
 
     const [error, setError] = useState(false);
 
@@ -16,8 +16,8 @@ function InputField({params,value,inputProps, isRequired, label, type, placehold
     return (
         <div className="form-group">
             <TextField
+                multiline={multiline}
                 fullWidth
-                inputProps={inputProps? inputProps : null }
                 required= {isRequired}
                 value = {value}
                 type={type}
@@ -40,6 +40,7 @@ InputField.propTypes = {
     validators: PropTypes.array,
     onChange: PropTypes.func.isRequired,
     isRequired: PropTypes.bool,
+    multiline: PropTypes.bool,
     inputProps: PropTypes.array
 
 }
@@ -51,6 +52,7 @@ InputField.defaultProps ={
     placeholder: '',
     validators: [],
     isRequired: false,
+    multiline: false,
     inputProps: []
 }
 

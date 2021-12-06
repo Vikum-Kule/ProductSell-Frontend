@@ -59,14 +59,14 @@ function Im_Items() {
 
       const [page, setPage] = React.useState(0);
       const [rowsPerPage, setRowsPerPage] = React.useState(10);
-      const [openForm, setOpenForm]= React.useState(true);
+      const [openForm, setOpenForm]= React.useState(false);
 
     return (
         
             <Paper className={classes.container} elevation={8}>
 
               {/* import list or import from */}
-              {openForm ? <ImportFrom/>:
+              {openForm ? <ImportFrom setOpenForm={setOpenForm} />:
                 <Grid container spacing={5}>
                     <Grid item xs={12} sm={9} sx={12}>
                           <Paper
@@ -84,7 +84,12 @@ function Im_Items() {
                         </Paper>
                     </Grid>
                     <Grid item xs={12} sm={3} sx={12}>
-                      <Button variant="contained">Add Import</Button>
+                      <Button 
+                        variant="contained" 
+                        onClick={()=>{setOpenForm(true)}}
+                      >
+                        Add Import
+                      </Button>
                     </Grid>
                     <Grid item xs={12} sm={12} sx={12}>
                         <TableItem columns={columns} rows={rows} page={page} setPage={setPage} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage}/>

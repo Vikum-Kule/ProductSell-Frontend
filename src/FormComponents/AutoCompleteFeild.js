@@ -5,17 +5,17 @@ import PropTypes from 'prop-types'
 // const filter = createFilterOptions();
 
 
-function AutoCompleteFeild({key,value, label, dataSet ,onChange, onClick}) {
+function AutoCompleteFeild({name, key, _key, value, label, dataSet ,onchange, onClick}) {
 
     const [error, setError] = useState(false);
     // const[value, setValue]= useState('');
     
 
-    const handleChange =(event) =>{
-         const {value} = event.target;
-        //  setError(FormValidation(validators,value));
-         onChange(value);
-    }
+    // const handleChange =(event) =>{
+    //      const {value} = event.target;
+    //     //  setError(FormValidation(validators,value));
+    //      onChange(event);
+    // }
     const handleClick=(event)=>{
         onClick();
     }
@@ -28,21 +28,27 @@ function AutoCompleteFeild({key,value, label, dataSet ,onChange, onClick}) {
                 size="small"
                 fullWidth
                 value={value}
-                // onChange={(event, newValue) => {
+                onChange={(event, newValue) => {
                 // setValue(newValue || "");
-                // handleChange(event);
-                // }}
-                onChange={handleChange}
+                onchange(name, newValue || "");
+                }}
+                // onChange={handleChange(newValue)}
                 inputValue={value}
-                // onInputChange={(event, newInputValue) => {
+                onInputChange={(event, newInputValue) => {
                 // setValue(newInputValue);
-                // handleChange(event);
-                // }}
-                onInputChange={handleChange}
+                onchange(name, newInputValue)
+                }}
+                // onInputChange={handleChange}
                 id="controllable-states-demo"
-                options={ Array.from(dataSet).map( i =>i.itemName) }
-                sx={{ width: 800 }}
-                renderInput={(params) => <TextField fullWidth onClick={handleClick} {...params} label={label} />}
+                options={ Array.from(dataSet).map( i =>i[_key]).filter((value, index, self) => self.indexOf(value) === index) }
+                
+                renderInput={(params) => <TextField
+                    fullWidth 
+                    name={name}
+                    onClick={handleClick} 
+                    {...params} 
+                    label={label} />}
+                    key={key}
             />
         </div>
     )
@@ -50,13 +56,14 @@ function AutoCompleteFeild({key,value, label, dataSet ,onChange, onClick}) {
 
 
 AutoCompleteFeild.propTypes = {
-    key:  PropTypes.string.isRequired,
+    _key:  PropTypes.string.isRequired,
     value: PropTypes.string,
+    name: PropTypes.string,
     label: PropTypes.string,
-    // type: PropTypes.string,
+    key: PropTypes.string,
     // placeholder: PropTypes.string,
     // validators: PropTypes.array,
-    onChange: PropTypes.func.isRequired,
+    onchange: PropTypes.func.isRequired,
     dataSet: PropTypes.array
     // isRequired: PropTypes.bool,
     // inputProps: PropTypes.array
@@ -67,7 +74,7 @@ AutoCompleteFeild.defaultProps ={
     value: '',
     dataSet:[],
     label: '',
-    // type: 'text',
+    name: ''
     // placeholder: '',
     // validators: [],
     // isRequired: false,
