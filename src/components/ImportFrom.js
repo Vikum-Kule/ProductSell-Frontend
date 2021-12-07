@@ -2,7 +2,7 @@ import { Autocomplete, Button, CircularProgress, Grid, IconButton, Paper, TextFi
 import React, { Fragment, useState } from 'react'
 import AutoCompleteFeild from '../FormComponents/AutoCompleteFeild';
 import InputField from '../FormComponents/InputField'
-import { getAllCategories, getAllImportData } from '../services/Import';
+import { getAllCategories, getAllImportData, submitNewImportItem } from '../services/Import';
 import { Validators } from '../Validation/FormValidation';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import Divider from '@mui/material/Divider';
@@ -61,18 +61,65 @@ function ImportFrom({setOpenForm}) {
     }
 
     //set error
-    const submitValue=() =>{
+    const submitValue= async() =>{
         setError(Validation(value));
+        if(!error._importName && !error._importQty && !error._importUnitType && !error._importMCategory && !error._importBrand){
+            console.log('Submit');
+        
+            for(let x=1; x<6; x++){
+                if(value["_subCat_"+x]==''){
+                    setValue({
+                        ...value,
+                        ["_subCat_"+x]: '-',
+                    });         
+                }
+            }
+            console.log(value._subCat_1.trim(), value._subCat_2.trim(), value._subCat_3.trim(), value._subCat_4.trim(), value._subCat_5.trim());
+            // if(value._subCat_1===''){
+            //     setValue({
+            //         ...value,
+            //         ["_subCat_1"]: '-',
+            //     });
+            // }
+            // if(value._subCat_2===''){
+            //     setValue({
+            //         ...value,
+            //         ["_subCat_2"]: '-',
+            //     });
+            // }
+            // if(value._subCat_3===''){
+            //     setValue({
+            //         ...value,
+            //         ["_subCat_3"]: '-',
+            //     });
+            // }
+            // if(value._subCat_4===''){
+            //     setValue({
+            //         ...value,
+            //         ["_subCat_4"]: '-',
+            //     });
+            // }
+            // if(value._subCat_5===''){
+            //     setValue({
+            //         ...value,
+            //         ["_subCat_5"]: '-',
+            //     });
+            // }
+
+            await submitNewImportItem(value);
+        }
     }
 
     //for import itens 
     const[itemSet, setItem]= useState([]);
     //to handle changing value
     const handleChange =(name, val)=>{
+        console.log(name, val);
         setValue({
             ...value,
             [name]: val,
         });
+        
     }
 
     //to create sub category feilds dynamically
@@ -82,12 +129,16 @@ function ImportFrom({setOpenForm}) {
         if(counter!= 5){
             setCounter(counter + 1);
         }
-        
-        console.log(counter);
+        console.log(value._subCat_2);
       };
 
     const removeSubCategory=()=>{
         setCounter(counter - 1);
+        setValue({
+            ...value,
+            ["_subCat_"+(counter)]: '',
+        });
+        console.log(counter);
     }
 
     //load import data when click on input feild
@@ -163,9 +214,9 @@ function ImportFrom({setOpenForm}) {
                                 <Grid item xs={12} sm={9} sx={12} >
                                     <AutoCompleteFeild
                                         key={counter} 
-                                        name={"subCat_"+(index+1)}
+                                        name={"_subCat_"+(index+1)}
                                         _key={"subCat_"+(index+1)}
-                                        value={value["subCat_"+(index+1)]} 
+                                        value={value["_subCat_"+(index+1)]} 
                                         dataSet={categories}
                                         label={"Subcategory "+(index+1)}
                                         onClick={loadData} 

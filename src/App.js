@@ -10,6 +10,7 @@ import Template  from './components/Template';
 import Home from './pages/Home';
 import ImItems from './pages/Im_Items';
 import Export from './pages/Export';
+import Im_Categories from './pages/Im_Categories';
 
 const theme = createTheme({
 
@@ -32,6 +33,9 @@ function App() {
                 </Route>
                 <Route path="/template/im_items">
                   <ImItems/>
+                </Route>
+                <Route path="/template/im_categories">
+                  <Im_Categories/>
                 </Route>
                 <Route path="/template/export">
                   <Export/>
