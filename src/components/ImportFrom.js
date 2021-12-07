@@ -2,12 +2,15 @@ import { Autocomplete, Button, CircularProgress, Grid, IconButton, Paper, TextFi
 import React, { Fragment, useState } from 'react'
 import AutoCompleteFeild from '../FormComponents/AutoCompleteFeild';
 import InputField from '../FormComponents/InputField'
-import { getAllImportData } from '../services/Import';
+import { getAllCategories, getAllImportData } from '../services/Import';
 import { Validators } from '../Validation/FormValidation';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import Divider from '@mui/material/Divider';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import CloseIcon from '@mui/icons-material/Close';
+import RestartAltOutlinedIcon from '@mui/icons-material/RestartAltOutlined';
+import {FormValidation} from '../Validation/FormValidation';
+import Validation from '../Validation/Validation';
 
 function ImportFrom({setOpenForm}) {
     //for input feild values
@@ -25,12 +28,47 @@ function ImportFrom({setOpenForm}) {
         _importNote:''
 
     });
+
+    //Reset values
+    const resetValues=()=>{
+        setValue({
+            _importName:'',
+            _importBrand:'',
+            _importMCategory:'',
+            _subCat_1:'',
+            _subCat_2:'',
+            _subCat_3:'',
+            _subCat_4:'',
+            _subCat_5:'',
+            _importQty:0,
+            _importUnitType:'',
+            _importNote:''
+        })
+    }
+
+    // errors for inputfeild
+    const[error, setError] = useState({
+        _importName: '',
+        _importBrand:'',
+        _importMCategory:'',
+        _importQty:'',
+        _importUnitType:'',
+    });
+
+    //reset errors...
+    const resetErrors=() =>{
+        setError({});
+    }
+
+    //set error
+    const submitValue=() =>{
+        setError(Validation(value));
+    }
+
     //for import itens 
     const[itemSet, setItem]= useState([]);
     //to handle changing value
     const handleChange =(name, val)=>{
-
-        console.log(name, val)
         setValue({
             ...value,
             [name]: val,
@@ -51,20 +89,23 @@ function ImportFrom({setOpenForm}) {
     const removeSubCategory=()=>{
         setCounter(counter - 1);
     }
-    
-    // const [values, setLabel]= useState({
-    //     subCat_1:'',
-    //     subCat_2:'',
-    //     subCat_3:'',
-    //     subCat_4:'',
-    //     subCat_5:''
-    // });
 
     //load import data when click on input feild
     const loadData=async()=>{
+        resetErrors();
         let importSet = await getAllImportData();
         console.log("array items",importSet);
         setItem(importSet);
+    }
+
+
+    const [categories, setCategory]= useState([])
+    //load category set..
+    const loadCategories= async() =>{
+        resetErrors();
+        let categroySet = await getAllCategories();
+        console.log(categroySet)
+        setCategory(categroySet)
     }
 
 
@@ -91,7 +132,8 @@ function ImportFrom({setOpenForm}) {
                         dataSet={itemSet}
                         label="Import Name"
                         onClick={loadData} 
-                        onchange={(event, newInputValue) => handleChange(event, newInputValue)}  />
+                        errorMsg={error._importName}
+                        onchange={(event, newInputValue) =>handleChange(event, newInputValue)}  />
                 </Grid>
                 <Grid item xs={12} sm={9} sx={12}>
                     <AutoCompleteFeild 
@@ -100,18 +142,20 @@ function ImportFrom({setOpenForm}) {
                         value={value._importBrand} 
                         dataSet={itemSet}
                         label="Brand"
+                        errorMsg={error._importBrand}
                         onClick={loadData} 
                         onchange={(event, newInputValue) => handleChange(event, newInputValue)}  />
                 </Grid>
                 <Grid item xs={12} sm={9} sx={12}>
                     <AutoCompleteFeild 
-                        _key="brand"
+                        _key="category"
                         name="_importMCategory"
                         value={value._importMCategory} 
-                        dataSet={itemSet}
+                        dataSet={categories}
                         label="Main Category"
-                        onClick={loadData} 
-                        onChange={(e) => handleChange(e)}  />
+                        onClick={loadCategories} 
+                        errorMsg={error._importMCategory}
+                        onchange={(event, newInputValue) => handleChange(event, newInputValue)}  />
                 </Grid>
                 {Array.from(Array(counter)).map((c, index) => {
                     
@@ -120,12 +164,13 @@ function ImportFrom({setOpenForm}) {
                                     <AutoCompleteFeild
                                         key={counter} 
                                         name={"subCat_"+(index+1)}
-                                        _key="brand"
+                                        _key={"subCat_"+(index+1)}
                                         value={value["subCat_"+(index+1)]} 
-                                        dataSet={itemSet}
+                                        dataSet={categories}
                                         label={"Subcategory "+(index+1)}
                                         onClick={loadData} 
-                                        onChange={(e) => handleChange(e)}  />
+                                        errorMsg={''}
+                                        onchange={(event, newInputValue) => handleChange(event, newInputValue)}  />
                                 </Grid>
                                 <Grid item xs={12} sm={1} sx={12}>
                                     <Tooltip title="Remove">
@@ -153,37 +198,55 @@ function ImportFrom({setOpenForm}) {
                 </Grid>
                 <Grid item item xs={12} sm={3} sx={12}>
                     <InputField
+                        name="_importQty"
+                        errorMsg={error._importQty}
                         value={value._importQty} 
-                        onChange={(e) => handleChange(e)} 
+                        onChange={(event, newInputValue) => handleChange(event, newInputValue)} 
                         type="number" 
                         label="Qty"
                         validators={[
-                            {check: Validators.required}
+                            {check: Validators.required},
+                            {check: Validators.number}
                         ]} />
                 </Grid>
-                <Grid item item xs={12} sm={3} sx={12}>
-                    <AutoCompleteFeild 
-                        _key="brand"
+                <Grid item xs={12} sm={3} sx={12}>
+                    <AutoCompleteFeild
+                        name="_importUnitType" 
+                        _key="unitType"
                         value={value._importUnitType} 
                         dataSet={itemSet}
                         label={"Unit type"}
-                        onClick={loadData} 
-                        onChange={(e) => handleChange(e)}  />
+                        onClick={loadData}
+                        errorMsg={error._importUnitType} 
+                        onchange={(event, newInputValue) => handleChange(event, newInputValue)}  />
                 </Grid>
                 <Grid item xs={12} sm={9} sx={12}>
                     <InputField
+                        name="_importNote"
                         value={value._importNote} 
-                        onChange={(e) => handleChange(e)} 
+                        onChange={(event, newInputValue) => handleChange(event, newInputValue)} 
                         type="number" 
                         label="Note"
                         multiline={true}
                          />
                 </Grid>
-                <Grid item xs={12} sm={4} sx={12}>
-                    <Button variant="outlined">Submit</Button>
-                </Grid>
-                <Grid item xs={12} sm={3} sx={12}>
-                    <Button variant="outlined">Reset</Button>
+                <Grid item xs={12} sm={12} sx={12}>
+                        <Grid container justifyContent="space-between" >
+                        <Grid item xs={12} sm={4} sx={12}>
+                            <Button 
+                                fullWidth 
+                                variant="contained"
+                                onClick={submitValue}
+                                >
+                                Submit</Button>
+                        </Grid>
+                        <Grid item xs={12} sm={1} sx={12}>
+                            <Button 
+                             onClick={resetValues}
+                             variant="outlined"
+                             >Reset</Button>
+                        </Grid>
+                        </Grid>
                 </Grid>
 
             </Grid>
