@@ -13,7 +13,7 @@ const useStyles = makeStyles({
   
   });
 
-function Im_Categories() {
+function Im_Bill() {
     const classes = useStyles();
 
     const [rows, setRows]= React.useState([]);
@@ -53,45 +53,11 @@ function Im_Categories() {
 
     //columns for table
     const columns = [
-        { id: 'category', label: 'Category', minWidth: 100 },
-        { id: 'subCat_1', label: 'Tag 1', minWidth: 100 },
-        {
-          id: 'subCat_1',
-          label: 'Tag 2',
-          minWidth: 100,
-          format: (value) => value.toLocaleString('en-US'),
-        },
-        {
-          id: 'subCat_2',
-          label: 'Tag 2',
-          minWidth: 100,
-          format: (value) => value.toLocaleString('en-US'),
-        },
-        {
-            id: 'subCat_3',
-            label: 'Tag 3',
-            minWidth: 100,
-            format: (value) => value.toLocaleString('en-US'),
-        },
-        {
-            id: 'subCat_4',
-            label: 'Tag 4',
-            minWidth: 100,
-            format: (value) => value.toLocaleString('en-US'),
-        },
-        {
-            id: 'subCat_5',
-            label: 'Tag 5',
-            minWidth: 100,
-            format: (value) => value.toLocaleString('en-US'),
-        },
-        {
-            id: 'count',
-            label: 'Item Count',
-            minWidth: 100,
-            format: (value) => value.toLocaleString('en-US'),
-          },
-
+        { id: 'bill_num', label: 'Bill No.', minWidth: 100 },
+        { id: 'added_by', label: 'Added By', minWidth: 100 },
+        { id: 'date', label: 'Date', minWidth: 100 },
+        { id: 'shop', label: 'Shop', minWidth: 100 },
+        
       ];
 
       //Drop down list for table
@@ -109,7 +75,7 @@ function Im_Categories() {
             {openForm? <Im_CategoryForm setOpenForm={setOpenForm}/> :
                 <Grid container spacing={4}>
                 <Grid item xs={12} sm={11} sx={12}>
-                    <Typography mt={1} variant="h6"> Categories </Typography>
+                    <Typography mt={1} variant="h6"> Import Bills </Typography>
                 </Grid>
                 <Grid item xs={12} sm={9} sx={12}>
                           <Paper
@@ -119,7 +85,7 @@ function Im_Categories() {
                             >
                             <InputBase
                                 sx={{ ml: 1, flex: 1 }}
-                                placeholder="Search items"
+                                placeholder="Search Bills"
                                 inputProps={{ 'aria-label': 'search google maps' }}
                             />
                             <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
@@ -132,10 +98,21 @@ function Im_Categories() {
                         variant="contained" 
                         onClick={()=>{setOpenForm(true)}}
                       >
-                        Add Category
+                        Add New Bill
                       </Button>
                     </Grid>
-                <Grid item xs={12} sm={12} sx={12}>
+                <Grid item xs={12} sm={6} sx={12}>
+                    <TableItem
+                        popUpList={popUpList} 
+                        dropDown={false}
+                        columns={columns} 
+                        rows={rows} 
+                        page={page} 
+                        setPage={setPage} 
+                        rowsPerPage={rowsPerPage} 
+                        setRowsPerPage={setRowsPerPage}/>
+                </Grid>
+                <Grid item xs={12} sm={6} sx={12}>
                     <TableItem
                         popUpList={popUpList} 
                         dropDown={false}
@@ -153,4 +130,4 @@ function Im_Categories() {
     )
 }
 
-export default Im_Categories
+export default Im_Bill

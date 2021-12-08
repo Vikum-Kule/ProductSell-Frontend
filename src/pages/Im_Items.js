@@ -1,4 +1,4 @@
-import { Button, Divider, Grid, IconButton, InputBase, Paper } from '@mui/material';
+import { Button, Divider, Grid, IconButton, InputBase, Paper, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import TableItem from '../components/TableItem';
@@ -68,8 +68,12 @@ function Im_Items() {
               {/* import list or import from */}
               {openForm ? <ImportFrom setOpenForm={setOpenForm} />:
                 <Grid container spacing={5}>
+                    <Grid item xs={12} sm={11} sx={12}>
+                      <Typography mt={1} variant="h6"> Import Items </Typography>
+                    </Grid>
                     <Grid item xs={12} sm={9} sx={12}>
                           <Paper
+                            variant="outlined" 
                             component="form"
                             sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 400 }}
                             >

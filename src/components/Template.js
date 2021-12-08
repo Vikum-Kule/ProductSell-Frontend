@@ -213,7 +213,7 @@ function Template({children}) {
                 </ListItemButton>
                 <ListItemButton sx={{ pl: 4 }}
                   selected={selectedIndex==4}
-                  onClick={(event) => handleListItemClick(event, 4,"/template/im_items")}
+                  onClick={(event) => handleListItemClick(event, 4,"/template/im_bills")}
                 >
                   <ListItemIcon>
                     {/* <StarBorder /> */}

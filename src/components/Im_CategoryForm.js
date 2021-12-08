@@ -1,58 +1,43 @@
-import { Autocomplete, Button, CircularProgress, Grid, IconButton, Paper, TextField, Tooltip, Typography } from '@mui/material'
+import Validation from '../Validation/Validation';
 import React, { Fragment, useState } from 'react'
-import AutoCompleteFeild from '../FormComponents/AutoCompleteFeild';
 import InputField from '../FormComponents/InputField'
-import { getAllCategories, getAllImportData, submitNewImportItem } from '../services/Import';
+import { getAllCategories, submitNewImportItem } from '../services/Import';
 import { Validators } from '../Validation/FormValidation';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import Divider from '@mui/material/Divider';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import CloseIcon from '@mui/icons-material/Close';
-import RestartAltOutlinedIcon from '@mui/icons-material/RestartAltOutlined';
-import {FormValidation} from '../Validation/FormValidation';
-import Validation from '../Validation/Validation';
+import { Button, Grid, IconButton, Tooltip, Typography } from '@mui/material';
+import AutoCompleteFeild from '../FormComponents/AutoCompleteFeild';
 
-function ImportFrom({setOpenForm}) {
+function Im_CategoryForm({setOpenForm}) {
     //for input feild values
-    const[value, setValue]= useState({
-        _importName:'',
-        _importBrand:'',
+    const[values, setValues]= useState({
+        
         _importMCategory:'',
         _subCat_1:'',
         _subCat_2:'',
         _subCat_3:'',
         _subCat_4:'',
-        _subCat_5:'',
-        _importQty:0,
-        _importUnitType:'',
-        _importNote:''
+        _subCat_5:''
 
     });
 
     //Reset values
     const resetValues=()=>{
-        setValue({
-            _importName:'',
-            _importBrand:'',
+        setValues({
             _importMCategory:'',
             _subCat_1:'',
             _subCat_2:'',
             _subCat_3:'',
             _subCat_4:'',
-            _subCat_5:'',
-            _importQty:0,
-            _importUnitType:'',
-            _importNote:''
+            _subCat_5:''
         })
     }
 
     // errors for inputfeild
     const[error, setError] = useState({
-        _importName: '',
-        _importBrand:'',
         _importMCategory:'',
-        _importQty:'',
-        _importUnitType:'',
     });
 
     //reset errors...
@@ -62,16 +47,16 @@ function ImportFrom({setOpenForm}) {
 
     //set error
     const submitValue= async() =>{
-        setError(Validation(value));
-        if(!error._importName && !error._importQty && !error._importUnitType && !error._importMCategory && !error._importBrand){
+        setError(Validation(values));
+        if(!error._importMCategory){
             console.log('Submit');
         
-            let data = {...value};
+            let data = {...values};
             for(let x=1; x<6; x++){
-                if(value["_subCat_"+x]==''){
+                if(values["_subCat_"+x]==''){
                     data["_subCat_"+x] = '-';  
                 }else{
-                    data["_subCat_"+x] = value["_subCat_"+x];  
+                    data["_subCat_"+x] = values["_subCat_"+x];  
                 }
             }
 
@@ -79,13 +64,11 @@ function ImportFrom({setOpenForm}) {
         }
     }
 
-    //for import itens 
-    const[itemSet, setItem]= useState([]);
     //to handle changing value
     const handleChange =(name, val)=>{
         console.log(name, val);
-        setValue({
-            ...value,
+        setValues({
+            ...values,
             [name]: val,
         });
         
@@ -98,26 +81,17 @@ function ImportFrom({setOpenForm}) {
         if(counter!= 5){
             setCounter(counter + 1);
         }
-        console.log(value._subCat_2);
+        console.log(values._subCat_2);
       };
 
     const removeSubCategory=()=>{
         setCounter(counter - 1);
-        setValue({
-            ...value,
+        setValues({
+            ...values,
             ["_subCat_"+(counter)]: '',
         });
         console.log(counter);
     }
-
-    //load import data when click on input feild
-    const loadData=async()=>{
-        resetErrors();
-        let importSet = await getAllImportData();
-        console.log("array items",importSet);
-        setItem(importSet);
-    }
-
 
     const [categories, setCategory]= useState([])
     //load category set..
@@ -128,11 +102,10 @@ function ImportFrom({setOpenForm}) {
         setCategory(categroySet)
     }
 
-
     return (
             <Grid container spacing={2}>
                 <Grid item xs={12} sm={11} sx={12}>
-                    <Typography mt={1} variant="h6"> Add Import Item </Typography>
+                    <Typography mt={1} variant="h6"> Add Import Category </Typography>
                 </Grid>
                 <Grid item xs={12} sm={1} sx={12}>
                 <Tooltip title="Close"> 
@@ -146,31 +119,9 @@ function ImportFrom({setOpenForm}) {
                 </Grid>
                 <Grid item xs={12} sm={9} sx={12}>
                     <AutoCompleteFeild 
-                        name="_importName"
-                        _key="itemName"
-                        value={value._importName} 
-                        dataSet={itemSet}
-                        label="Import Name"
-                        onClick={loadData} 
-                        errorMsg={error._importName}
-                        onchange={(event, newInputValue) =>handleChange(event, newInputValue)}  />
-                </Grid>
-                <Grid item xs={12} sm={9} sx={12}>
-                    <AutoCompleteFeild 
-                        name="_importBrand"
-                        _key="brand"
-                        value={value._importBrand} 
-                        dataSet={itemSet}
-                        label="Brand"
-                        errorMsg={error._importBrand}
-                        onClick={loadData} 
-                        onchange={(event, newInputValue) => handleChange(event, newInputValue)}  />
-                </Grid>
-                <Grid item xs={12} sm={9} sx={12}>
-                    <AutoCompleteFeild 
                         _key="category"
                         name="_importMCategory"
-                        value={value._importMCategory} 
+                        value={values._importMCategory} 
                         dataSet={categories}
                         label="Main Category"
                         onClick={loadCategories} 
@@ -185,10 +136,10 @@ function ImportFrom({setOpenForm}) {
                                         key={counter} 
                                         name={"_subCat_"+(index+1)}
                                         _key={"subCat_"+(index+1)}
-                                        value={value["_subCat_"+(index+1)]} 
+                                        value={values["_subCat_"+(index+1)]} 
                                         dataSet={categories}
                                         label={"Subcategory "+(index+1)}
-                                        onClick={loadData} 
+                                        onClick={loadCategories} 
                                         errorMsg={''}
                                         onchange={(event, newInputValue) => handleChange(event, newInputValue)}  />
                                 </Grid>
@@ -216,40 +167,6 @@ function ImportFrom({setOpenForm}) {
                     </IconButton>
                 </Tooltip>
                 </Grid>
-                <Grid item item xs={12} sm={3} sx={12}>
-                    <InputField
-                        name="_importQty"
-                        errorMsg={error._importQty}
-                        value={value._importQty} 
-                        onChange={(event, newInputValue) => handleChange(event, newInputValue)} 
-                        type="number" 
-                        label="Qty"
-                        validators={[
-                            {check: Validators.required},
-                            {check: Validators.number}
-                        ]} />
-                </Grid>
-                <Grid item xs={12} sm={3} sx={12}>
-                    <AutoCompleteFeild
-                        name="_importUnitType" 
-                        _key="unitType"
-                        value={value._importUnitType} 
-                        dataSet={itemSet}
-                        label={"Unit type"}
-                        onClick={loadData}
-                        errorMsg={error._importUnitType} 
-                        onchange={(event, newInputValue) => handleChange(event, newInputValue)}  />
-                </Grid>
-                <Grid item xs={12} sm={9} sx={12}>
-                    <InputField
-                        name="_importNote"
-                        value={value._importNote} 
-                        onChange={(event, newInputValue) => handleChange(event, newInputValue)} 
-                        type="number" 
-                        label="Note"
-                        multiline={true}
-                         />
-                </Grid>
                 <Grid item xs={12} sm={12} sx={12}>
                         <Grid container justifyContent="space-between" >
                         <Grid item xs={12} sm={4} sx={12}>
@@ -273,4 +190,4 @@ function ImportFrom({setOpenForm}) {
     )
 }
 
-export default ImportFrom
+export default Im_CategoryForm

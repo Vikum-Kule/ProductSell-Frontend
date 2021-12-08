@@ -78,6 +78,7 @@ const submitNewImportItem= async(values)=>{
     let checkedCategory= await checkCategory(values);
 }
 
+//check category availability
 const checkCategory= async(values)=>{
     console.log(values._subCat_4.trim());
 
@@ -107,4 +108,28 @@ const checkCategory= async(values)=>{
     });
 }
 
-export {getImportData, getAllImportData, getAllCategories, submitNewImportItem};
+//get import category data with pagination
+const getImportCategoryData = async (offset, pageSize)=>{
+    let token = getToken();
+    return axios.get("/api/import/category/all/"+ offset +"/"+pageSize,
+    {
+        headers: { 
+            "Content-Type": "application/json",
+            "Authorization": "Bearer "+token
+      }}
+    ).then(response=>{
+        console.log(response);
+        console.log("Response --",response.data.content);
+        return response.data.content;
+    }).catch(error =>{
+        return "Something went wrong...";
+        //  console.log(error);
+        // if (error.response.statuscode == 403) {
+        //     console.log(error);
+        // } else {
+        //   console.log("something else");
+        // }
+    });
+}
+
+export {getImportData, getAllImportData, getAllCategories, submitNewImportItem, getImportCategoryData};
