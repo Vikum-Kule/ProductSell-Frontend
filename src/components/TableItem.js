@@ -71,7 +71,7 @@ const PopUp = ({openPopup, anchorEl, handleClose, popUpList})=>{
 }
 
 
-function TableItem({dropDown, columns, rows, page, setPage, rowsPerPage, setRowsPerPage, popUpList}) {
+function TableItem({dropDown, tablePagin, columns, rows, page, setPage, rowsPerPage, setRowsPerPage, popUpList}) {
 
   const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -162,7 +162,7 @@ function TableItem({dropDown, columns, rows, page, setPage, rowsPerPage, setRows
                 })}
             </TableBody>
           </Table>
-           {openPopup?
+           {openPopup && popUpList?
               <PopUp 
                 popUpList={popUpList}
                 openPopup={openPopup} 
@@ -171,15 +171,16 @@ function TableItem({dropDown, columns, rows, page, setPage, rowsPerPage, setRows
                 />: null
             }
         </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[10, 25, 100]}
-          component="div"
-          count={rows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
+        {tablePagin?
+          <TablePagination
+            rowsPerPageOptions={[10, 25, 100]}
+            component="div"
+            count={rows.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />: null}
       </Paper>
     );
 }

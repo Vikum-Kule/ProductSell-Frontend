@@ -142,6 +142,7 @@ function Im_Categories() {
                         columns={columns} 
                         rows={rows} 
                         page={page} 
+                        tablePagin={true}
                         setPage={setPage} 
                         rowsPerPage={rowsPerPage} 
                         setRowsPerPage={setRowsPerPage}/>

@@ -96,7 +96,14 @@ function Im_Items() {
                       </Button>
                     </Grid>
                     <Grid item xs={12} sm={12} sx={12}>
-                        <TableItem columns={columns} rows={rows} page={page} setPage={setPage} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage}/>
+                        <TableItem 
+                          columns={columns} 
+                          rows={rows} 
+                          page={page} 
+                          setPage={setPage} 
+                          rowsPerPage={rowsPerPage}
+                          tablePagin={true} 
+                          setRowsPerPage={setRowsPerPage}/>
                     </Grid>
 
                 </Grid>
