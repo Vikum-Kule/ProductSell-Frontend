@@ -174,7 +174,28 @@ const getImportBillById = async (bill_id)=>{
     });
 }
 
+const getAllBills = async ()=>{
+    let token = getToken();
+    return axios.get("/api/import/bill/all",
+    {
+        headers: { 
+            "Content-Type": "application/json",
+            "Authorization": "Bearer "+token
+      }}
+    ).then(response=>{
+        console.log(response);
+        console.log("Response --",response.data);
+        return response.data;
+    }).catch(error =>{
+        return "Something went wrong...";
+        
+    });
+}
+
 export {getImportData, 
     getAllImportData, 
     getAllCategories, 
-    submitNewImportItem, getImportCategoryData, getImportBillData, getImportBillById};
+    submitNewImportItem, 
+    getImportCategoryData,
+    getAllBills, 
+    getImportBillData, getImportBillById};
