@@ -15,7 +15,7 @@ import { List, ListItem, ListItemButton, ListItemText, Popover } from '@mui/mate
 
 
 
-const PopUp = ({openPopup, anchorEl, handleClose, popUpList})=>{
+const PopUp = ({openPopup, anchorEl, handleClose, popUpList, selectedRow})=>{
   return (
     <div>
       {/* <Button aria-describedby={id} variant="contained" onClick={handleClick}>
@@ -36,34 +36,15 @@ const PopUp = ({openPopup, anchorEl, handleClose, popUpList})=>{
             {popUpList.map((items) => {
                 return (
                   <ListItem disablePadding>
-                  <ListItemButton>
+                  <ListItemButton
+                    onClick={(e)=>items.func(selectedRow)}
+                  >
                     <ListItemText primary={items.label} />
                   </ListItemButton>
                 </ListItem>
-                            // <TableCell 
-                            //   key={column.id} 
-                            //   align={column.align}  
-                            //   onClick={handleClick}>
-                            //   {column.format && typeof value === 'number'
-                            //     ? column.format(value)
-                            //     : value}
-                            // </TableCell>
-                            
                 );
             })}
             </List>
-          {/* <List>
-            <ListItem disablePadding>
-              <ListItemButton>
-                <ListItemText primary="Trash" />
-              </ListItemButton>
-            </ListItem>
-            <ListItem disablePadding>
-              <ListItemButton component="a" href="#simple-list">
-                <ListItemText primary="Spam" />
-              </ListItemButton>
-            </ListItem>
-          </List> */}
         </nav>
       </Popover>
     </div>
@@ -71,19 +52,31 @@ const PopUp = ({openPopup, anchorEl, handleClose, popUpList})=>{
 }
 
 
-function TableItem({dropDown, tablePagin, columns, rows, page, setPage, rowsPerPage, setRowsPerPage, popUpList}) {
+function TableItem({dropDown, 
+  tablePagin, 
+  columns, 
+  rows,
+  getRow, 
+  page, setPage, rowsPerPage, setRowsPerPage, popUpList}) {
 
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [selectedRow, setSelectRow]= React.useState(null);
 
-  const handleClick = (event) => {
+  const handleClick =(event, row) => {
+    console.log(row);
     if(popUpList){
       setOpenpopup(true);
       setAnchorEl(event.currentTarget);
+      setSelectRow(row);
     }
+    else{
+      getRow(row);
+    } 
     
   };
 
   const handleClose = () => {
+    
     if(popUpList){
       setOpenpopup(false);
       setAnchorEl(null);
@@ -105,7 +98,7 @@ function TableItem({dropDown, tablePagin, columns, rows, page, setPage, rowsPerP
     const [openPopup, setOpenpopup] = React.useState(false);
   
     return (
-      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+      <Paper elevation={3} sx={{ width: '100%', overflow: 'hidden' }}>
         <TableContainer sx={{ maxHeight: 440 }}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
@@ -128,7 +121,7 @@ function TableItem({dropDown, tablePagin, columns, rows, page, setPage, rowsPerP
             <TableBody>
               {rows
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row) => {
+                .map((row,index) => {
                   return (
                     <TableRow  hover role="checkbox" tabIndex={-1} key={row.code}>
                       {dropDown?
@@ -144,12 +137,13 @@ function TableItem({dropDown, tablePagin, columns, rows, page, setPage, rowsPerP
                       }
                       {columns.map((column) => {
                         const value = row[column.id];
+                        const selected = row;
                         return (
                           
                             <TableCell 
                               key={column.id} 
                               align={column.align}  
-                              onClick={handleClick}>
+                              onClick={(event)=>{handleClick(event, row)}}>
                               {column.format && typeof value === 'number'
                                 ? column.format(value)
                                 : value}
@@ -164,6 +158,7 @@ function TableItem({dropDown, tablePagin, columns, rows, page, setPage, rowsPerP
           </Table>
            {openPopup && popUpList?
               <PopUp 
+                selectedRow={selectedRow}
                 popUpList={popUpList}
                 openPopup={openPopup} 
                 anchorEl={anchorEl} 

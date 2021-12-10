@@ -154,10 +154,27 @@ const getImportBillData = async (offset, pageSize)=>{
         //   console.log("something else");
         // }
     });
+}
 
+const getImportBillById = async (bill_id)=>{
+    let token = getToken();
+    return axios.get("/api/import/bill/find/"+ bill_id,
+    {
+        headers: { 
+            "Content-Type": "application/json",
+            "Authorization": "Bearer "+token
+      }}
+    ).then(response=>{
+        console.log(response);
+        console.log("Response --",response.data);
+        return response.data;
+    }).catch(error =>{
+        return "Something went wrong...";
+        
+    });
 }
 
 export {getImportData, 
     getAllImportData, 
     getAllCategories, 
-    submitNewImportItem, getImportCategoryData, getImportBillData};
+    submitNewImportItem, getImportCategoryData, getImportBillData, getImportBillById};

@@ -5,6 +5,8 @@ import TableItem from '../components/TableItem';
 import React, {useEffect} from 'react'
 import {getImportData} from '../services/Import';
 import ImportFrom from '../components/ImportFrom';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 
 const useStyles = makeStyles({
@@ -19,6 +21,7 @@ const useStyles = makeStyles({
 function Im_Items() {
     const classes = useStyles();
     useEffect(async () => {
+      setLoading(true);
       //get import items data when page loading...
       let importSet = await getImportData(0,10);
         const newSet = []
@@ -31,9 +34,11 @@ function Im_Items() {
         // console.log("ImportSet",newSet);
         // set rows to table
         setRows(newSet);
+        setLoading(false);
     }, [])
 
     const [rows, setRows]= React.useState([]);
+    const [isLoading, setLoading]= React.useState(false);
 
     //columns for table
     const columns = [
@@ -96,14 +101,20 @@ function Im_Items() {
                       </Button>
                     </Grid>
                     <Grid item xs={12} sm={12} sx={12}>
-                        <TableItem 
-                          columns={columns} 
-                          rows={rows} 
-                          page={page} 
-                          setPage={setPage} 
-                          rowsPerPage={rowsPerPage}
-                          tablePagin={true} 
-                          setRowsPerPage={setRowsPerPage}/>
+                    {isLoading?
+                      <Box sx={{ display: 'flex' , justifyContent: 'center'}}>
+                      <CircularProgress />
+                    </Box>:
+                    <TableItem 
+                      columns={columns} 
+                      rows={rows} 
+                      page={page} 
+                      setPage={setPage} 
+                      rowsPerPage={rowsPerPage}
+                      tablePagin={true} 
+                      setRowsPerPage={setRowsPerPage}/>
+                    }
+                        
                     </Grid>
 
                 </Grid>

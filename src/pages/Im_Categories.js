@@ -6,6 +6,8 @@ import TableItem from '../components/TableItem';
 import { getImportCategoryData } from '../services/Import';
 import SearchIcon from '@mui/icons-material/Search';
 import Im_CategoryForm from '../components/Im_CategoryForm';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 const useStyles = makeStyles({
     container:{
         padding:"10px"
@@ -20,8 +22,11 @@ function Im_Categories() {
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [openForm, setOpenForm]= React.useState(false);
+    const [isLoading, setLoading]= React.useState(false);
 
     useEffect(async () => {
+        // set loading
+        setLoading(true);
         //get import Categories data when page loading...
         let categorySet = await getImportCategoryData(0,10);
           const newSet = []
@@ -44,6 +49,7 @@ function Im_Categories() {
           // console.log("ImportSet",newSet);
           // set rows to table
           setRows(newSet);
+          setLoading(false);
       }, [])
 
       //creating data for rows according to Id
@@ -94,11 +100,15 @@ function Im_Categories() {
 
       ];
 
+    const myFunc =(row)=>{
+      console.log("My func", row);
+    }
+
       //Drop down list for table
     const popUpList = [
-        { id: 1, label: 'View Items' },
-        { id: 2, label: 'Edit' },
-        { id: 3, label: 'Delete' },
+        { id: 1, label: 'View Items', func: myFunc},
+        { id: 2, label: 'Edit', func: myFunc },
+        { id: 3, label: 'Delete', func: myFunc },
         
 
       ];
@@ -136,16 +146,22 @@ function Im_Categories() {
                       </Button>
                     </Grid>
                 <Grid item xs={12} sm={12} sx={12}>
+                    {isLoading?
+                      <Box sx={{ display: 'flex' , justifyContent: 'center'}}>
+                      <CircularProgress />
+                    </Box>:
                     <TableItem
-                        popUpList={popUpList} 
-                        dropDown={false}
-                        columns={columns} 
-                        rows={rows} 
-                        page={page} 
-                        tablePagin={true}
-                        setPage={setPage} 
-                        rowsPerPage={rowsPerPage} 
-                        setRowsPerPage={setRowsPerPage}/>
+                      popUpList={popUpList} 
+                      dropDown={false}
+                      columns={columns} 
+                      rows={rows} 
+                      page={page} 
+                      tablePagin={true}
+                      setPage={setPage} 
+                      rowsPerPage={rowsPerPage} 
+                      setRowsPerPage={setRowsPerPage}/>
+                    }
+                    
                 </Grid>
             </Grid>
             }
