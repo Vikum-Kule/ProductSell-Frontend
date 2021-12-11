@@ -6,6 +6,8 @@ import AutoCompleteFeild from '../FormComponents/AutoCompleteFeild';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import { Box } from '@mui/system';
 import InputField from '../FormComponents/InputField'
+import SelectingTable from '../FormComponents/SelectingTable';
+import {getImportData} from '../services/Import';
 
 
 const style = {
@@ -13,7 +15,7 @@ const style = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    // width: 400,
+    // height: 400,
     bgcolor: 'background.paper',
     // border: '2px solid #000',
     boxShadow: 24,
@@ -46,7 +48,7 @@ function Im_addBill({setOpenForm}) {
     const[bills, setBills]= useState([]);
 
     // set open table
-    const [openTable, setOpenTable]= useState(true);
+    const [openTable, setOpenTable]= useState(false);
 
     // errors for inputfeild
     const[error, setError] = useState({
@@ -63,12 +65,81 @@ function Im_addBill({setOpenForm}) {
         
     }
 
-    const handleOpenTable=()=>{
+        //columns for table
+            // const columns = [
+            //     { id: 'item', label: 'Item', minWidth: 100 },
+            //     { id: 'brand', label: 'Brand', minWidth: 100 },
+            //     {
+            //     id: 'category_m',
+            //     label: 'Main Category',
+            //     minWidth: 100,
+            //     format: (value) => value.toLocaleString('en-US'),
+            //     },
+            //     {
+            //     id: 'qty',
+            //     label: 'Qty',
+            //     minWidth: 100,
+            //     format: (value) => value.toLocaleString('en-US'),
+            //     },
+            // ];
+
+        const columns = [
+        {
+            id: 'item',
+            numeric: false,
+            disablePadding: true,
+            label: 'Item',
+        },
+        {
+            id: 'brand',
+            numeric: false,
+            disablePadding: true,
+            label: 'Brand',
+        },
+        {
+            id: 'category_m',
+            numeric: false,
+            disablePadding: true,
+            label: 'Main Category',
+        },
+        {
+            id: 'qty',
+            numeric: true,
+            disablePadding: true,
+            label: 'Qty',
+        },
+        ];
+
+      function createData( item, brand, category_m, qty, im_id) {
+        return {  item, brand, category_m, qty, im_id };
+      }
+
+      const [page, setPage] = React.useState(0);
+      const [rowsPerPage, setRowsPerPage] = React.useState(10);
+      const [rows, setRows]= React.useState([]);
+      const [selectedItems, setSelectedItems]= React.useState([]);
+
+
+    const handleOpenTable=async()=>{
         setOpenTable(true);
+        //get import items data when page loading...
+        let importSet = await getImportData(0,10);
+        const newSet = []
+        
+        for(let x=0; x< importSet.length; x++){
+            let category_list = importSet[x].im_category;
+            console.log(category_list);
+            //set data in new set list to display in the table
+            newSet.push( createData(importSet[x].itemName, importSet[x].brand, category_list.category, importSet[x].qty, importSet[x].importId));
+        }
+        // console.log("ImportSet",newSet);
+        // set rows to table
+        setRows(newSet);
     }
 
     const handleCloseTable=()=>{
         setOpenTable(false);
+        console.log("selectedItems", selectedItems);
     }
 
     return (
@@ -128,12 +199,19 @@ function Im_addBill({setOpenForm}) {
                         aria-describedby="keep-mounted-modal-description"
                     >
                         <Paper  sx={style} >
-                        <Typography id="keep-mounted-modal-title" variant="h6" component="h2">
-                            Text in a modal
-                        </Typography>
-                        <Typography id="keep-mounted-modal-description" sx={{ mt: 2 }}>
-                            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-                        </Typography>
+                            <SelectingTable
+                                page={page} 
+                                setPage={setPage} 
+                                rowsPerPage={rowsPerPage}
+                                setRowsPerPage={setRowsPerPage}
+                                title="Bill Items"
+                                columns={columns} 
+                                rows={rows} 
+                                setSelected={setSelectedItems}
+                                selected={selectedItems}
+                                _key="im_id"
+                                setOpenTable={setOpenTable}
+                            />
                         </Paper>
                     </Modal>
             </Grid>
