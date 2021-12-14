@@ -111,7 +111,7 @@ function Template({children}) {
       <AppBar style={{backgroundColor:"#2f3c66"}} position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
           <Typography variant="h6" noWrap component="div">
-            Clipped drawer
+            Business 
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>

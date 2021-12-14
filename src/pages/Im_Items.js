@@ -112,7 +112,8 @@ function Im_Items() {
                       setPage={setPage} 
                       rowsPerPage={rowsPerPage}
                       tablePagin={true} 
-                      setRowsPerPage={setRowsPerPage}/>
+                      setRowsPerPage={setRowsPerPage}
+                      />
                     }
                         
                     </Grid>

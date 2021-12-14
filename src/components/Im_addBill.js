@@ -1,4 +1,4 @@
-import { Divider, Grid, IconButton, Modal, Paper, Tooltip, Typography } from '@mui/material'
+import { Button, Divider, Grid, IconButton, Modal, Paper, TextField, Tooltip, Typography } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close';
 import React, { useState } from 'react'
 import { getAllBills } from '../services/Import';
@@ -8,6 +8,8 @@ import { Box } from '@mui/system';
 import InputField from '../FormComponents/InputField'
 import SelectingTable from '../FormComponents/SelectingTable';
 import {getImportData} from '../services/Import';
+import TableItem from './TableItem';
+import WritableTable from './WritableTable';
 
 
 const style = {
@@ -33,14 +35,20 @@ function Im_addBill({setOpenForm}) {
      //for input feild values
      const[values, setValues]= useState({
         _billNo:'',
-        _shop:''
+        _shop:'',
+        _discount:0.00,
+        _total:0.00,
+        _billNote:''
     });
 
     //Reset values
     const resetValues=()=>{
         setValues({
             _billNo:'',
-            _shop:''
+            _shop:'',
+            _discount:0.00,
+            _total:0.00,
+            _billNote:''
         })
     }
 
@@ -110,20 +118,39 @@ function Im_addBill({setOpenForm}) {
         },
         ];
 
+    
+         //columns for selected table
+    const selectedColumns = [
+        { id: 'item', label: 'Item', minWidth: 100, editable: false },
+        { id: 'brand', label: 'Brand', minWidth: 100, editable: false },
+        {id: 'category_m', label: 'Main category', minWidth: 100 , editable: false},
+        {id: 'qty', label: 'Qty', minWidth: 100, editable: true, type:'number', isDecimal: false},
+        {id: 'unitType', label: 'Unit', minWidth: 100, editable: false},
+        {id: 'discountPerItem', label: 'Discount', minWidth: 100, editable: true, type:'number', isDecimal: true},
+        {id: 'price', label: 'Price', minWidth: 100, editable: true, type:'number', isDecimal: true}
+      ];
+   
+
       function createData( item, brand, category_m, qty, im_id) {
         return {  item, brand, category_m, qty, im_id };
       }
+
 
       const [page, setPage] = React.useState(0);
       const [rowsPerPage, setRowsPerPage] = React.useState(10);
       const [rows, setRows]= React.useState([]);
       const [selectedItems, setSelectedItems]= React.useState([]);
-
+      const [selectedRows, setSelectedRows]= React.useState();
+      const [importMainSet, setMainItems] = React.useState();
+      //just hard coded...
+      const [writeable_page, set_writeable_Page] = React.useState(0);
+      const [writeable_rowsPerPage, set_writeable_RowsPerPage] = React.useState(100);
 
     const handleOpenTable=async()=>{
         setOpenTable(true);
         //get import items data when page loading...
         let importSet = await getImportData(0,10);
+        setMainItems(importSet);
         const newSet = []
         
         for(let x=0; x< importSet.length; x++){
@@ -139,9 +166,28 @@ function Im_addBill({setOpenForm}) {
 
     const handleCloseTable=()=>{
         setOpenTable(false);
+        const selectedArray=[];
         console.log("selectedItems", selectedItems);
+        for(let x=0; x<selectedItems.length; x++ ){
+            for(let y=0; y<importMainSet.length; y++ ){
+                console.log("rows", importMainSet[y]);
+                if(selectedItems[x]===importMainSet[y].importId){
+
+                    selectedArray.push(createDataForSelectedTable(importMainSet[y].itemName,
+                        importMainSet[y].brand, "category", 0,importMainSet[y].unitType, 0.00, 0.00, importMainSet[y].importId ));
+                }
+            }
+        }
+        console.log("selectedArray", selectedArray);
+        setSelectedRows(selectedArray);
+        console.log("Selected Rows", selectedRows);
     }
 
+    function createDataForSelectedTable( item, brand, category_m, qty,unitType, discountPerItem, price, im_id) {
+        return {  item, brand, category_m, qty,unitType, discountPerItem, price, im_id };
+      }
+
+    
     return (
         <Grid container spacing={2}>
             <Grid item xs={12} sm={11} sx={12}>
@@ -165,6 +211,7 @@ function Im_addBill({setOpenForm}) {
                         onChange={(event, newInputValue) => handleChange(event, newInputValue)} 
                         type="text" 
                         label="Bill Number" />
+                        
             </Grid>
             <Grid item xs={12} sm={9} sx={12}>
                     <AutoCompleteFeild 
@@ -177,7 +224,7 @@ function Im_addBill({setOpenForm}) {
                         errorMsg={error._shop}
                         onchange={(event, newInputValue) => handleChange(event, newInputValue)}  />
             </Grid>
-            <Grid item xs={12} sm={9} sx={12} sx={{ mt: 2}}> 
+            <Grid item xs={12} sm={9} sx={12} sx={{ mt: 2}} > 
                 <Divider variant="middle" />
             </Grid>
             <Grid item xs={12} sm={3} sx={12}>
@@ -190,6 +237,72 @@ function Im_addBill({setOpenForm}) {
                     </IconButton>
                 </Tooltip>
             </Grid>
+            <Grid item xs={12} sm={12} sx={12} >
+                {/* selected table */}
+                {selectedRows?
+                    <WritableTable
+                        columns={selectedColumns} 
+                        rows={selectedRows}
+                        setRows={setRows} 
+                        page={writeable_page} 
+                        setPage={set_writeable_Page} 
+                        rowsPerPage={writeable_rowsPerPage}
+                        tablePagin={false} 
+                        setRowsPerPage={set_writeable_RowsPerPage}
+                        />: null
+                }
+                
+            </Grid>
+            <Grid item xs={12} sm={3} sx={12}>
+                    <InputField
+                        name="_discount"
+                        value={values._discount} 
+                        onChange={(event, newInputValue) => handleChange(event, newInputValue)} 
+                        type="text" 
+                        label="Discount" />
+            </Grid>
+            <Grid item xs={12} sm={9} sx={12}></Grid>
+            <Grid item xs={12} sm={1} sx={12}>
+                <Typography variant="subtitle2" gutterBottom component="div">Total :</Typography>
+            </Grid>
+            <Grid item xs={12} sm={3} sx={12}>
+                <InputField
+                        name="_total"
+                        value={values._total} 
+                        onChange={(event, newInputValue) => handleChange(event, newInputValue)} 
+                        type="text" 
+                        label="Total" />
+
+                {/* <Typography variant="subtitle2" gutterBottom component="div">{values._total}</Typography> */}
+            </Grid>
+            <Grid item xs={12} sm={9} sx={12}>
+                    <InputField
+                        name="_billNote"
+                        value={values._billNote} 
+                        // onChange={(event, newInputValue) => handleChange(event, newInputValue)} 
+                        type="text" 
+                        label="Note"
+                        multiline={true}
+                         />
+                </Grid>
+            <Grid item xs={12} sm={12} sx={12}>
+                        <Grid container justifyContent="space-between" >
+                        <Grid item xs={12} sm={4} sx={12}>
+                            <Button 
+                                fullWidth 
+                                variant="contained"
+                                // onClick={submitValue}
+                                >
+                                Submit</Button>
+                        </Grid>
+                        <Grid item xs={12} sm={1} sx={12}>
+                            <Button 
+                             onClick={resetValues}
+                             variant="outlined"
+                             >Reset</Button>
+                        </Grid>
+                        </Grid>
+                </Grid>
             <Grid item xs={12} sm={9} sx={12} sx={{ mt: 2}}>    
                     <Modal
                         keepMounted
@@ -215,9 +328,7 @@ function Im_addBill({setOpenForm}) {
                         </Paper>
                     </Modal>
             </Grid>
-            {/* <Grid container>
-                
-            </Grid> */}
+            
             
         </Grid>
     )

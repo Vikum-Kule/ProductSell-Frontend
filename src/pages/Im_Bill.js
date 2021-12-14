@@ -1,4 +1,4 @@
-import { Button, Grid, IconButton, InputBase, Paper, Typography } from '@mui/material'
+import { Button, Grid, IconButton, InputBase, Modal, Paper, Typography } from '@mui/material'
 import { typography } from '@mui/system'
 import React, { useEffect } from 'react'
 import { makeStyles } from '@mui/styles';
@@ -15,6 +15,18 @@ const useStyles = makeStyles({
     }
   
   });
+
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    // height: 400,
+    bgcolor: 'background.paper',
+    // border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+  };
 
 function Im_Bill() {
     const classes = useStyles();
@@ -55,8 +67,8 @@ function Im_Bill() {
       }
 
       //creating data for selected bill items
-      function createDataForBillItems( item, qty, discount, price) {        
-        return {  item, qty, discount, price};
+      function createDataForBillItems( item, MCategory, tag_1, tag_2, tag_3, tag_4, tag_5, qty, discount, price) {        
+        return {  item, MCategory, tag_1, tag_2, tag_3, tag_4, tag_5, qty, discount, price};
       }
 
     //columns for table
@@ -69,6 +81,12 @@ function Im_Bill() {
       ];
     const columns_bill_view = [
         { id: 'item', label: 'Item', minWidth: 200 },
+        { id: 'MCategory', label: 'Category', minWidth: 50 },
+        { id: 'tag_1', label: 'Tag 1', minWidth: 50 },
+        { id: 'tag_2', label: 'Tag 2', minWidth: 50 },
+        { id: 'tag_3', label: 'Tag 3', minWidth: 50 },
+        { id: 'tag_4', label: 'Tag 4', minWidth: 50 },
+        { id: 'tag_5', label: 'Tag 5', minWidth: 50 },
         { id: 'qty', label: 'qty', minWidth: 30 },
         { id: 'discount', label: 'discount', minWidth: 30 },
         { id: 'price', label: 'price', minWidth: 30 },
@@ -91,6 +109,7 @@ function Im_Bill() {
         console.log("Selected Row", Row);
         let bill_data = await getImportBillById(Row.billId);
         let billItemSet = bill_data.import_billItems;
+        console.log("billItemSet", billItemSet);
         setBill(bill_data);
         const newSet = []
         for(let x=0; x< billItemSet.length; x++){
@@ -112,6 +131,10 @@ function Im_Bill() {
     const[slectedBill, setBill]= React.useState(null);
 
     const[selectedBillItems, setBillItems ] = React.useState(null);
+
+    const handleCloseTable=()=>{
+      setBill(null);
+  }
 
 
     return (
@@ -145,7 +168,7 @@ function Im_Bill() {
                         Add New Bill
                       </Button>
                     </Grid>
-                <Grid item xs={12} sm={6} sx={12}>
+                <Grid item xs={12} sm={12} sx={12}>
                   {billLoading?
                     <Box sx={{ display: 'flex' , justifyContent: 'center'}}>
                       <CircularProgress />
@@ -164,55 +187,61 @@ function Im_Bill() {
                   }
                     
                 </Grid>
-                <Grid item xs={12} sm={6} sx={12}>
-                  <Paper variant="outlined" className={classes.container}>
-                    {slectedBill?
+                <Modal
+                        keepMounted
+                        open={slectedBill}
+                        onClose={handleCloseTable}
+                        aria-labelledby="keep-mounted-modal-title"
+                        aria-describedby="keep-mounted-modal-description"
+                    >
+                        <Paper  sx={style} >
+                        {slectedBill?
                       <Grid>
                       {itemLoading?
                         <Box sx={{ display: 'flex' , justifyContent: 'center'}}>
                           <CircularProgress />
                         </Box>:
                         <Grid container> 
-                          <Grid item xs={12} sm={6} sx={12}>
+                          <Grid item xs={12} sm={2} sx={12}>
                             <Typography variant="subtitle2" gutterBottom component="div">Bill No :</Typography>
                           </Grid>
-                          <Grid item xs={12} sm={6} sx={12}>
+                          <Grid item xs={12} sm={10} sx={12}>
                             <Typography variant="subtitle2" gutterBottom component="div">{slectedBill.billNo}</Typography>
                           </Grid>
-                          <Grid item xs={12} sm={6} sx={12}>
+                          <Grid item xs={12} sm={2} sx={12}>
                             <Typography variant="subtitle2" gutterBottom component="div">Shop :</Typography>
                           </Grid>
-                          <Grid item xs={12} sm={6} sx={12}>
+                          <Grid item xs={12} sm={10} sx={12}>
                             <Typography variant="subtitle2" gutterBottom component="div">{slectedBill.shop}</Typography>
                           </Grid>
-                          <Grid item xs={12} sm={6} sx={12}>
+                          <Grid item xs={12} sm={2} sx={12}>
                             <Typography variant="subtitle2" gutterBottom component="div">Date :</Typography>
                           </Grid>
-                          <Grid item xs={12} sm={6} sx={12}>
+                          <Grid item xs={12} sm={10} sx={12}>
                             <Typography variant="subtitle2" gutterBottom component="div">{slectedBill.createdDate}</Typography>
                           </Grid>
-                          <Grid item xs={12} sm={6} sx={12}>
+                          <Grid item xs={12} sm={2} sx={12}>
                             <Typography variant="subtitle2" gutterBottom component="div">Added By :</Typography>
                           </Grid>
-                          <Grid item xs={12} sm={6} sx={12}>
+                          <Grid item xs={12} sm={10} sx={12}>
                             <Typography variant="subtitle2" gutterBottom component="div">{slectedBill.addedBy}</Typography>
                           </Grid>
-                          <Grid item xs={12} sm={6} sx={12}>
+                          <Grid item xs={12} sm={2} sx={12}>
                             <Typography variant="subtitle2" gutterBottom component="div">Payment Status</Typography>
                           </Grid>
-                          <Grid item xs={12} sm={6} sx={12}>
+                          <Grid item xs={12} sm={10} sx={12}>
                             <Typography variant="subtitle2" gutterBottom component="div"></Typography>
                           </Grid>
-                          <Grid item xs={12} sm={6} sx={12}>
+                          <Grid item xs={12} sm={2} sx={12}>
                             <Typography variant="subtitle2" gutterBottom component="div">discount:</Typography>
                           </Grid>
-                          <Grid item xs={12} sm={6} sx={12}>
+                          <Grid item xs={12} sm={10} sx={12}>
                             <Typography variant="subtitle2" gutterBottom component="div">{slectedBill.discount}</Typography>
                           </Grid>
-                          <Grid item xs={12} sm={6} sx={12}>
+                          <Grid item xs={12} sm={2} sx={12}>
                             <Typography variant="subtitle2" gutterBottom component="div">Total: </Typography>
                           </Grid>
-                          <Grid item xs={12} sm={6} sx={12}>
+                          <Grid item xs={12} sm={10} sx={12}>
                             <Typography variant="subtitle2" gutterBottom component="div">{slectedBill.total}</Typography>
                           </Grid>
                             <Grid item xs={12} sm={12} sx={12}>
@@ -234,63 +263,8 @@ function Im_Bill() {
                       
                       </Grid>:<Typography > Not selected bill</Typography>
                     }
-                    {/* <Grid container>
-                    <Grid item xs={12} sm={6} sx={12}>
-                      <Typography variant="subtitle2" gutterBottom component="div">Bill No :</Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={6} sx={12}>
-                      <Typography variant="subtitle2" gutterBottom component="div"></Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={6} sx={12}>
-                      <Typography variant="subtitle2" gutterBottom component="div">Shop :</Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={6} sx={12}>
-                      <Typography variant="subtitle2" gutterBottom component="div"></Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={6} sx={12}>
-                      <Typography variant="subtitle2" gutterBottom component="div">Date :</Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={6} sx={12}>
-                      <Typography variant="subtitle2" gutterBottom component="div"></Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={6} sx={12}>
-                      <Typography variant="subtitle2" gutterBottom component="div">Added By :</Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={6} sx={12}>
-                      <Typography variant="subtitle2" gutterBottom component="div"></Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={6} sx={12}>
-                      <Typography variant="subtitle2" gutterBottom component="div">Payment Status</Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={6} sx={12}>
-                      <Typography variant="subtitle2" gutterBottom component="div"></Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={6} sx={12}>
-                      <Typography variant="subtitle2" gutterBottom component="div">discount:</Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={6} sx={12}>
-                      <Typography variant="subtitle2" gutterBottom component="div"></Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={6} sx={12}>
-                      <Typography variant="subtitle2" gutterBottom component="div">Total: </Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={6} sx={12}>
-                      <Typography variant="subtitle2" gutterBottom component="div"></Typography>
-                    </Grid>
-                      <Grid item xs={12} sm={12} sx={12}>
-                        <TableItem
-                            dropDown={false}
-                            columns={columns_bill_view} 
-                            rows={rows} 
-                            page={page} 
-                            tablePagin={false}
-                            setPage={setPage} 
-                            rowsPerPage={rowsPerPage} 
-                            setRowsPerPage={setRowsPerPage}/>
-                      </Grid>
-                    </Grid>     */}
-                  </Paper>
-                </Grid>
+                        </Paper>
+                    </Modal>
             </Grid>
             }
             
