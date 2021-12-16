@@ -2,7 +2,7 @@ import { Autocomplete, Button, CircularProgress, Grid, IconButton, Paper, TextFi
 import React, { Fragment, useState } from 'react'
 import AutoCompleteFeild from '../FormComponents/AutoCompleteFeild';
 import InputField from '../FormComponents/InputField'
-import { getAllCategories, getAllImportData, submitNewImportItem } from '../services/Import';
+import { getAllCategories, getAllImportData, checkCategory } from '../services/Import';
 import { Validators } from '../Validation/FormValidation';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import Divider from '@mui/material/Divider';
@@ -25,6 +25,7 @@ function ImportFrom({setOpenForm}) {
         _subCat_5:'',
         _importQty:0,
         _importUnitType:'',
+        _minRate:0,
         _importNote:''
 
     });
@@ -42,6 +43,7 @@ function ImportFrom({setOpenForm}) {
             _subCat_5:'',
             _importQty:0,
             _importUnitType:'',
+            _minRate:0,
             _importNote:''
         })
     }
@@ -75,7 +77,8 @@ function ImportFrom({setOpenForm}) {
                 }
             }
 
-            await submitNewImportItem(data);
+            let result = await checkCategory(data);
+            console.log("result", result);
         }
     }
 
@@ -239,6 +242,15 @@ function ImportFrom({setOpenForm}) {
                         onClick={loadData}
                         errorMsg={error._importUnitType} 
                         onchange={(event, newInputValue) => handleChange(event, newInputValue)}  />
+                </Grid>
+                <Grid item item xs={12} sm={3} sx={12}>
+                    <InputField
+                        name="_minRate"
+                        value={value._importQty} 
+                        onChange={(event, newInputValue) => handleChange(event, newInputValue)} 
+                        type="number" 
+                        label="Minimum Range"
+                         />
                 </Grid>
                 <Grid item xs={12} sm={9} sx={12}>
                     <InputField

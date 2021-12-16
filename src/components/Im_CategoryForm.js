@@ -1,7 +1,7 @@
 import Validation from '../Validation/Validation';
 import React, { Fragment, useState } from 'react'
 import InputField from '../FormComponents/InputField'
-import { getAllCategories, submitNewImportItem } from '../services/Import';
+import { getAllCategories} from '../services/Import';
 import { Validators } from '../Validation/FormValidation';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import Divider from '@mui/material/Divider';
@@ -60,7 +60,7 @@ function Im_CategoryForm({setOpenForm}) {
                 }
             }
 
-            await submitNewImportItem(data);
+            // await submitNewImportItem(data);
         }
     }
 

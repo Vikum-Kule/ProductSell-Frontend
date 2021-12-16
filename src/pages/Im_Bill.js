@@ -109,14 +109,21 @@ function Im_Bill() {
         console.log("Selected Row", Row);
         let bill_data = await getImportBillById(Row.billId);
         let billItemSet = bill_data.import_billItems;
-        console.log("billItemSet", billItemSet);
+        
         setBill(bill_data);
         const newSet = []
         for(let x=0; x< billItemSet.length; x++){
             // let splitDate = billSet[x].createdDate.split("T");
-
+            let categorySet = billItemSet[x].imports.im_category;
+            console.log("categorySet", billItemSet[x].imports.im_category);
             newSet.push( createDataForBillItems(
               billItemSet[x].itemName+" : "+ billItemSet[x].brand,
+              categorySet.category, 
+              categorySet.subCat_1,
+              categorySet.subCat_2, 
+              categorySet.subCat_3, 
+              categorySet.subCat_4, 
+              categorySet.subCat_5,
               billItemSet[x].bill_qty+" "+billItemSet[x].unitType,
               billItemSet[x].discount_perItem,
               billItemSet[x].price

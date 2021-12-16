@@ -74,9 +74,9 @@ const getAllCategories = async ()=>{
     });
 }
 
-const submitNewImportItem= async(values)=>{
-    let checkedCategory= await checkCategory(values);
-}
+// const submitNewImportItem= async(values)=>{
+//     let checkedCategory= await checkCategory(values);
+// }
 
 //check category availability
 const checkCategory= async(values)=>{
@@ -90,6 +90,77 @@ const checkCategory= async(values)=>{
         "subCat_3": values._subCat_3.trim(),
         "subCat_4": values._subCat_4.trim(),
         "subCat_5": values._subCat_5.trim()
+    },
+    {
+        headers: { 
+            "Content-Type": "application/json",
+            "Authorization": "Bearer "+token
+      }}
+    ).then( async response=>{
+        console.log(response.data);
+        if(response.data.ifExist){
+           let isExistItem =  await checkItem(values, response.data.category.cat_id);
+           if(!isExistItem){
+               let responseSubmit= await addIm_Item(values, response.data.category.cat_id);
+               if(responseSubmit === "Something went wrong..."){
+                   return "Something went wrong...";
+               }
+               else{
+                   return responseSubmit;
+               } 
+           }
+           else{
+               return "Item already exist"
+           }
+        }else{
+
+        }
+        
+    })
+    .catch(error =>{
+        // return error.response.data.message.toString;
+         console.log(error.response.status );
+         return "Something went wrong...";
+    });
+}
+
+//check the item availability
+const checkItem= async(values, catId)=>{
+    let token = getToken();
+    return axios.post("/api/import/check",{
+        
+            "itemName":values._importName,
+            "brand":values._importBrand,
+            "catId": catId
+    },
+    {
+        headers: { 
+            "Content-Type": "application/json",
+            "Authorization": "Bearer "+token
+      }}
+    ).then( async response=>{
+        console.log(response);
+        // setUserSession(response.data.token, response.data.user)
+        
+    })
+    .catch(error =>{
+        // return error.response.data.message.toString;
+         console.log(error.response.status );
+         return "Something went wrong...";
+    });
+}
+
+//create import item
+const addIm_Item = async(values, catId)=>{
+    let token = getToken();
+    return axios.post("/api/import/add/category/"+catId,{
+        
+        "itemName":values._importName,
+        "unitType":values._importUnitType,
+        "qty":values._importQty,
+        "refillRate":values._minRate,
+        "brand":values._importBrand,
+        "note":values._importNote
     },
     {
         headers: { 
@@ -195,7 +266,7 @@ const getAllBills = async ()=>{
 export {getImportData, 
     getAllImportData, 
     getAllCategories, 
-    submitNewImportItem, 
+    checkCategory, 
     getImportCategoryData,
     getAllBills, 
     getImportBillData, getImportBillById};

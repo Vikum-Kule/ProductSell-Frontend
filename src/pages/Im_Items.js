@@ -28,8 +28,17 @@ function Im_Items() {
         
         for(let x=0; x< importSet.length; x++){
           let category_list = importSet[x].im_category;
+          console.log("category_list", category_list)
           //set data in new set list to display in the table
-          newSet.push( createData(importSet[x].itemName, importSet[x].brand, category_list.category, importSet[x].qty, 2));
+          newSet.push( createData(importSet[x].itemName, 
+            importSet[x].brand, 
+            category_list.category,
+            category_list.subCat_1,
+            category_list.subCat_2,
+            category_list.subCat_3,
+            category_list.subCat_4,
+            category_list.subCat_5,
+            importSet[x].qty, 2));
         }
         // console.log("ImportSet",newSet);
         // set rows to table
@@ -50,6 +59,11 @@ function Im_Items() {
           minWidth: 100,
           format: (value) => value.toLocaleString('en-US'),
         },
+        { id: 'tag_1', label: 'Tag 1', minWidth: 50 },
+        { id: 'tag_2', label: 'Tag 2', minWidth: 50 },
+        { id: 'tag_3', label: 'Tag 3', minWidth: 50 },
+        { id: 'tag_4', label: 'Tag 4', minWidth: 50 },
+        { id: 'tag_5', label: 'Tag 5', minWidth: 50 },
         {
           id: 'qty',
           label: 'Qty',
@@ -58,8 +72,8 @@ function Im_Items() {
         },
       ];
       
-      function createData( item, brand, category_m, qty, im_id) {
-        return {  item, brand, category_m, qty, im_id };
+      function createData( item, brand, category_m, tag_1, tag_2, tag_3, tag_4, tag_5, qty, im_id) {
+        return {  item, brand, category_m, tag_1, tag_2, tag_3, tag_4, tag_5, qty, im_id };
       }
 
       const [page, setPage] = React.useState(0);
