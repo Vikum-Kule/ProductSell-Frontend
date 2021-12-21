@@ -74,13 +74,37 @@ const getAllCategories = async ()=>{
     });
 }
 
+//get imports by category
+const getImportsByCategory = async (cat_id)=>{
+    let token = getToken();
+    return axios.get("/api/import/find/category/"+cat_id,
+    {
+        headers: { 
+            "Content-Type": "application/json",
+            "Authorization": "Bearer "+token
+      }}
+    ).then(response=>{
+        console.log(response);
+        console.log("Response all--",response.data);
+        return response.data;
+    }).catch(error =>{
+        return "Something went wrong...";
+        //  console.log(error);
+        // if (error.response.statuscode == 403) {
+        //     console.log(error);
+        // } else {
+        //   console.log("something else");
+        // }
+    });
+}
+
 // const submitNewImportItem= async(values)=>{
 //     let checkedCategory= await checkCategory(values);
 // }
 
 //check category availability
 const checkCategory= async(values)=>{
-    console.log(values._subCat_4.trim());
+    console.log("values",values);
 
     let token = getToken();
     return axios.post("/api/import/category/check",{
@@ -97,24 +121,26 @@ const checkCategory= async(values)=>{
             "Authorization": "Bearer "+token
       }}
     ).then( async response=>{
-        console.log(response.data);
-        if(response.data.ifExist){
-           let isExistItem =  await checkItem(values, response.data.category.cat_id);
-           if(!isExistItem){
-               let responseSubmit= await addIm_Item(values, response.data.category.cat_id);
-               if(responseSubmit === "Something went wrong..."){
-                   return "Something went wrong...";
-               }
-               else{
-                   return responseSubmit;
-               } 
-           }
-           else{
-               return "Item already exist"
-           }
-        }else{
+        console.log("Category",response.data);
+        return response.data.ifExist; 
+        // if(response.data.ifExist){
+        //    let isExistItem =  await checkItem(values, response.data.category.cat_id);
+        //    if(!isExistItem){
+        //     //    console.log("isExistItem", isExistItem);
+        //        let responseSubmit= await addIm_Item(values, response.data.category.cat_id);
+        //        if(responseSubmit === "Something went wrong..."){
+        //            return "Something went wrong...";
+        //        }
+        //        else{
+        //            return responseSubmit;
+        //        } 
+        //    }
+        //    else{
+        //        return "Item already exist"
+        //    }
+        // }else{
 
-        }
+        // }
         
     })
     .catch(error =>{
@@ -123,6 +149,35 @@ const checkCategory= async(values)=>{
          return "Something went wrong...";
     });
 }
+
+
+//add new category
+const addNewCategory = async(values)=>{
+    let token = getToken();
+    return axios.post("/api/import/category/add",{
+        "category": values._importMCategory.trim(),
+        "subCat_1": values._subCat_1.trim(),
+        "subCat_2": values._subCat_2.trim(),
+        "subCat_3": values._subCat_3.trim(),
+        "subCat_4": values._subCat_4.trim(),
+        "subCat_5": values._subCat_5.trim()
+    },
+    {
+        headers: { 
+            "Content-Type": "application/json",
+            "Authorization": "Bearer "+token
+      }}
+    ).then( async response=>{
+        console.log("Response",response.data);
+        return response.data; 
+    })
+    .catch(error =>{
+        // return error.response.data.message.toString;
+         console.log(error.response.status );
+         return "Something went wrong...";
+    });
+}
+
 
 //check the item availability
 const checkItem= async(values, catId)=>{
@@ -140,6 +195,7 @@ const checkItem= async(values, catId)=>{
       }}
     ).then( async response=>{
         console.log(response);
+        return response.data;
         // setUserSession(response.data.token, response.data.user)
         
     })
@@ -269,4 +325,4 @@ export {getImportData,
     checkCategory, 
     getImportCategoryData,
     getAllBills, 
-    getImportBillData, getImportBillById};
+    getImportBillData, getImportBillById, getImportsByCategory, addNewCategory};

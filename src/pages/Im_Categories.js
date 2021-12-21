@@ -3,7 +3,7 @@ import { typography } from '@mui/system'
 import React, { useEffect } from 'react'
 import { makeStyles } from '@mui/styles';
 import TableItem from '../components/TableItem';
-import { getImportCategoryData } from '../services/Import';
+import { getImportCategoryData, getImportsByCategory } from '../services/Import';
 import SearchIcon from '@mui/icons-material/Search';
 import Im_CategoryForm from '../components/Im_CategoryForm';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -32,7 +32,7 @@ function Im_Categories() {
           const newSet = []
         console.log(categorySet);
           for(let x=0; x< categorySet.length; x++){
-            let import_list = categorySet[x].imports;
+            let import_list = await getImportsByCategory(categorySet[x].cat_id);
             console.log("Imports ",import_list);
             //set data in new set list to display in the table
             newSet.push( createData(

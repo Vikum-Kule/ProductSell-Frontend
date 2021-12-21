@@ -1,7 +1,7 @@
 import Validation from '../Validation/Validation';
 import React, { Fragment, useState } from 'react'
 import InputField from '../FormComponents/InputField'
-import { getAllCategories} from '../services/Import';
+import { getAllCategories, checkCategory, addNewCategory} from '../services/Import';
 import { Validators } from '../Validation/FormValidation';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import Divider from '@mui/material/Divider';
@@ -9,6 +9,7 @@ import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOut
 import CloseIcon from '@mui/icons-material/Close';
 import { Button, Grid, IconButton, Tooltip, Typography } from '@mui/material';
 import AutoCompleteFeild from '../FormComponents/AutoCompleteFeild';
+import FormAlert from './FormAlert';
 
 function Im_CategoryForm({setOpenForm}) {
     //for input feild values
@@ -25,6 +26,7 @@ function Im_CategoryForm({setOpenForm}) {
 
     //Reset values
     const resetValues=()=>{
+        closeAlert();
         setValues({
             _importMCategory:'',
             _subCat_1:'',
@@ -32,6 +34,23 @@ function Im_CategoryForm({setOpenForm}) {
             _subCat_3:'',
             _subCat_4:'',
             _subCat_5:''
+        })
+    }
+
+    //display alert...
+    const[displayAlert, setAlert] = useState(false);
+
+    //alert data
+    const[alertData, setAlertData] = useState({
+        type:'',
+        message:''
+    });
+
+    const closeAlert = ()=>{
+        setAlert(false);
+        setAlertData({
+            type:'',
+            message:''
         })
     }
 
@@ -60,7 +79,41 @@ function Im_CategoryForm({setOpenForm}) {
                 }
             }
 
-            // await submitNewImportItem(data);
+            // check the category already exist or not
+            let status = await checkCategory(data);
+            console.log("status", status);
+            if(!status){
+                let submitData = await addNewCategory(data);
+                if(submitData){
+                    resetValues();
+                    setAlertData({
+                        type:"success",
+                        message:"Category submitted.."
+                    })
+                    setAlert(true);
+                }else{
+                    setAlertData({
+                        type:"error",
+                        message:"Something went wrong..."
+                    })
+                    setAlert(true);
+                }
+
+            }
+            else if(status){
+                setAlertData({
+                    type:"warning",
+                    message:"Category already exist.."
+                })
+                setAlert(true);
+            }
+            else{
+                setAlertData({
+                    type:"error",
+                    message:"Something went wrong..."
+                })
+                setAlert(true);
+            }
         }
     }
 
@@ -97,6 +150,7 @@ function Im_CategoryForm({setOpenForm}) {
     //load category set..
     const loadCategories= async() =>{
         resetErrors();
+        closeAlert();
         let categroySet = await getAllCategories();
         console.log(categroySet)
         setCategory(categroySet)
@@ -166,6 +220,11 @@ function Im_CategoryForm({setOpenForm}) {
                         <AddCircleOutlineOutlinedIcon fontSize="small" />
                     </IconButton>
                 </Tooltip>
+                </Grid>
+                <Grid item xs={12} sm={12} sx={12}>
+                    {displayAlert?
+                        <FormAlert type={alertData.type} message={alertData.message} />: null
+                    }
                 </Grid>
                 <Grid item xs={12} sm={12} sx={12}>
                         <Grid container justifyContent="space-between" >
