@@ -10,7 +10,7 @@ import TableRow from '@mui/material/TableRow';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import IconButton from '@mui/material/IconButton';
-import { List, ListItem, ListItemButton, ListItemText, Popover } from '@mui/material';
+import { List, ListItem, ListItemButton, ListItemText, Pagination, Popover, Stack } from '@mui/material';
 
 
 
@@ -53,11 +53,9 @@ const PopUp = ({openPopup, anchorEl, handleClose, popUpList, selectedRow})=>{
 
 
 function TableItem({dropDown, 
-  tablePagin, 
   columns, 
   rows,
-  getRow, 
-  page, setPage, rowsPerPage, setRowsPerPage, popUpList}) {
+  getRow,popUpList}) {
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [selectedRow, setSelectRow]= React.useState(null);
@@ -83,17 +81,7 @@ function TableItem({dropDown,
     }
     
   };
-    
   
-    const handleChangePage = (event, newPage) => {
-      setPage(newPage);
-    };
-  
-    const handleChangeRowsPerPage = (event) => {
-      setRowsPerPage(+event.target.value);
-      setPage(0);
-    };
-
     const [open, setOpen] = React.useState(false);
     const [openPopup, setOpenpopup] = React.useState(false);
   
@@ -120,7 +108,7 @@ function TableItem({dropDown,
             </TableHead>
             <TableBody>
               {rows
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row,index) => {
                   return (
                     <TableRow  hover role="checkbox" tabIndex={-1} key={row.code}>
@@ -166,16 +154,7 @@ function TableItem({dropDown,
                 />: null
             }
         </TableContainer>
-        {tablePagin?
-          <TablePagination
-            rowsPerPageOptions={[10, 25, 100]}
-            component="div"
-            count={rows.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />: null}
+ 
       </Paper>
     );
 }

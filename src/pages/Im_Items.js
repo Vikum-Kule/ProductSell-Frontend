@@ -1,9 +1,9 @@
-import { Button, Divider, Grid, IconButton, InputBase, Paper, Typography } from '@mui/material';
+import { Button, Divider, Grid, IconButton, InputBase, Pagination, Paper, Stack, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import TableItem from '../components/TableItem';
 import React, {useEffect} from 'react'
-import {getImportData} from '../services/Import';
+import {getImportData, getAllImportData} from '../services/Import';
 import ImportFrom from '../components/ImportFrom';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
@@ -21,33 +21,15 @@ const useStyles = makeStyles({
 function Im_Items() {
     const classes = useStyles();
     useEffect(async () => {
-      setLoading(true);
-      //get import items data when page loading...
-      let importSet = await getImportData(0,10);
-        const newSet = []
+      
+      fetchData();
         
-        for(let x=0; x< importSet.length; x++){
-          let category_list = importSet[x].im_category;
-          console.log("category_list", category_list)
-          //set data in new set list to display in the table
-          newSet.push( createData(importSet[x].itemName, 
-            importSet[x].brand, 
-            category_list.category,
-            category_list.subCat_1,
-            category_list.subCat_2,
-            category_list.subCat_3,
-            category_list.subCat_4,
-            category_list.subCat_5,
-            importSet[x].qty, 2));
-        }
-        // console.log("ImportSet",newSet);
-        // set rows to table
-        setRows(newSet);
-        setLoading(false);
     }, [])
 
     const [rows, setRows]= React.useState([]);
     const [isLoading, setLoading]= React.useState(false);
+    const [totalRows, setTotalRows] = React.useState(0);
+    const [totalPages, setTotalPages] = React.useState(0);
 
     //columns for table
     const columns = [
@@ -79,6 +61,57 @@ function Im_Items() {
       const [page, setPage] = React.useState(0);
       const [rowsPerPage, setRowsPerPage] = React.useState(10);
       const [openForm, setOpenForm]= React.useState(false);
+      const [search, setSearch] = React.useState("");
+
+      const handleChange = async(event, value) => {
+        setPage(value-1);
+        console.log("Page", page);
+        await fetchData();
+      };
+
+      //fetch data for pagination actions
+      const fetchData = async()=>{
+        console.log("Fetch data", page, rowsPerPage);
+        setLoading(true);
+        //get import items data when page loading...
+       let result = await getImportData(page, rowsPerPage, search);
+       let importSet = result.content;
+       
+      //set total rows and pages
+      setTotalPages(result.totalPages);
+      setTotalRows(result.totalElements);
+
+        const newSet = []
+        
+        for(let x=0; x< importSet.length; x++){
+          let category_list = importSet[x].im_category;
+          console.log("category_list", category_list)
+          //set data in new set list to display in the table
+          newSet.push( createData(importSet[x].itemName, 
+            importSet[x].brand, 
+            category_list.category,
+            category_list.subCat_1,
+            category_list.subCat_2,
+            category_list.subCat_3,
+            category_list.subCat_4,
+            category_list.subCat_5,
+            importSet[x].qty, 2));
+        }
+      
+      // set rows to table
+      setRows(newSet);
+      setLoading(false);
+      
+
+      }
+
+    const searchItem= async(event, value)=>{
+        setSearch(event.target.value);
+        console.log(event.target.value);
+        await fetchData();
+        
+    }
+
 
     return (
         
@@ -100,6 +133,8 @@ function Im_Items() {
                                 sx={{ ml: 1, flex: 1 }}
                                 placeholder="Search items"
                                 inputProps={{ 'aria-label': 'search google maps' }}
+                                onChange={searchItem}
+                                value={search}
                             />
                             <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
                                 <SearchIcon />
@@ -123,13 +158,24 @@ function Im_Items() {
                       columns={columns} 
                       rows={rows} 
                       page={page} 
-                      setPage={setPage} 
-                      rowsPerPage={rowsPerPage}
+                      setPage={setPage}
                       tablePagin={true} 
-                      setRowsPerPage={setRowsPerPage}
+                      totalPages = {totalPages}
+                      getData = {fetchData}
                       />
                     }
                         
+                    </Grid>
+                    <Grid item xs={12} sm={12} sx={12}>
+                    <Stack spacing={3}>
+                      <Pagination 
+                        count={totalPages} 
+                        variant="outlined" 
+                        shape="rounded"  
+                        size="small"
+                        onChange={handleChange}
+                        />
+                    </Stack>
                     </Grid>
 
                 </Grid>

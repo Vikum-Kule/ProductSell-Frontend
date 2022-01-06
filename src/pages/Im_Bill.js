@@ -3,7 +3,7 @@ import { typography } from '@mui/system'
 import React, { useEffect } from 'react'
 import { makeStyles } from '@mui/styles';
 import TableItem from '../components/TableItem';
-import { getImportBillData, getImportBillById } from '../services/Import';
+import { getImportBillData, getImportBillById, searchImportItem } from '../services/Import';
 import SearchIcon from '@mui/icons-material/Search';
 import Im_CategoryForm from '../components/Im_CategoryForm';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -41,7 +41,7 @@ function Im_Bill() {
     useEffect(async () => {
         //get import Categories data when page loading...
         set_billLoading(true);
-        let billSet = await getImportBillData(0,10);
+        let billSet = await getImportBillData(page, rowsPerPage);
           const newSet = []
         console.log(billSet);
           for(let x=0; x< billSet.length; x++){
@@ -60,6 +60,13 @@ function Im_Bill() {
           // set rows to table
           setRows(newSet);
       }, [])
+
+      //search item
+      const[searchVal, setSearchVal]= React.useState('');
+
+      const searchBar = async(val)=>{
+          let searchResults = await searchImportItem(val);
+      }
 
       //creating data for rows according to Id
       function createDataForBills( bill_num, added_by, date, shop, billId) {        

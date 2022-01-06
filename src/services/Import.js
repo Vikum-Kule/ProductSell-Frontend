@@ -3,9 +3,12 @@ import {getToken} from "../Utils/Common"
 
 
 //get import data with pagination
-const getImportData = async (offset, pageSize)=>{
+const getImportData = async (offset, pageSize, search)=>{
+    
     let token = getToken();
-    return axios.get("/api/import/all/"+ offset +"/"+pageSize,
+    return axios.post("/api/import/all/"+ offset +"/"+pageSize,{
+        "search":search.trim()
+    },
     {
         headers: { 
             "Content-Type": "application/json",
@@ -14,7 +17,7 @@ const getImportData = async (offset, pageSize)=>{
     ).then(response=>{
         console.log(response);
         console.log("Response --",response.data.content);
-        return response.data.content;
+        return response.data;
     }).catch(error =>{
         return "Something went wrong...";
         //  console.log(error);
@@ -97,6 +100,11 @@ const getImportsByCategory = async (cat_id)=>{
         // }
     });
 }
+
+// search import items
+ const searchImportItem= async(val)=>{
+
+ }
 
 // const submitNewImportItem= async(values)=>{
 //     let checkedCategory= await checkCategory(values);
@@ -325,4 +333,5 @@ export {getImportData,
     checkCategory, 
     getImportCategoryData,
     getAllBills, 
-    getImportBillData, getImportBillById, getImportsByCategory, addNewCategory};
+    getImportBillData, 
+    getImportBillById, getImportsByCategory, addNewCategory, searchImportItem};
