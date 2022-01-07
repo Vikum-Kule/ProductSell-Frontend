@@ -244,9 +244,11 @@ const addIm_Item = async(values, catId)=>{
 }
 
 //get import category data with pagination
-const getImportCategoryData = async (offset, pageSize)=>{
+const getImportCategoryData = async (offset, pageSize, search)=>{
     let token = getToken();
-    return axios.get("/api/import/category/all/"+ offset +"/"+pageSize,
+    return axios.post("/api/import/category/all/"+ offset +"/"+pageSize,{
+        "search":search.trim()
+    },
     {
         headers: { 
             "Content-Type": "application/json",
@@ -254,8 +256,8 @@ const getImportCategoryData = async (offset, pageSize)=>{
       }}
     ).then(response=>{
         console.log(response);
-        console.log("Response --",response.data.content);
-        return response.data.content;
+        console.log("Response --",response.data);
+        return response.data;
     }).catch(error =>{
         return "Something went wrong...";
         //  console.log(error);
@@ -268,9 +270,11 @@ const getImportCategoryData = async (offset, pageSize)=>{
 }
 
 //get import bill data with pagination
-const getImportBillData = async (offset, pageSize)=>{
+const getImportBillData = async (offset, pageSize, search)=>{
     let token = getToken();
-    return axios.get("/api/import/bill/all/"+ offset +"/"+pageSize,
+    return axios.post("/api/import/bill/all/"+ offset +"/"+pageSize,{
+        "search":search.trim()
+    },
     {
         headers: { 
             "Content-Type": "application/json",
@@ -279,7 +283,7 @@ const getImportBillData = async (offset, pageSize)=>{
     ).then(response=>{
         console.log(response);
         console.log("Response --",response.data.content);
-        return response.data.content;
+        return response.data;
     }).catch(error =>{
         return "Something went wrong...";
         //  console.log(error);

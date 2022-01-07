@@ -22,7 +22,7 @@ function Im_Items() {
     const classes = useStyles();
     useEffect(async () => {
       
-      fetchData();
+      await fetchData(search, page);
         
     }, [])
 
@@ -66,15 +66,15 @@ function Im_Items() {
       const handleChange = async(event, value) => {
         setPage(value-1);
         console.log("Page", page);
-        await fetchData();
+        await fetchData(search, value-1);
       };
 
       //fetch data for pagination actions
-      const fetchData = async()=>{
+      const fetchData = async(keyword, pageNo)=>{
         console.log("Fetch data", page, rowsPerPage);
         setLoading(true);
         //get import items data when page loading...
-       let result = await getImportData(page, rowsPerPage, search);
+       let result = await getImportData(pageNo, 2, keyword);
        let importSet = result.content;
        
       //set total rows and pages
@@ -106,9 +106,10 @@ function Im_Items() {
       }
 
     const searchItem= async(event, value)=>{
+        setPage(0);
         setSearch(event.target.value);
         console.log(event.target.value);
-        await fetchData();
+        await fetchData(event.target.value,0);
         
     }
 

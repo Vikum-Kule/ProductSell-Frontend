@@ -1,4 +1,4 @@
-import { Button, Grid, IconButton, InputBase, Paper, Typography } from '@mui/material'
+import { Button, Grid, IconButton, InputBase, Pagination, Paper, Stack, Typography } from '@mui/material'
 import { typography } from '@mui/system'
 import React, { useEffect } from 'react'
 import { makeStyles } from '@mui/styles';
@@ -23,33 +23,11 @@ function Im_Categories() {
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [openForm, setOpenForm]= React.useState(false);
     const [isLoading, setLoading]= React.useState(false);
+    const [totalPages, setTotalPages] = React.useState(0);
+    const [search, setSearch] = React.useState("");
 
     useEffect(async () => {
-        // set loading
-        setLoading(true);
-        //get import Categories data when page loading...
-        let categorySet = await getImportCategoryData(0,10);
-          const newSet = []
-        console.log(categorySet);
-          for(let x=0; x< categorySet.length; x++){
-            let import_list = await getImportsByCategory(categorySet[x].cat_id);
-            console.log("Imports ",import_list);
-            //set data in new set list to display in the table
-            newSet.push( createData(
-                categorySet[x].category, 
-                categorySet[x].subCat_1, 
-                categorySet[x].subCat_2, 
-                categorySet[x].subCat_3,
-                categorySet[x].subCat_4,
-                categorySet[x].subCat_5,
-                import_list.length,
-                categorySet[x].cat_id
-                ));
-          }
-          // console.log("ImportSet",newSet);
-          // set rows to table
-          setRows(newSet);
-          setLoading(false);
+        await fetchData(search, page);
       }, [])
 
       //creating data for rows according to Id
@@ -113,6 +91,54 @@ function Im_Categories() {
 
       ];
 
+      const handleChange = async(event, value) => {
+        setPage(value-1);
+        console.log("Page", page);
+        await fetchData(search, value-1);
+      }
+    
+      const fetchData = async(keyword, pageNo)=>{
+          // set loading
+        setLoading(true);
+        //get import Categories data when page loading...
+        let result = await getImportCategoryData(pageNo,10, keyword);
+
+        let categorySet = result.content;
+       
+        //set total rows and pages
+        setTotalPages(result.totalPages);
+        
+          const newSet = []
+        console.log(categorySet);
+          for(let x=0; x< categorySet.length; x++){
+            let import_list = await getImportsByCategory(categorySet[x].cat_id);
+            console.log("Imports ",import_list);
+            //set data in new set list to display in the table
+            newSet.push( createData(
+                categorySet[x].category, 
+                categorySet[x].subCat_1, 
+                categorySet[x].subCat_2, 
+                categorySet[x].subCat_3,
+                categorySet[x].subCat_4,
+                categorySet[x].subCat_5,
+                import_list.length,
+                categorySet[x].cat_id
+                ));
+          }
+          // console.log("ImportSet",newSet);
+          // set rows to table
+          setRows(newSet);
+          setLoading(false);
+      }
+
+      const searchItem= async(event, value)=>{
+        setPage(0);
+        setSearch(event.target.value);
+        console.log(event.target.value);
+        await fetchData(event.target.value,0);
+        
+    }
+
 
     return (
         <Paper className={classes.container}>
@@ -131,6 +157,8 @@ function Im_Categories() {
                                 sx={{ ml: 1, flex: 1 }}
                                 placeholder="Search items"
                                 inputProps={{ 'aria-label': 'search google maps' }}
+                                value={search}
+                                onChange={searchItem}
                             />
                             <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
                                 <SearchIcon />
@@ -154,14 +182,20 @@ function Im_Categories() {
                       popUpList={popUpList} 
                       dropDown={false}
                       columns={columns} 
-                      rows={rows} 
-                      page={page} 
-                      tablePagin={true}
-                      setPage={setPage} 
-                      rowsPerPage={rowsPerPage} 
-                      setRowsPerPage={setRowsPerPage}/>
+                      rows={rows}/>
                     }
                     
+                </Grid>
+                <Grid item xs={12} sm={12} sx={12}>
+                    <Stack spacing={3}>
+                      <Pagination 
+                        count={totalPages} 
+                        variant="outlined" 
+                        shape="rounded"  
+                        size="small"
+                        onChange={handleChange}
+                        />
+                    </Stack>
                 </Grid>
             </Grid>
             }

@@ -1,4 +1,4 @@
-import { Button, Grid, IconButton, InputBase, Modal, Paper, Typography } from '@mui/material'
+import { Button, Grid, IconButton, InputBase, Modal, Pagination, Paper, Stack, Typography } from '@mui/material'
 import { typography } from '@mui/system'
 import React, { useEffect } from 'react'
 import { makeStyles } from '@mui/styles';
@@ -37,11 +37,25 @@ function Im_Bill() {
     const [openForm, setOpenForm]= React.useState(false);
     const [billLoading, set_billLoading]= React.useState(false);
     const [itemLoading, set_itemLoading]= React.useState(false);
+    const [totalPages, setTotalPages] = React.useState(0);
+    const [search, setSearch] = React.useState("");
 
     useEffect(async () => {
-        //get import Categories data when page loading...
+        await fetchData(search, page);
+      }, [])
+
+
+      //get bill data
+      const fetchData = async(keyword, pageNo)=>{
+          //get import Categories data when page loading...
         set_billLoading(true);
-        let billSet = await getImportBillData(page, rowsPerPage);
+        let result = await getImportBillData(pageNo, rowsPerPage, keyword);
+
+        let billSet = result.content;
+       
+        //set total rows and pages
+        setTotalPages(result.totalPages);
+
           const newSet = []
         console.log(billSet);
           for(let x=0; x< billSet.length; x++){
@@ -59,7 +73,8 @@ function Im_Bill() {
           // console.log("ImportSet",newSet);
           // set rows to table
           setRows(newSet);
-      }, [])
+      }
+
 
       //search item
       const[searchVal, setSearchVal]= React.useState('');
@@ -150,6 +165,20 @@ function Im_Bill() {
       setBill(null);
   }
 
+  const handleChange = async(event, value) => {
+    setPage(value-1);
+    console.log("Page", page);
+    await fetchData(search, value-1);
+  }
+
+  const searchItem= async(event, value)=>{
+    setPage(0);
+    setSearch(event.target.value);
+    console.log(event.target.value);
+    await fetchData(event.target.value,0);
+    
+}
+
 
     return (
         <Paper className={classes.container}>
@@ -168,6 +197,8 @@ function Im_Bill() {
                                 sx={{ ml: 1, flex: 1 }}
                                 placeholder="Search Bills"
                                 inputProps={{ 'aria-label': 'search google maps' }}
+                                value={search}
+                                onChange={searchItem}
                             />
                             <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
                                 <SearchIcon />
@@ -192,14 +223,20 @@ function Im_Bill() {
                       dropDown={false}
                       columns={columns_bill} 
                       rows={rows} 
-                      page={page} 
-                      getRow={getSelectedRow}
-                      setPage={setPage} 
-                      tablePagin={true}
-                      rowsPerPage={rowsPerPage} 
-                      setRowsPerPage={setRowsPerPage}/>
+                      getRow={getSelectedRow}/>
                   }
                     
+                </Grid>
+                <Grid item xs={12} sm={12} sx={12}>
+                    <Stack spacing={3}>
+                      <Pagination 
+                        count={totalPages} 
+                        variant="outlined" 
+                        shape="rounded"  
+                        size="small"
+                        onChange={handleChange}
+                        />
+                    </Stack>
                 </Grid>
                 <Modal
                         keepMounted
