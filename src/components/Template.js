@@ -88,10 +88,16 @@ function Template({children}) {
   };
 
   const handleClickExport = () => {
+    if(openImport){
+      setOpenImport(false);
+    }
     setOpenExport(!openExport);
   };
 
   const handleClickImport = () => {
+    if(openExport){
+      setOpenExport(false);
+    }
     setOpenImport(!openImport);
   };
 
@@ -223,8 +229,8 @@ function Template({children}) {
               </List>
             </Collapse>
             <ListItemButton 
-            selected={selectedIndex==4}
-            onClick={(event) => handleListItemClick(event, 5,"/template/export")}
+            selected={selectedIndex==5}
+            onClick={(event) => handleListItemClick(event, 5,"/template/ex_products")}
             style={
               {
                 backgroundColor:selectedIndex==5?"#15285c":"#2f3c66"
@@ -239,11 +245,14 @@ function Template({children}) {
             </ListItemButton>
             <Collapse in={openExport} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
-                <ListItemButton sx={{ pl: 4 }}>
+              <ListItemButton sx={{ pl: 4 }}
+                  selected={selectedIndex==5}
+                  onClick={(event) => handleListItemClick(event, 5,"/template/ex_products")}
+                >
                   <ListItemIcon>
                     {/* <StarBorder /> */}
                   </ListItemIcon>
-                  <ListItemText className={classes.menuText} primary="Starred" />
+                  <ListItemText className={classes.menuText} primary="Products" />
                 </ListItemButton>
                 <ListItemButton sx={{ pl: 4 }}>
                   <ListItemIcon>

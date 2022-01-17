@@ -1,14 +1,14 @@
-import { Button, Divider, Grid, IconButton, Modal, Paper, TextField, Tooltip, Typography } from '@mui/material'
+import { Button, Divider, Grid, IconButton, InputBase, Modal, Pagination, Paper, Stack, TextField, Tooltip, Typography } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close';
 import React, { useState } from 'react'
-import { getAllBills } from '../services/Import';
+import { getAllBills, getImportItemById } from '../services/Import';
 import AutoCompleteFeild from '../FormComponents/AutoCompleteFeild';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import { Box } from '@mui/system';
 import InputField from '../FormComponents/InputField'
 import SelectingTable from '../FormComponents/SelectingTable';
 import {getImportData} from '../services/Import';
-import TableItem from './TableItem';
+import SearchIcon from '@mui/icons-material/Search';
 import WritableTable from './WritableTable';
 
 
@@ -140,16 +140,26 @@ function Im_addBill({setOpenForm}) {
       const [rowsPerPage, setRowsPerPage] = React.useState(10);
       const [rows, setRows]= React.useState([]);
       const [selectedItems, setSelectedItems]= React.useState([]);
-      const [selectedRows, setSelectedRows]= React.useState();
+      const [selectedRows, setSelectedRows]= React.useState([]);
       const [importMainSet, setMainItems] = React.useState();
       //just hard coded...
       const [writeable_page, set_writeable_Page] = React.useState(0);
       const [writeable_rowsPerPage, set_writeable_RowsPerPage] = React.useState(100);
+      const [totalPages, setTotalPages] = React.useState(0);
 
-    const handleOpenTable=async()=>{
+      //search item to add bill
+      const [search, setSearch] = React.useState("");
+
+    const fetchData = async(keyword, pageNo)=>{
         setOpenTable(true);
         //get import items data when page loading...
-        let importSet = await getImportData(0,10);
+        let result = await getImportData(pageNo,2, keyword);
+
+        let importSet = result.content;
+       
+        //set total rows and pages
+        setTotalPages(result.totalPages);
+
         setMainItems(importSet);
         const newSet = []
         
@@ -164,19 +174,34 @@ function Im_addBill({setOpenForm}) {
         setRows(newSet);
     }
 
-    const handleCloseTable=()=>{
+    const searchItem= async(event, value)=>{
+        setPage(0);
+        setSearch(event.target.value);
+        console.log(event.target.value);
+        await fetchData(event.target.value,0);
+        
+    }
+
+    const handleOpenTable=async()=>{
+        await fetchData(search, page);
+    }
+
+    const handleChangepage = async(event, value) => {
+        setPage(value-1);
+        console.log("Page", page);
+        await fetchData(search, value-1);
+      }
+
+    const handleCloseTable= async()=>{
         setOpenTable(false);
         const selectedArray=[];
         console.log("selectedItems", selectedItems);
         for(let x=0; x<selectedItems.length; x++ ){
-            for(let y=0; y<importMainSet.length; y++ ){
-                console.log("rows", importMainSet[y]);
-                if(selectedItems[x]===importMainSet[y].importId){
-
-                    selectedArray.push(createDataForSelectedTable(importMainSet[y].itemName,
-                        importMainSet[y].brand, "category", 0,importMainSet[y].unitType, 0.00, 0.00, importMainSet[y].importId ));
-                }
-            }
+            let importItem = await getImportItemById(selectedItems[x]);
+            console.log("importItem", importItem);
+            selectedArray.push(createDataForSelectedTable(importItem.itemName,
+            importItem.brand, "category", 0,importItem.unitType, 0.00, 0.00, importItem.importId ));
+           
         }
         console.log("selectedArray", selectedArray);
         setSelectedRows(selectedArray);
@@ -239,7 +264,7 @@ function Im_addBill({setOpenForm}) {
             </Grid>
             <Grid item xs={12} sm={12} sx={12} >
                 {/* selected table */}
-                {selectedRows?
+                {selectedItems.length!=0?
                     <WritableTable
                         columns={selectedColumns} 
                         rows={selectedRows}
@@ -312,19 +337,51 @@ function Im_addBill({setOpenForm}) {
                         aria-describedby="keep-mounted-modal-description"
                     >
                         <Paper  sx={style} >
-                            <SelectingTable
-                                page={page} 
-                                setPage={setPage} 
-                                rowsPerPage={rowsPerPage}
-                                setRowsPerPage={setRowsPerPage}
-                                title="Bill Items"
-                                columns={columns} 
-                                rows={rows} 
-                                setSelected={setSelectedItems}
-                                selected={selectedItems}
-                                _key="im_id"
-                                setOpenTable={setOpenTable}
-                            />
+                            <Grid container >
+                                <Grid item xs={12} sm={9} sx={12}>
+                                    <Paper
+                                        variant="outlined" 
+                                        component="form"
+                                        sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 400 }}
+                                        >
+                                        <InputBase
+                                            sx={{ ml: 1, flex: 1 }}
+                                            placeholder="Search items"
+                                            inputProps={{ 'aria-label': 'search google maps' }}
+                                            value={search}
+                                            onChange={searchItem}
+                                        />
+                                        <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
+                                            <SearchIcon />
+                                        </IconButton>
+                                    </Paper>
+                                </Grid>
+                                <Grid item  xs={12} sm={12} sx={12}>
+                                    <SelectingTable
+                                        page={page} 
+                                        setPage={setPage} 
+                                        rowsPerPage={rowsPerPage}
+                                        setRowsPerPage={setRowsPerPage}
+                                        title="Bill Items"
+                                        columns={columns} 
+                                        rows={rows} 
+                                        setSelected={setSelectedItems}
+                                        selected={selectedItems}
+                                        _key="im_id"
+                                        setOpenTable={setOpenTable}
+                                    />
+                                </Grid>
+                                
+                                <Stack spacing={3}>
+                                <Pagination 
+                                    count={totalPages} 
+                                    variant="outlined" 
+                                    shape="rounded"  
+                                    size="small"
+                                    onChange={handleChangepage}
+                                    />
+                                </Stack>
+                                </Grid>
                         </Paper>
                     </Modal>
             </Grid>

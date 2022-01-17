@@ -66,15 +66,6 @@ function EnhancedTableHead(props) {
     <TableHead>
       <TableRow>
         <TableCell padding="checkbox">
-          <Checkbox
-            color="primary"
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{
-              'aria-label': 'select all desserts',
-            }}
-          />
         </TableCell>
         {columns.map((headCell) => (
           <TableCell
@@ -173,24 +164,13 @@ export default function SelectingTable({
     columns, 
     rows, 
     title,
-    page,
     setSelected,
     selected, 
     _key,
-    setOpenTable,
-    setPage, rowsPerPage, setRowsPerPage}) {
+    setOpenTable}) {
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('calories');
-//   const [selected, setSelected] = React.useState([]);
 
-  React.useEffect( () => {
-    console.log("check");
-    // if(selectedItems===[]){
-    //     console.log("Not empty");
-    // }
-    console.log(selected)
-    
-  }, [])
 
 
   const handleRequestSort = (event, property) => {
@@ -228,28 +208,18 @@ export default function SelectingTable({
     }
 
     setSelected(newSelected);
+    console.log(selected);
   };
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  
 
   const isSelected = (row) => selected.indexOf(row) !== -1;
 
   // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+  // const emptyRows =
+  //   page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
   return (
-    <Box sx={{ width: '100%', height:'50%' }}>
-      <Paper sx={{ width: '100%',  height:'50%' ,mb: 5 , mt: 5}}>
+    <Box sx={{ width: '100%', height:'90%' }}>
+      <Paper sx={{ width: '100%',  height:'100%' ,mb: 5 , mt: 5}}>
         <EnhancedTableToolbar setOpenTable={setOpenTable} title ={title} numSelected={selected.length} />
         <TableContainer style={{"height": '350px' }}>
           <Table
@@ -271,7 +241,7 @@ export default function SelectingTable({
               {/* if you don't need to support IE11, you can replace the `stableSort` call with:
                  rows.slice().sort(getComparator(order, orderBy)) */}
               {stableSort(rows, getComparator(order, orderBy))
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
                     
 
@@ -298,14 +268,6 @@ export default function SelectingTable({
                           }}
                         />
                       </TableCell>
-                      {/* <TableCell
-                        component="th"
-                        id={labelId}
-                        scope="row"
-                        padding="none"
-                      >
-                        {row.name}
-                      </TableCell> */}
                       { columns.map((column) => {
                         const value = row[column.id];
                         const selected = row;
@@ -325,27 +287,9 @@ export default function SelectingTable({
                     </TableRow>
                   );
                 })}
-              {emptyRows > 0 && (
-                <TableRow
-                  style={{
-                    height: 33 * emptyRows,
-                  }}
-                >
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
             </TableBody>
           </Table>
         </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={rows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
       </Paper>
       {/* <FormControlLabel
         control={<Switch checked={dense} onChange={handleChangeDense} />}

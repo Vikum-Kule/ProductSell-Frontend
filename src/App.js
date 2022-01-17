@@ -12,6 +12,7 @@ import ImItems from './pages/Im_Items';
 import Export from './pages/Export';
 import Im_Categories from './pages/Im_Categories';
 import Im_Bill from './pages/Im_Bill';
+import Ex_Products from './pages/Ex_Products';
 
 const theme = createTheme({
 
@@ -41,8 +42,8 @@ function App() {
                 <Route path="/template/im_bills">
                   <Im_Bill/>
                 </Route>
-                <Route path="/template/export">
-                  <Export/>
+                <Route path="/template/ex_products">
+                  <Ex_Products/>
                 </Route>
             </Switch>
         </Template>
