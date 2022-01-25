@@ -9,7 +9,6 @@ import Login from './components/Login';
 import Template  from './components/Template';
 import Home from './pages/Home';
 import ImItems from './pages/Im_Items';
-import Export from './pages/Export';
 import Im_Categories from './pages/Im_Categories';
 import Im_Bill from './pages/Im_Bill';
 import Ex_Products from './pages/Ex_Products';
