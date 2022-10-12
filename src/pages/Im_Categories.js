@@ -110,6 +110,7 @@ function Im_Categories() {
         
           const newSet = []
         console.log(categorySet);
+        if(categorySet){
           for(let x=0; x< categorySet.length; x++){
             let import_list = await getImportsByCategory(categorySet[x].cat_id);
             console.log("Imports ",import_list);
@@ -125,6 +126,8 @@ function Im_Categories() {
                 categorySet[x].cat_id
                 ));
           }
+        }
+          
           // console.log("ImportSet",newSet);
           // set rows to table
           setRows(newSet);

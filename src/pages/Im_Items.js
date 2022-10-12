@@ -82,7 +82,7 @@ function Im_Items() {
       setTotalRows(result.totalElements);
 
         const newSet = []
-        
+      if(importSet){
         for(let x=0; x< importSet.length; x++){
           let category_list = importSet[x].im_category;
           console.log("category_list", category_list)
@@ -97,6 +97,8 @@ function Im_Items() {
             category_list.subCat_5,
             importSet[x].qty, 2));
         }
+      }  
+        
       
       // set rows to table
       setRows(newSet);

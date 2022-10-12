@@ -1,9 +1,11 @@
 import axios from "axios";
 import {getToken} from "../Utils/Common"
+import {RefreshToken} from "./Auth" 
 
 
 //get import data with pagination
 const getImportData = async (offset, pageSize, search)=>{
+    
     
     let token = getToken();
     return axios.post("/api/import/all/"+ offset +"/"+pageSize,{
@@ -19,11 +21,15 @@ const getImportData = async (offset, pageSize, search)=>{
         console.log("Response --",response.data.content);
         return response.data;
     }).catch(error =>{
+        // return "Something went wrong...";
+        console.log("get imports "+ error);
+        if (error == "Error: Request failed with status code 403") {
+           let refresh_result = RefreshToken();
+           console.log(refresh_result);
+            // getImportData(offset, pageSize, search);
+        }
         return "Something went wrong...";
-        //  console.log(error);
-        // if (error.response.statuscode == 403) {
-        //     console.log(error);
-        // } else {
+        //  else {
         //   console.log("something else");
         // }
     });
@@ -31,6 +37,8 @@ const getImportData = async (offset, pageSize, search)=>{
 
 //get all import data
 const getAllImportData = async ()=>{
+
+    console.log("xxxx");
     let token = getToken();
     return axios.get("/api/import/all",
     {
@@ -44,9 +52,9 @@ const getAllImportData = async ()=>{
         return response.data;
     }).catch(error =>{
         return "Something went wrong...";
-        //  console.log(error);
-        // if (error.response.statuscode == 403) {
-        //     console.log(error);
+         console.log("xxxx"+error);
+        if (error.response.statuscode == 403) {
+            console.log(error);}
         // } else {
         //   console.log("something else");
         // }

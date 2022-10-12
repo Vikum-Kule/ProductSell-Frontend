@@ -79,6 +79,14 @@ function ImportFrom({setOpenForm}) {
 
             let result = await checkCategory(data);
             console.log("result", result);
+            if(result){
+                // category already exist..
+                
+            }
+            else{
+                //category doesn't exist 
+            }
+
         }
     }
 
