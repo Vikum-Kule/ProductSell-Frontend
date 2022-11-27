@@ -12,6 +12,7 @@ import ImItems from './pages/Im_Items';
 import Im_Categories from './pages/Im_Categories';
 import Im_Bill from './pages/Im_Bill';
 import Ex_Products from './pages/Ex_Products';
+import Im_Stockupdates from './pages/Im_stockupdates';
 
 const theme = createTheme({
 
@@ -40,6 +41,9 @@ function App() {
                 </Route>
                 <Route path="/template/im_bills">
                   <Im_Bill/>
+                </Route>
+                <Route path="/template/im_stockupdates">
+                  <Im_Stockupdates/>
                 </Route>
                 <Route path="/template/ex_products">
                   <Ex_Products/>

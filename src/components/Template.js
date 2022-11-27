@@ -187,7 +187,13 @@ function Template({children}) {
               onClick={(event) => handleListItemClick(event, 1,"/template/im_items")}
               style={
                 {
-                  backgroundColor:(selectedIndex==1 || selectedIndex==2 || selectedIndex==3 || selectedIndex==4)?"#15285c":"#2f3c66"
+                  backgroundColor:(
+                    selectedIndex==1 || 
+                    selectedIndex==2 || 
+                    selectedIndex==3 || 
+                    selectedIndex==4 ||
+                    selectedIndex==5
+                    )?"#15285c":"#2f3c66"
                 }
               }
             >
@@ -226,11 +232,20 @@ function Template({children}) {
                   </ListItemIcon>
                   <ListItemText primaryTypographyProps={{ style: sub }} primary="Bills" />
                 </ListItemButton>
+                <ListItemButton sx={{ pl: 4 }}
+                  selected={selectedIndex==5}
+                  onClick={(event) => handleListItemClick(event, 5,"/template/im_stockupdates")}
+                >
+                  <ListItemIcon>
+                    {/* <StarBorder /> */}
+                  </ListItemIcon>
+                  <ListItemText primaryTypographyProps={{ style: sub }} primary="Stock Updates" />
+                </ListItemButton>
               </List>
             </Collapse>
             <ListItemButton 
-            selected={selectedIndex==5}
-            onClick={(event) => handleListItemClick(event, 5,"/template/ex_products")}
+            selected={selectedIndex==6}
+            onClick={(event) => handleListItemClick(event, 6,"/template/ex_products")}
             style={
               {
                 backgroundColor:selectedIndex==5?"#15285c":"#2f3c66"

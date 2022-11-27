@@ -57,10 +57,10 @@ function Im_Bill() {
         setTotalPages(result.totalPages);
 
           const newSet = []
-        console.log(billSet);
-        if(billSet){
+        console.log(billSet.length);
+        if(billSet.length == 0){
           for(let x=0; x< billSet.length; x++){
-            set_billLoading(false);
+            
             let splitDate = billSet[x].createdDate.split("T");
 
             newSet.push( createDataForBills(
@@ -72,6 +72,7 @@ function Im_Bill() {
                 ));
           }
         }
+        set_billLoading(false);
           
           // console.log("ImportSet",newSet);
           // set rows to table
@@ -135,9 +136,11 @@ function Im_Bill() {
         let bill_data = await getImportBillById(Row.billId);
         let billItemSet = bill_data.import_billItems;
         
+        
         setBill(bill_data);
         const newSet = []
-        for(let x=0; x< billItemSet.length; x++){
+        if(billItemSet){
+          for(let x=0; x< billItemSet.length; x++){
             // let splitDate = billSet[x].createdDate.split("T");
             let categorySet = billItemSet[x].imports.im_category;
             console.log("categorySet", billItemSet[x].imports.im_category);
@@ -154,8 +157,10 @@ function Im_Bill() {
               billItemSet[x].price
                 ));
           }
-        setBillItems(newSet);
-        set_itemLoading(false);
+          setBillItems(newSet);
+
+        }
+                set_itemLoading(false);
         
     }
 

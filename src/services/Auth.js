@@ -60,9 +60,9 @@ const getUserData = async(token_data, email)=>{
 }
 
 const RefreshToken = async()=>{
+    console.log("Refreshhhh")
 
     let refresh_token = getRefreshToken();
-    let user_data = getUserData();
     return axios.get("/api/users/token/refresh",
     {
         headers: { 

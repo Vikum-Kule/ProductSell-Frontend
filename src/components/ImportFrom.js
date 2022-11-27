@@ -2,7 +2,7 @@ import { Autocomplete, Button, CircularProgress, Grid, IconButton, Paper, TextFi
 import React, { Fragment, useState } from 'react'
 import AutoCompleteFeild from '../FormComponents/AutoCompleteFeild';
 import InputField from '../FormComponents/InputField'
-import { getAllCategories, getAllImportData, checkCategory } from '../services/Import';
+import { getAllCategories, getAllImportData, checkCategory, addNewCategory } from '../services/Import';
 import { Validators } from '../Validation/FormValidation';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import Divider from '@mui/material/Divider';
@@ -11,6 +11,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import RestartAltOutlinedIcon from '@mui/icons-material/RestartAltOutlined';
 import {FormValidation} from '../Validation/FormValidation';
 import Validation from '../Validation/Validation';
+import {addIm_Item} from '../services/Import'
+import FormAlert from './FormAlert';
 
 function ImportFrom({setOpenForm}) {
     //for input feild values
@@ -57,6 +59,23 @@ function ImportFrom({setOpenForm}) {
         _importUnitType:'',
     });
 
+    //display alert...
+    const[displayAlert, setAlert] = useState(false);
+
+    //alert data
+    const[alertData, setAlertData] = useState({
+        type:'',
+        message:''
+    });
+
+    const closeAlert = ()=>{
+        setAlert(false);
+        setAlertData({
+            type:'',
+            message:''
+        })
+    }
+
     //reset errors...
     const resetErrors=() =>{
         setError({});
@@ -79,12 +98,47 @@ function ImportFrom({setOpenForm}) {
 
             let result = await checkCategory(data);
             console.log("result", result);
-            if(result){
+            if(result.ifExist){
                 // category already exist..
+                console.log("Category data "+ result.category.cat_id);
+                let submit_import_data = await addIm_Item(data,result.category.cat_id);
+                if(submit_import_data){
+                    resetValues();
+                    setAlertData({
+                        type:"success",
+                        message:"Item submitted.."
+                    })
+                    setAlert(true);
+                }else{
+                    setAlertData({
+                        type:"error",
+                        message:"Something went wrong..."
+                    })
+                    setAlert(true);
+                }
+                console.log(submit_import_data);
                 
             }
             else{
                 //category doesn't exist 
+                let submitData = await addNewCategory(data);
+                console.log(submitData.cat_id);
+
+                let submit_import_data = await addIm_Item(data,submitData.cat_id);
+                if(submit_import_data){
+                    resetValues();
+                    setAlertData({
+                        type:"success",
+                        message:"Item submitted.."
+                    })
+                    setAlert(true);
+                }else{
+                    setAlertData({
+                        type:"error",
+                        message:"Something went wrong..."
+                    })
+                    setAlert(true);
+                }
             }
 
         }
@@ -124,6 +178,7 @@ function ImportFrom({setOpenForm}) {
     //load import data when click on input feild
     const loadData=async()=>{
         resetErrors();
+        closeAlert();
         let importSet = await getAllImportData();
         console.log("array items",importSet);
         setItem(importSet);
@@ -216,7 +271,7 @@ function ImportFrom({setOpenForm}) {
                             </Fragment>
                 })}
                 
-                <Grid item xs={12} sm={9} sx={12} sx={{ mt: 2}}> <Divider variant="middle" /></Grid>
+                <Grid item xs={12} sm={9} sx={{ mt: 2}}> <Divider variant="middle" /></Grid>
                 <Grid item xs={12} sm={3} sx={12}>
                 <Tooltip title="Add Tag"> 
                    <IconButton
@@ -227,7 +282,7 @@ function ImportFrom({setOpenForm}) {
                     </IconButton>
                 </Tooltip>
                 </Grid>
-                <Grid item item xs={12} sm={3} sx={12}>
+                <Grid item xs={12} sm={3} sx={12}>
                     <InputField
                         name="_importQty"
                         errorMsg={error._importQty}
@@ -251,7 +306,7 @@ function ImportFrom({setOpenForm}) {
                         errorMsg={error._importUnitType} 
                         onchange={(event, newInputValue) => handleChange(event, newInputValue)}  />
                 </Grid>
-                <Grid item item xs={12} sm={3} sx={12}>
+                <Grid item  xs={12} sm={3} sx={12}>
                     <InputField
                         name="_minRate"
                         value={value._importQty} 
@@ -269,6 +324,11 @@ function ImportFrom({setOpenForm}) {
                         label="Note"
                         multiline={true}
                          />
+                </Grid>
+                <Grid item xs={12} sm={12} sx={12}>
+                    {displayAlert?
+                        <FormAlert type={alertData.type} message={alertData.message} />: null
+                    }
                 </Grid>
                 <Grid item xs={12} sm={12} sx={12}>
                         <Grid container justifyContent="space-between" >

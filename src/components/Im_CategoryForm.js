@@ -82,7 +82,7 @@ function Im_CategoryForm({setOpenForm}) {
             // check the category already exist or not
             let status = await checkCategory(data);
             console.log("status", status);
-            if(!status){
+            if(!status.ifExist){
                 let submitData = await addNewCategory(data);
                 if(submitData){
                     resetValues();
@@ -210,7 +210,7 @@ function Im_CategoryForm({setOpenForm}) {
                             </Fragment>
                 })}
                 
-                <Grid item xs={12} sm={9} sx={12} sx={{ mt: 2}}> <Divider variant="middle" /></Grid>
+                <Grid item xs={12} sm={9}  sx={{ mt: 2}}> <Divider variant="middle" /></Grid>
                 <Grid item xs={12} sm={3} sx={12}>
                 <Tooltip title="Add Tag"> 
                    <IconButton

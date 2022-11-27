@@ -1,136 +1,144 @@
 import axios from "axios";
-import {getToken} from "../Utils/Common"
+import jwtDecode from "jwt-decode";
+import {getToken, getUser} from "../Utils/Common"
 import {RefreshToken} from "./Auth" 
+import tocken_valid from "./TokenValid";
 
 
 //get import data with pagination
 const getImportData = async (offset, pageSize, search)=>{
     
+    //check access tocken expiry function
+    let tocken_valid_result = await tocken_valid();
+    if(tocken_valid_result){
+        let token = getToken();
+
+        return axios.post("/api/import/all/"+ offset +"/"+pageSize,{
+            "search":search.trim()
+        },
+        {
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": "Bearer "+token
+        }}
+        ).then(response=>{
+            console.log(response);
+            console.log("Response --",response.data.content);
+            return response.data;
+        }).catch(async error =>{
+            // return "Something went wrong...";
+            console.log("get imports "+ error);
+            return "Something went wrong..."
+            
+        });
+    }
     
-    let token = getToken();
-    return axios.post("/api/import/all/"+ offset +"/"+pageSize,{
-        "search":search.trim()
-    },
-    {
-        headers: { 
-            "Content-Type": "application/json",
-            "Authorization": "Bearer "+token
-      }}
-    ).then(response=>{
-        console.log(response);
-        console.log("Response --",response.data.content);
-        return response.data;
-    }).catch(error =>{
-        // return "Something went wrong...";
-        console.log("get imports "+ error);
-        if (error == "Error: Request failed with status code 403") {
-           let refresh_result = RefreshToken();
-           console.log(refresh_result);
-            // getImportData(offset, pageSize, search);
-        }
-        return "Something went wrong...";
-        //  else {
-        //   console.log("something else");
-        // }
-    });
+    
 }
 
 //get all import data
 const getAllImportData = async ()=>{
 
-    console.log("xxxx");
-    let token = getToken();
-    return axios.get("/api/import/all",
-    {
-        headers: { 
-            "Content-Type": "application/json",
-            "Authorization": "Bearer "+token
-      }}
-    ).then(response=>{
-        console.log(response);
-        console.log("Response all--",response.data);
-        return response.data;
-    }).catch(error =>{
-        return "Something went wrong...";
-         console.log("xxxx"+error);
-        if (error.response.statuscode == 403) {
-            console.log(error);}
-        // } else {
-        //   console.log("something else");
-        // }
-    });
+     //check access tocken expiry function
+     let tocken_valid_result = await tocken_valid();
+    if(tocken_valid_result){
+            let token = getToken();
+        return axios.get("/api/import/all",
+        {
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": "Bearer "+token
+        }}
+        ).then(response=>{
+            console.log(response);
+            console.log("Response all--",response.data);
+            return response.data;
+        }).catch(error =>{
+            // return "Something went wrong...";
+            console.log("get imports "+ error);
+            return "Something went wrong..."
+            
+        });
+    }
 }
 
 //find import item by id
 const getImportItemById = async (itemId)=>{
-    let token = getToken();
-    return axios.get("/api/import/"+itemId,
-    {
-        headers: { 
-            "Content-Type": "application/json",
-            "Authorization": "Bearer "+token
-      }}
-    ).then(response=>{
-        console.log(response);
-        console.log("Response all--",response.data);
-        return response.data;
-    }).catch(error =>{
-        return "Something went wrong...";
-        //  console.log(error);
-        // if (error.response.statuscode == 403) {
-        //     console.log(error);
-        // } else {
-        //   console.log("something else");
-        // }
-    });
+
+    //check access tocken expiry function
+    let tocken_valid_result = await tocken_valid();
+    if(tocken_valid_result){
+
+        let token = getToken();
+        return axios.get("/api/import/"+itemId,
+        {
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": "Bearer "+token
+        }}
+        ).then(response=>{
+            console.log(response);
+            console.log("Response all--",response.data);
+            return response.data;
+        }).catch(error =>{
+            // return "Something went wrong...";
+            console.log("get imports "+ error);
+            return "Something went wrong..."
+            
+        });
+     }
 }
 
 //get all categories
 const getAllCategories = async ()=>{
-    let token = getToken();
-    return axios.get("/api/import/category/all",
-    {
-        headers: { 
-            "Content-Type": "application/json",
-            "Authorization": "Bearer "+token
-      }}
-    ).then(response=>{
-        console.log(response);
-        console.log("Response all--",response.data);
-        return response.data;
-    }).catch(error =>{
-        return "Something went wrong...";
-        //  console.log(error);
-        // if (error.response.statuscode == 403) {
-        //     console.log(error);
-        // } else {
-        //   console.log("something else");
-        // }
-    });
+     //check access tocken expiry function
+     let tocken_valid_result = await tocken_valid();
+     if(tocken_valid_result){
+        let token = getToken();
+        return axios.get("/api/import/category/all",
+        {
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": "Bearer "+token
+        }}
+        ).then(response=>{
+            console.log(response);
+            console.log("Response all--",response.data);
+            return response.data;
+        }).catch(error =>{
+            // return "Something went wrong...";
+            console.log("get imports "+ error);
+            return "Something went wrong..."
+            
+        });
+     }
 }
 
 //get imports by category
 const getImportsByCategory = async (cat_id)=>{
-    let token = getToken();
-    return axios.get("/api/import/find/category/"+cat_id,
-    {
-        headers: { 
-            "Content-Type": "application/json",
-            "Authorization": "Bearer "+token
-      }}
-    ).then(response=>{
-        console.log(response);
-        console.log("Response all--",response.data);
-        return response.data;
-    }).catch(error =>{
-        return "Something went wrong...";
-        //  console.log(error);
-        // if (error.response.statuscode == 403) {
-        //     console.log(error);
-        // } else {
-        //   console.log("something else");
-        // }
-    });
+
+    //check access tocken expiry function
+    let tocken_valid_result = await tocken_valid();
+    if(tocken_valid_result){
+    
+        let token = getToken();
+        return axios.get("/api/import/find/category/"+cat_id,
+        {
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": "Bearer "+token
+        }}
+        ).then(response=>{
+            console.log(response);
+            console.log("Response all--",response.data);
+            return response.data;
+        }).catch(error =>{
+            // return "Something went wrong...";
+            console.log("get imports "+ error);
+            return "Something went wrong..."
+            
+        });
+    }
 }
 
 // search import items
@@ -144,223 +152,262 @@ const getImportsByCategory = async (cat_id)=>{
 
 //check category availability
 const checkCategory= async(values)=>{
-    console.log("values",values);
 
-    let token = getToken();
-    return axios.post("/api/import/category/check",{
-        "category": values._importMCategory.trim(),
-        "subCat_1": values._subCat_1.trim(),
-        "subCat_2": values._subCat_2.trim(),
-        "subCat_3": values._subCat_3.trim(),
-        "subCat_4": values._subCat_4.trim(),
-        "subCat_5": values._subCat_5.trim()
-    },
-    {
-        headers: { 
-            "Content-Type": "application/json",
-            "Authorization": "Bearer "+token
-      }}
-    ).then( async response=>{
-        console.log("Category",response.data);
-        return response.data.ifExist; 
-        // if(response.data.ifExist){
-        //    let isExistItem =  await checkItem(values, response.data.category.cat_id);
-        //    if(!isExistItem){
-        //     //    console.log("isExistItem", isExistItem);
-        //        let responseSubmit= await addIm_Item(values, response.data.category.cat_id);
-        //        if(responseSubmit === "Something went wrong..."){
-        //            return "Something went wrong...";
-        //        }
-        //        else{
-        //            return responseSubmit;
-        //        } 
-        //    }
-        //    else{
-        //        return "Item already exist"
-        //    }
-        // }else{
+    //check access tocken expiry function
+    let tocken_valid_result = await tocken_valid();
+    if(tocken_valid_result){
+            
+        console.log("values",values);
 
-        // }
+        let token = getToken();
+        return axios.post("/api/import/category/check",{
+            "category": values._importMCategory.trim(),
+            "subCat_1": values._subCat_1.trim(),
+            "subCat_2": values._subCat_2.trim(),
+            "subCat_3": values._subCat_3.trim(),
+            "subCat_4": values._subCat_4.trim(),
+            "subCat_5": values._subCat_5.trim()
+        },
+        {
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": "Bearer "+token
+        }}
+        ).then( async response=>{
+            console.log("Category",response.data);
+            return response.data; 
         
-    })
-    .catch(error =>{
-        // return error.response.data.message.toString;
-         console.log(error.response.status );
-         return "Something went wrong...";
-    });
+            
+        })
+        .catch(error =>{
+        // return "Something went wrong...";
+        console.log("get imports "+ error);
+        return "Something went wrong..."
+        
+
+        });
+    }
 }
 
 
 //add new category
 const addNewCategory = async(values)=>{
-    let token = getToken();
-    return axios.post("/api/import/category/add",{
-        "category": values._importMCategory.trim(),
-        "subCat_1": values._subCat_1.trim(),
-        "subCat_2": values._subCat_2.trim(),
-        "subCat_3": values._subCat_3.trim(),
-        "subCat_4": values._subCat_4.trim(),
-        "subCat_5": values._subCat_5.trim()
-    },
-    {
-        headers: { 
-            "Content-Type": "application/json",
-            "Authorization": "Bearer "+token
-      }}
-    ).then( async response=>{
-        console.log("Response",response.data);
-        return response.data; 
-    })
-    .catch(error =>{
-        // return error.response.data.message.toString;
-         console.log(error.response.status );
-         return "Something went wrong...";
-    });
+
+     //check access tocken expiry function
+     let tocken_valid_result = await tocken_valid();
+     if(tocken_valid_result){
+            
+        let token = getToken();
+        return axios.post("/api/import/category/add",{
+            "category": values._importMCategory.trim(),
+            "subCat_1": values._subCat_1.trim(),
+            "subCat_2": values._subCat_2.trim(),
+            "subCat_3": values._subCat_3.trim(),
+            "subCat_4": values._subCat_4.trim(),
+            "subCat_5": values._subCat_5.trim()
+        },
+        {
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": "Bearer "+token
+        }}
+        ).then( async response=>{
+            console.log("Response",response.data);
+            return response.data; 
+        })
+        .catch(error =>{
+        // return "Something went wrong...";
+        console.log("get imports "+ error);
+        return "Something went wrong..."
+        
+        });
+     }
 }
 
 
 //check the item availability
 const checkItem= async(values, catId)=>{
-    let token = getToken();
-    return axios.post("/api/import/check",{
-        
-            "itemName":values._importName,
-            "brand":values._importBrand,
-            "catId": catId
-    },
-    {
-        headers: { 
-            "Content-Type": "application/json",
-            "Authorization": "Bearer "+token
-      }}
-    ).then( async response=>{
-        console.log(response);
-        return response.data;
-        // setUserSession(response.data.token, response.data.user)
-        
-    })
-    .catch(error =>{
-        // return error.response.data.message.toString;
-         console.log(error.response.status );
-         return "Something went wrong...";
-    });
+
+     //check access tocken expiry function
+     let tocken_valid_result = await tocken_valid();
+     if(tocken_valid_result){
+
+        let token = getToken();
+        return axios.post("/api/import/check",{
+            
+                "itemName":values._importName,
+                "brand":values._importBrand,
+                "catId": catId
+        },
+        {
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": "Bearer "+token
+        }}
+        ).then( async response=>{
+            console.log(response);
+            return response.data;
+            // setUserSession(response.data.token, response.data.user)
+            
+        })
+        .catch(error =>{
+            // return "Something went wrong...";
+            console.log("get imports "+ error);
+            return "Something went wrong..."
+            
+        });
+     }
 }
 
 //create import item
 const addIm_Item = async(values, catId)=>{
-    let token = getToken();
-    return axios.post("/api/import/add/category/"+catId,{
+
+     //check access tocken expiry function
+     let tocken_valid_result = await tocken_valid();
+     if(tocken_valid_result){
+        let token = getToken();
+
+        //get user name 
+        let user = getUser();
+        console.log("User"+user.username);
         
-        "itemName":values._importName,
-        "unitType":values._importUnitType,
-        "qty":values._importQty,
-        "refillRate":values._minRate,
-        "brand":values._importBrand,
-        "note":values._importNote
-    },
-    {
-        headers: { 
-            "Content-Type": "application/json",
-            "Authorization": "Bearer "+token
-      }}
-    ).then( async response=>{
-        console.log(response);
-        // setUserSession(response.data.token, response.data.user)
-        
-    })
-    .catch(error =>{
-        // return error.response.data.message.toString;
-         console.log(error.response.status );
-         return "Something went wrong...";
-    });
+        return axios.post("/api/import/add/category/"+catId,{
+            
+            "itemName":values._importName,
+            "unitType":values._importUnitType,
+            "qty":values._importQty,
+            "refillRate":values._minRate,
+            "brand":values._importBrand,
+            "note":values._importNote,
+            "addedBy":user.username
+        },
+        {
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": "Bearer "+token
+        }}
+        ).then( async response=>{
+            console.log(response);
+            // setUserSession(response.data.token, response.data.user)
+            return true;
+            
+        })
+        .catch(error =>{
+            // return "Something went wrong...";
+            console.log("get imports "+ error);
+            return false;
+            
+        });
+     }
 }
 
 //get import category data with pagination
 const getImportCategoryData = async (offset, pageSize, search)=>{
-    let token = getToken();
-    return axios.post("/api/import/category/all/"+ offset +"/"+pageSize,{
-        "search":search.trim()
-    },
-    {
-        headers: { 
-            "Content-Type": "application/json",
-            "Authorization": "Bearer "+token
-      }}
-    ).then(response=>{
-        console.log(response);
-        console.log("Response --",response.data);
-        return response.data;
-    }).catch(error =>{
-        return "Something went wrong...";
-        //  console.log(error);
-        // if (error.response.statuscode == 403) {
-        //     console.log(error);
-        // } else {
-        //   console.log("something else");
-        // }
-    });
+
+     //check access tocken expiry function
+     let tocken_valid_result = await tocken_valid();
+     if(tocken_valid_result){
+        let token = getToken();
+        return axios.post("/api/import/category/all/"+ offset +"/"+pageSize,{
+            "search":search.trim()
+        },
+        {
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": "Bearer "+token
+        }}
+        ).then(response=>{
+            console.log(response);
+            console.log("Response --",response.data);
+            return response.data;
+        }).catch(error =>{
+            // return "Something went wrong...";
+            console.log("get imports "+ error);
+            return "Something went wrong..."
+            
+        });
+     }
 }
 
 //get import bill data with pagination
 const getImportBillData = async (offset, pageSize, search)=>{
-    let token = getToken();
-    return axios.post("/api/import/bill/all/"+ offset +"/"+pageSize,{
-        "search":search.trim()
-    },
-    {
-        headers: { 
-            "Content-Type": "application/json",
-            "Authorization": "Bearer "+token
-      }}
-    ).then(response=>{
-        console.log(response);
-        console.log("Response --",response.data.content);
-        return response.data;
-    }).catch(error =>{
-        return "Something went wrong...";
-        //  console.log(error);
-        // if (error.response.statuscode == 403) {
-        //     console.log(error);
-        // } else {
-        //   console.log("something else");
-        // }
-    });
+
+     //check access tocken expiry function
+     let tocken_valid_result = await tocken_valid();
+     if(tocken_valid_result){
+
+        let token = getToken();
+        return axios.post("/api/import/bill/all/"+ offset +"/"+pageSize,{
+            "search":search.trim()
+        },
+        {
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": "Bearer "+token
+        }}
+        ).then(response=>{
+            console.log(response);
+            console.log("Response --",response.data.content);
+            return response.data;
+        }).catch(error =>{
+            // return "Something went wrong...";
+            console.log("get imports "+ error);
+            return "Something went wrong..."
+            
+        });
+     }
 }
 
 const getImportBillById = async (bill_id)=>{
-    let token = getToken();
-    return axios.get("/api/import/bill/find/"+ bill_id,
-    {
-        headers: { 
-            "Content-Type": "application/json",
-            "Authorization": "Bearer "+token
-      }}
-    ).then(response=>{
-        console.log(response);
-        console.log("Response --",response.data);
-        return response.data;
-    }).catch(error =>{
-        return "Something went wrong...";
-        
-    });
+
+     //check access tocken expiry function
+     let tocken_valid_result = await tocken_valid();
+     if(tocken_valid_result){
+
+        let token = getToken();
+        return axios.get("/api/import/bill/find/"+ bill_id,
+        {
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": "Bearer "+token
+        }}
+        ).then(response=>{
+            console.log(response);
+            console.log("Response --",response.data);
+            return response.data;
+        }).catch(error =>{
+            // return "Something went wrong...";
+            console.log("get imports "+ error);
+            return "Something went wrong..."
+            
+            
+        });
+     }
 }
 
 const getAllBills = async ()=>{
-    let token = getToken();
-    return axios.get("/api/import/bill/all",
-    {
-        headers: { 
-            "Content-Type": "application/json",
-            "Authorization": "Bearer "+token
-      }}
-    ).then(response=>{
-        console.log(response);
-        console.log("Response --",response.data);
-        return response.data;
-    }).catch(error =>{
-        return "Something went wrong...";
-        
-    });
+
+     //check access tocken expiry function
+     let tocken_valid_result = await tocken_valid();
+     if(tocken_valid_result){
+        let token = getToken();
+        return axios.get("/api/import/bill/all",
+        {
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": "Bearer "+token
+        }}
+        ).then(response=>{
+            console.log(response);
+            console.log("Response --",response.data);
+            return response.data;
+        }).catch(error =>{
+            // return "Something went wrong...";
+            console.log("get imports "+ error);
+            return "Something went wrong..."
+            
+        });
+     }
 }
 
 export {getImportData, 
@@ -370,5 +417,6 @@ export {getImportData,
     getImportCategoryData,
     getAllBills,
     getImportItemById, 
-    getImportBillData, 
+    getImportBillData,
+    addIm_Item, 
     getImportBillById, getImportsByCategory, addNewCategory, searchImportItem};

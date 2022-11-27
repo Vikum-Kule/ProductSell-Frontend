@@ -33,6 +33,7 @@ function Im_Items() {
 
     //columns for table
     const columns = [
+        { id: 'code', label: 'Code', minWidth: 80 },
         { id: 'item', label: 'Item', minWidth: 100 },
         { id: 'brand', label: 'Brand', minWidth: 100 },
         {
@@ -54,8 +55,8 @@ function Im_Items() {
         },
       ];
       
-      function createData( item, brand, category_m, tag_1, tag_2, tag_3, tag_4, tag_5, qty, im_id) {
-        return {  item, brand, category_m, tag_1, tag_2, tag_3, tag_4, tag_5, qty, im_id };
+      function createData( code, item, brand, category_m, tag_1, tag_2, tag_3, tag_4, tag_5, qty, im_id) {
+        return { code, item, brand, category_m, tag_1, tag_2, tag_3, tag_4, tag_5, qty, im_id };
       }
 
       const [page, setPage] = React.useState(0);
@@ -87,7 +88,9 @@ function Im_Items() {
           let category_list = importSet[x].im_category;
           console.log("category_list", category_list)
           //set data in new set list to display in the table
-          newSet.push( createData(importSet[x].itemName, 
+          newSet.push( createData(
+            importSet[x].product_code,
+            importSet[x].itemName, 
             importSet[x].brand, 
             category_list.category,
             category_list.subCat_1,
@@ -124,7 +127,7 @@ function Im_Items() {
               {openForm ? <ImportFrom setOpenForm={setOpenForm} />:
                 <Grid container spacing={5}>
                     <Grid item xs={12} sm={11} sx={12}>
-                      <Typography mt={1} variant="h6"> Import Items </Typography>
+                      <Typography mt={1} variant="h6"> Import Inventory </Typography>
                     </Grid>
                     <Grid item xs={12} sm={9} sx={12}>
                           <Paper
@@ -145,7 +148,7 @@ function Im_Items() {
                         </Paper>
                     </Grid>
                     <Grid item xs={12} sm={3} sx={12}>
-                      <Button 
+                    <Button 
                         variant="contained" 
                         onClick={()=>{setOpenForm(true)}}
                       >
