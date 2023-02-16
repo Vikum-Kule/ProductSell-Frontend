@@ -82,7 +82,7 @@ function Template({children}) {
     if(index===1){
       handleClickImport();
     }
-    else if(index ===5){
+    else if(index ===6){
       handleClickExport();
     }
   };
@@ -183,7 +183,7 @@ function Template({children}) {
             </ListItemButton>
             <ListItemButton 
             // onClick={handleClickImport}
-            selected={selectedIndex==1 || selectedIndex==2 || selectedIndex==3 || selectedIndex==4}
+            selected={selectedIndex==1 || selectedIndex==2 || selectedIndex==3 || selectedIndex==4 || selectedIndex==5}
               onClick={(event) => handleListItemClick(event, 1,"/template/im_items")}
               style={
                 {
@@ -244,11 +244,14 @@ function Template({children}) {
               </List>
             </Collapse>
             <ListItemButton 
-            selected={selectedIndex==6}
+            selected={selectedIndex==6 || selectedIndex==7}
             onClick={(event) => handleListItemClick(event, 6,"/template/ex_products")}
             style={
               {
-                backgroundColor:selectedIndex==5?"#15285c":"#2f3c66"
+                backgroundColor:(
+                  selectedIndex==6 ||
+                  selectedIndex==7
+                  )?"#15285c":"#2f3c66"
               }
             }
             >
@@ -261,8 +264,8 @@ function Template({children}) {
             <Collapse in={openExport} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
               <ListItemButton sx={{ pl: 4 }}
-                  selected={selectedIndex==5}
-                  onClick={(event) => handleListItemClick(event, 5,"/template/ex_products")}
+                  selected={selectedIndex==7}
+                  onClick={(event) => handleListItemClick(event, 7,"/template/ex_products")}
                 >
                   <ListItemIcon>
                     {/* <StarBorder /> */}
