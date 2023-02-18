@@ -449,6 +449,34 @@ const getStockUpdateData = async (offset, pageSize, search)=>{
     
 }
 
+//get import stock update by id
+const getImportStockUpdateById = async (intakeId)=>{
+
+    //check access tocken expiry function
+    let tocken_valid_result = await tocken_valid();
+    if(tocken_valid_result){
+
+       let token = getToken();
+       return axios.get("/api/stockintake/"+ intakeId,
+       {
+           headers: { 
+               "Content-Type": "application/json",
+               "Authorization": "Bearer "+token
+       }}
+       ).then(response=>{
+           console.log(response);
+           console.log("Response --",response.data);
+           return response.data;
+       }).catch(error =>{
+           // return "Something went wrong...";
+           console.log("get imports "+ error);
+           return "Something went wrong..."
+           
+           
+       });
+    }
+}
+
 
 
 // /////////////////////////////////////////////////////
@@ -464,4 +492,5 @@ export {getImportData,
     addIm_Item, 
     getImportBillById,
     getStockUpdateData,
+    getImportStockUpdateById,
     getImportsByCategory, addNewCategory, searchImportItem};

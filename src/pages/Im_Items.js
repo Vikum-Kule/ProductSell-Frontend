@@ -11,7 +11,7 @@ import Box from '@mui/material/Box';
 
 const useStyles = makeStyles({
     container:{
-        padding:"10px"
+        padding:"5px"
     }
   
   });

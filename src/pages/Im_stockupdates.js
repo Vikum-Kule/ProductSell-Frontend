@@ -7,6 +7,7 @@ import {getStockUpdateData} from '../services/Import';
 import ImportFrom from '../components/ImportFrom';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import { useHistory } from 'react-router';
 
 const useStyles = makeStyles({
   container:{
@@ -17,6 +18,8 @@ const useStyles = makeStyles({
 
 function Im_stockupdates() {
   const classes = useStyles();
+  const history = useHistory();
+
     useEffect(async () => {
       
       await fetchData(search, page);
@@ -46,10 +49,11 @@ function Im_stockupdates() {
           minWidth: 100,
           format: (value) => value.toLocaleString('en-US'),
         },
+        { id: 'action', label: 'Actions', minWidth: 100 },
       ];
       
-      function createData( date ,item, brand, billNo, qty, total, id) {
-        return { date ,item, brand, qty, billNo, total, id};
+      function createData( date ,item, brand, billNo, qty, total, action, id) {
+        return { date ,item, brand, qty, billNo, total, action, id};
       }
 
       const [page, setPage] = React.useState(0);
@@ -106,6 +110,19 @@ function Im_stockupdates() {
         
     }
 
+    const handleAction= (event, id)=>{
+      switch(event) {
+        case 'view':
+          history.push('/template/stock_update_view/'+id);
+          break;
+        case 'edit':
+          return 'bar';
+        case 'delete':
+          return 'bar';
+        default:
+          return 'foo';
+      }
+    }
 
     return (
         
@@ -156,6 +173,7 @@ function Im_stockupdates() {
                       tablePagin={true} 
                       totalPages = {totalPages}
                       getData = {fetchData}
+                      handleAction = {handleAction}
                       />
                     }
                         
