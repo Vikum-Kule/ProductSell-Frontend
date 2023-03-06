@@ -265,7 +265,6 @@ function Im_addBill({setOpenForm}) {
             
             //get user name 
             let user = getUser();
-            
             const billBody = {
                 "addedBy":user.username,
                 "billNo":values._billNo,
