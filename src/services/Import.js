@@ -6,7 +6,7 @@ import tocken_valid from "./TokenValid";
 
 
 //get import data with pagination
-const getImportData = async (offset, pageSize, search)=>{
+const getImportData = async (offset, pageSize, filter)=>{
     
     //check access tocken expiry function
     let tocken_valid_result = await tocken_valid();
@@ -14,7 +14,12 @@ const getImportData = async (offset, pageSize, search)=>{
         let token = getToken();
 
         return axios.post("/api/import/all/"+ offset +"/"+pageSize,{
-            "search":search.trim()
+            "productCode":filter._productCode?filter._productCode.trim():null,
+            "itemName":filter._itemName?filter._itemName.trim():null,
+            "brand":filter._brand?filter._brand.trim():null,
+            "addedBy":filter._addedBy?filter._addedBy.trim():null,
+            "unitType":filter._unitType?filter._unitType.trim():null,
+            "category":filter._category?filter._category.trim():null
         },
         {
             headers: { 
@@ -272,7 +277,8 @@ const addIm_Item = async(values, catId)=>{
         console.log("User"+user.username);
         
         return axios.post("/api/import/add/category/"+catId,{
-            
+
+            "product_code":values._productCode ?values._productCode :"-" ,
             "itemName":values._importName,
             "unitType":values._importUnitType,
             "qty":values._importQty,
@@ -410,11 +416,39 @@ const getAllBills = async ()=>{
      }
 }
 
+//create import item
+const addImportBill = async(billBody)=>{
+
+    //check access tocken expiry function
+    let tocken_valid_result = await tocken_valid();
+    if(tocken_valid_result){
+       let token = getToken();
+
+       return axios.post("/api/import/bill/add",billBody,
+       {
+           headers: { 
+               "Content-Type": "application/json",
+               "Authorization": "Bearer "+token
+       }}
+       ).then( async response=>{
+           console.log(response);
+           return true;
+           
+       })
+       .catch(error =>{
+           // return "Something went wrong...";
+           console.log("Bill Error "+ error);
+           return false;
+           
+       });
+    }
+}
+
 ///////////////////////////////////////////////// stock update
 
 
 //get import data with pagination
-const getStockUpdateData = async (offset, pageSize, search)=>{
+const getStockUpdateData = async (offset, pageSize, filter)=>{
     
     //check access tocken expiry function
     let tocken_valid_result = await tocken_valid();
@@ -422,11 +456,11 @@ const getStockUpdateData = async (offset, pageSize, search)=>{
         let token = getToken();
 
         return axios.post("/api/stockintake/all/"+ offset +"/"+pageSize,{
-                "ProductCode":null,
-                "itemName":null,
-                "brand":null,
-                "addedBy":null,
-                "billNo":null
+                "ProductCode":filter._productCode?filter._productCode.trim():null,
+                "itemName":filter._itemName?filter._itemName.trim():null,
+                "brand":filter._brand?filter._brand.trim():null,
+                "addedBy":filter._addedBy?filter._addedBy.trim():null,
+                "billNo":filter._billNo?filter._billNo.trim():null
             
         },
         {
@@ -489,6 +523,7 @@ export {getImportData,
     getAllBills,
     getImportItemById, 
     getImportBillData,
+    addImportBill,
     addIm_Item, 
     getImportBillById,
     getStockUpdateData,

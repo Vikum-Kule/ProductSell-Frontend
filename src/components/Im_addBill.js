@@ -1,15 +1,16 @@
 import { Button, Divider, Grid, IconButton, InputBase, Modal, Pagination, Paper, Stack, TextField, Tooltip, Typography } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close';
 import React, { useState } from 'react'
-import { getAllBills, getImportItemById } from '../services/Import';
+import { getAllBills, getImportItemById, addImportBill } from '../services/Import';
 import AutoCompleteFeild from '../FormComponents/AutoCompleteFeild';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import { Box } from '@mui/system';
 import InputField from '../FormComponents/InputField'
 import SelectingTable from '../FormComponents/SelectingTable';
 import {getImportData} from '../services/Import';
-import SearchIcon from '@mui/icons-material/Search';
+import {getUser} from "../Utils/Common"
 import WritableTable from './WritableTable';
+import FormAlert from './FormAlert';
 
 
 const style = {
@@ -32,6 +33,40 @@ function Im_addBill({setOpenForm}) {
         setBills(bill_list);
     }
 
+    /// filter area /////////////////////////////////
+  
+       // filter values
+       const[filter, setFilter]= useState({
+        _productCode:'',
+        _itemName:'',
+        _brand:'',
+        _category:'',
+        _unitType:''
+  
+    });
+  
+    //reset filters
+    const resetFilters =()=>{
+      setFilter({
+        _productCode:'',
+        _itemName:'',
+        _brand:'',
+        _category:'',
+        _unitType:''
+    });
+  
+    fetchData();
+    }
+  
+     //to handle changing filters
+     const handleFilterChange =(name, val)=>{
+      setFilter({
+          ...filter,
+          [name]: val,
+      });
+    }
+    /////////////////////////////////////////////////
+
      //for input feild values
      const[values, setValues]= useState({
         _billNo:'',
@@ -43,6 +78,8 @@ function Im_addBill({setOpenForm}) {
 
     //Reset values
     const resetValues=()=>{
+        closeAlert();
+        setSelectedItems([]);
         setValues({
             _billNo:'',
             _shop:'',
@@ -51,6 +88,28 @@ function Im_addBill({setOpenForm}) {
             _billNote:''
         })
     }
+
+
+    // Alerts ////////////////////////////////////
+    
+    //display alert...
+    const[displayAlert, setAlert] = useState(false);
+
+    //alert data
+    const[alertData, setAlertData] = useState({
+        type:'',
+        message:''
+    });
+
+    const closeAlert = ()=>{
+        setAlert(false);
+        setAlertData({
+            type:'',
+            message:''
+        })
+    }
+
+    //////////////////////////////////////////////
 
     //dataset for bills
     const[bills, setBills]= useState([]);
@@ -72,24 +131,6 @@ function Im_addBill({setOpenForm}) {
         });
         
     }
-
-        //columns for table
-            // const columns = [
-            //     { id: 'item', label: 'Item', minWidth: 100 },
-            //     { id: 'brand', label: 'Brand', minWidth: 100 },
-            //     {
-            //     id: 'category_m',
-            //     label: 'Main Category',
-            //     minWidth: 100,
-            //     format: (value) => value.toLocaleString('en-US'),
-            //     },
-            //     {
-            //     id: 'qty',
-            //     label: 'Qty',
-            //     minWidth: 100,
-            //     format: (value) => value.toLocaleString('en-US'),
-            //     },
-            // ];
 
         const columns = [
         {
@@ -150,10 +191,10 @@ function Im_addBill({setOpenForm}) {
       //search item to add bill
       const [search, setSearch] = React.useState("");
 
-    const fetchData = async(keyword, pageNo)=>{
+    const fetchData = async()=>{
         setOpenTable(true);
         //get import items data when page loading...
-        let result = await getImportData(pageNo,2, keyword);
+        let result = await getImportData(page,3, filter);
 
         let importSet = result.content;
        
@@ -174,22 +215,14 @@ function Im_addBill({setOpenForm}) {
         setRows(newSet);
     }
 
-    const searchItem= async(event, value)=>{
-        setPage(0);
-        setSearch(event.target.value);
-        console.log(event.target.value);
-        await fetchData(event.target.value,0);
-        
-    }
 
     const handleOpenTable=async()=>{
-        await fetchData(search, page);
+        await fetchData();
     }
 
     const handleChangepage = async(event, value) => {
         setPage(value-1);
-        console.log("Page", page);
-        await fetchData(search, value-1);
+        await fetchData();
       }
 
     const handleCloseTable= async()=>{
@@ -208,10 +241,62 @@ function Im_addBill({setOpenForm}) {
         console.log("Selected Rows", selectedRows);
     }
 
-    function createDataForSelectedTable( item, brand, category_m, qty,unitType, discountPerItem, price, im_id) {
-        return {  item, brand, category_m, qty,unitType, discountPerItem, price, im_id };
+    function createDataForSelectedTable( item, brand, category_m, qty,unitType, discountPerItem, price, importId) {
+        return {  item, brand, category_m, qty,unitType, discountPerItem, price, importId };
       }
 
+      
+      const submitValue= async()=>{
+        
+        if(rows){
+            //set bill items according to the bill body
+            const importBillItems =[];
+            for(let x=0; x<rows.length; x++ ){
+                const item ={
+                    "bill_qty":parseInt(rows[x].qty),
+                    "discount_perItem":parseFloat(rows[x].discountPerItem),
+                    "price":parseFloat(rows[x].price),
+                    "importId": rows[x].importId
+                }
+                importBillItems.push(item);
+            }
+            
+            //create bill body
+            
+            //get user name 
+            let user = getUser();
+            
+            const billBody = {
+                "addedBy":user.username,
+                "billNo":values._billNo,
+                "shop":values._shop,
+                "paymentStatus":"Cash",
+                "note":values._billNote,
+                "total": 100,
+                "discount": values._discount,
+                "import_billItems":importBillItems
+            }
+
+            console.log(billBody);
+            let result = await addImportBill(billBody);
+
+            if(result){
+                resetValues();
+                setAlertData({
+                    type:"success",
+                    message:"Item submitted.."
+                })
+                setAlert(true);
+            }else{
+                setAlertData({
+                    type:"error",
+                    message:"Something went wrong..."
+                })
+                setAlert(true);
+            }
+
+        }
+      }
     
     return (
         <Grid container spacing={2}>
@@ -228,7 +313,7 @@ function Im_addBill({setOpenForm}) {
                     </IconButton>
                 </Tooltip>
             </Grid>
-            <Grid item item xs={12} sm={4} sx={12}>
+            <Grid item xs={12} sm={4} sx={12}>
                     <InputField
                         name="_billNo"
                         errorMsg={error._billNo}
@@ -311,12 +396,17 @@ function Im_addBill({setOpenForm}) {
                          />
                 </Grid>
             <Grid item xs={12} sm={12} sx={12}>
+                {displayAlert?
+                    <FormAlert type={alertData.type} message={alertData.message} />: null
+                }
+            </Grid>
+            <Grid item xs={12} sm={12} sx={12}>
                         <Grid container justifyContent="space-between" >
                         <Grid item xs={12} sm={4} sx={12}>
                             <Button 
                                 fullWidth 
                                 variant="contained"
-                                // onClick={submitValue}
+                                onClick={submitValue}
                                 >
                                 Submit</Button>
                         </Grid>
@@ -338,23 +428,70 @@ function Im_addBill({setOpenForm}) {
                     >
                         <Paper  sx={style} >
                             <Grid container >
-                                <Grid item xs={12} sm={9} sx={12}>
-                                    <Paper
-                                        variant="outlined" 
-                                        component="form"
-                                        sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 400 }}
-                                        >
-                                        <InputBase
-                                            sx={{ ml: 1, flex: 1 }}
-                                            placeholder="Search items"
-                                            inputProps={{ 'aria-label': 'search google maps' }}
-                                            value={search}
-                                            onChange={searchItem}
-                                        />
-                                        <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
-                                            <SearchIcon />
-                                        </IconButton>
-                                    </Paper>
+                                <Grid item xs={12} sm={12} sx={12}>
+                                        <Grid container spacing={2}>
+                                            <Grid item xs={12} sm={4} sx={12}>
+                                                <InputField
+                                                    name="_productCode"
+                                                    value={filter._productCode} 
+                                                    onChange={(event, newInputValue) => handleFilterChange(event, newInputValue)} 
+                                                    type="text" 
+                                                    label="Product Code"
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12} sm={4} sx={12}>
+                                                <InputField
+                                                    name="_itemName"
+                                                    value={filter._itemName} 
+                                                    onChange={(event, newInputValue) => handleFilterChange(event, newInputValue)} 
+                                                    type="text" 
+                                                    label="Item Name"
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12} sm={4} sx={12}>
+                                                <InputField
+                                                    name="_brand"
+                                                    value={filter._brand} 
+                                                    onChange={(event, newInputValue) => handleFilterChange(event, newInputValue)} 
+                                                    type="text" 
+                                                    label="Brand"
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12} sm={3} sx={12}>
+                                                <InputField
+                                                    name="_category"
+                                                    value={filter._category} 
+                                                    onChange={(event, newInputValue) => handleFilterChange(event, newInputValue)} 
+                                                    type="text" 
+                                                    label="Category"
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12} sm={3} sx={12}>
+                                                <InputField
+                                                    name="_unitType"
+                                                    value={filter._unitType} 
+                                                    onChange={(event, newInputValue) => handleFilterChange(event, newInputValue)} 
+                                                    type="text" 
+                                                    label="Unit Type"
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12} sm={4} sx={12}>
+                                                <Stack direction="row" spacing={2}>
+                                                    <Button 
+                                                    variant="contained" 
+                                                    onClick={()=>{resetFilters()}}
+                                                    >
+                                                    Reset
+                                                    </Button>
+                                                    <Button 
+                                                    variant="contained" 
+                                                    onClick={()=>{fetchData()}}
+                                                    >
+                                                    Filter
+                                                    </Button>
+                                                </Stack>
+                                            </Grid>
+                                        </Grid>
                                 </Grid>
                                 <Grid item  xs={12} sm={12} sx={12}>
                                     <SelectingTable

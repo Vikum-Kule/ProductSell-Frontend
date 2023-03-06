@@ -58,7 +58,7 @@ function Im_Bill() {
 
           const newSet = []
         console.log(billSet.length);
-        if(billSet.length == 0){
+        if(billSet.length != 0){
           for(let x=0; x< billSet.length; x++){
             
             let splitDate = billSet[x].createdDate.split("T");
@@ -74,9 +74,9 @@ function Im_Bill() {
         }
         set_billLoading(false);
           
-          // console.log("ImportSet",newSet);
           // set rows to table
           setRows(newSet);
+
       }
 
 

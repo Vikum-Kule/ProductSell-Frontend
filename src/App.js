@@ -51,7 +51,7 @@ function App() {
                 <Route path="/template/ex_products">
                   <Ex_Products/>
                 </Route>
-                <Route path="/template/im_item_view">
+                <Route path="/template/im_item_view:importId">
                   <ImportItemView/>
                 </Route>
                 <Route path="/template/im_category_view">

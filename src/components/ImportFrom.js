@@ -19,6 +19,7 @@ function ImportFrom({setOpenForm}) {
     const[value, setValue]= useState({
         _importName:'',
         _importBrand:'',
+        _productCode:'',
         _importMCategory:'',
         _subCat_1:'',
         _subCat_2:'',
@@ -37,6 +38,7 @@ function ImportFrom({setOpenForm}) {
         setValue({
             _importName:'',
             _importBrand:'',
+            _productCode:'',
             _importMCategory:'',
             _subCat_1:'',
             _subCat_2:'',
@@ -231,6 +233,15 @@ function ImportFrom({setOpenForm}) {
                         errorMsg={error._importBrand}
                         onClick={loadData} 
                         onchange={(event, newInputValue) => handleChange(event, newInputValue)}  />
+                </Grid>
+                <Grid item xs={12} sm={9} sx={12}>
+                    <InputField
+                        name="_productCode"
+                        value={value._productCode} 
+                        onChange={(event, newInputValue) => handleChange(event, newInputValue)} 
+                        type="text" 
+                        label="Product Code"
+                         />
                 </Grid>
                 <Grid item xs={12} sm={9} sx={12}>
                     <AutoCompleteFeild 
