@@ -8,6 +8,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import Im_CategoryForm from '../components/Im_CategoryForm';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import { useHistory } from 'react-router';
+
 const useStyles = makeStyles({
     container:{
         padding:"10px"
@@ -17,6 +19,7 @@ const useStyles = makeStyles({
 
 function Im_Categories() {
     const classes = useStyles();
+    const history = useHistory();
 
     const [rows, setRows]= React.useState([]);
     const [page, setPage] = React.useState(0);
@@ -31,8 +34,8 @@ function Im_Categories() {
       }, [])
 
       //creating data for rows according to Id
-      function createData( category, subCat_1, subCat_2, subCat_3, subCat_4, subCat_5,count, cat_id) {
-        return {  category, subCat_1, subCat_2, subCat_3, subCat_4, subCat_5, count, cat_id};
+      function createData( category, subCat_1, subCat_2, subCat_3, subCat_4, subCat_5, count, action, cat_id) {
+        return {  category, subCat_1, subCat_2, subCat_3, subCat_4, subCat_5, count, action, cat_id};
       }
 
     //columns for table
@@ -75,6 +78,7 @@ function Im_Categories() {
             minWidth: 100,
             format: (value) => value.toLocaleString('en-US'),
           },
+        { id: 'action', label: 'Actions', minWidth: 100 },
 
       ];
 
@@ -142,6 +146,23 @@ function Im_Categories() {
         
     }
 
+    const handleAction= (event, id)=>{
+      console.log(event);
+      
+      switch(event) {
+        case 'view':
+          history.push('/template/im_category_view/'+id);
+          break;
+        case 'edit':
+          return 'bar';
+        case 'delete':
+          return 'bar';
+        default:
+          return 'foo';
+      }
+    }
+
+
 
     return (
         <Paper className={classes.container}>
@@ -182,10 +203,10 @@ function Im_Categories() {
                       <CircularProgress />
                     </Box>:
                     <TableItem
-                      popUpList={popUpList} 
-                      dropDown={false}
                       columns={columns} 
-                      rows={rows}/>
+                      handleAction = {handleAction}
+                      rows={rows}
+                    />
                     }
                     
                 </Grid>

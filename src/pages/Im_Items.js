@@ -105,7 +105,7 @@ function Im_Items() {
     const handleAction= (event, id)=>{
       switch(event) {
         case 'view':
-          history.push('/template/im_item_view'+id);
+          history.push('/template/im_item_view/'+id);
           break;
         case 'edit':
           return 'bar';

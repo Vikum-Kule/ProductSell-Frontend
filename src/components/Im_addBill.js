@@ -253,7 +253,7 @@ function Im_addBill({setOpenForm}) {
             const importBillItems =[];
             for(let x=0; x<rows.length; x++ ){
                 const item ={
-                    "bill_qty":parseInt(rows[x].qty),
+                    "qty":parseInt(rows[x].qty),
                     "discount_perItem":parseFloat(rows[x].discountPerItem),
                     "price":parseFloat(rows[x].price),
                     "importId": rows[x].importId

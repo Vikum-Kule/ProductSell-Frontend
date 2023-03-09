@@ -1,9 +1,12 @@
 import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import { useParams } from "react-router-dom";
-import {getImportItemById} from '../services/Import';
+import {getImportItemById, getImportStockUpdateByImportId} from '../services/Import';
 import { Grid,Paper,Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
+import TableItem from '../components/TableItem';
 
 
 const useStyles = makeStyles({
@@ -22,6 +25,29 @@ const fetchData= async() =>{
     let result = await getImportItemById(importId);
     if(result){
       setImportItem(result);
+
+      setLoading(true);
+      let stockUpdateSet = await getImportStockUpdateByImportId(importId);
+      console.log(stockUpdateSet);
+
+        const newSet = []
+      if(stockUpdateSet){
+        for(let x=0; x< stockUpdateSet.length; x++){
+          //set data in new set list to display in the table
+          newSet.push( createData(
+            stockUpdateSet[x].addedDate,
+            stockUpdateSet[x].imports.itemName, 
+            stockUpdateSet[x].imports.brand,
+            stockUpdateSet[x].billNo,
+            stockUpdateSet[x].qty,
+            stockUpdateSet[x].totalPrice,
+            stockUpdateSet[x].intakeId));
+        }
+      }
+
+      // set rows to table
+      setRows(newSet);
+      setLoading(false);
     }
     else{
 
@@ -33,6 +59,73 @@ const fetchData= async() =>{
 useEffect(async () => {
     fetchData(); 
   }, [])
+
+  const [rows, setRows]= React.useState([]);
+    const [isLoading, setLoading]= React.useState(false);
+    const [totalRows, setTotalRows] = React.useState(0);
+    const [totalPages, setTotalPages] = React.useState(0);
+
+    
+    //columns for table
+    const columns = [
+      { id: 'date', label: 'Date', minWidth: 80 },
+      { id: 'item', label: 'Item', minWidth: 100 },
+      { id: 'brand', label: 'Brand', minWidth: 100 },
+      { id: 'billNo', label: 'Bill', minWidth: 100 },
+      {
+        id: 'qty',
+        label: 'Qty',
+        minWidth: 100,
+        format: (value) => value.toLocaleString('en-US'),
+      },
+      {
+        id: 'total',
+        label: 'Total',
+        minWidth: 100,
+        format: (value) => value.toLocaleString('en-US'),
+      },
+    ];
+    
+    function createData( date ,item, brand, billNo, qty, total, id) {
+      return { date ,item, brand, qty, billNo, total, id};
+    }
+      const [page, setPage] = React.useState(0);
+      const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    
+      const handleChange = async(event, value) => {
+        setPage(value-1);
+        console.log("Page", page);
+        await fetchData(value-1);
+      };
+
+      // //fetch data for pagination actions
+      // const fetchIntakeData = async()=>{
+      //   setLoading(true);
+      //   console.log(filter);
+      //   //get import items data when page loading...
+      //  let result = await getStockUpdateData(page, rowsPerPage, filter);
+      //  let stockUpdateSet = result.content;
+       
+      // //set total rows and pages
+      // setTotalPages(result.totalPages);
+      // setTotalRows(result.totalElements);
+
+      //   const newSet = []
+      // if(stockUpdateSet){
+      //   for(let x=0; x< stockUpdateSet.length; x++){
+      //     //set data in new set list to display in the table
+      //     newSet.push( createData(
+      //       stockUpdateSet[x].addedDate,
+      //       stockUpdateSet[x].imports.itemName, 
+      //       stockUpdateSet[x].imports.brand,
+      //       stockUpdateSet[x].billNo,
+      //       stockUpdateSet[x].qty,
+      //       stockUpdateSet[x].totalPrice,
+      //       stockUpdateSet[x].intakeId));
+      //   }
+      // }
+      // } 
+    
 
   return (
     <Paper className={classes.container} elevation={8}>
@@ -87,6 +180,23 @@ useEffect(async () => {
           <Grid item xs={12}>
             <Typography variant="h7" fontWeight="700">Note</Typography>
             <Typography>{importItem.note}</Typography>
+          </Grid>
+          <Grid item xs={12} sm={12} sx={12}>
+              {isLoading?
+                <Box sx={{ display: 'flex' , justifyContent: 'center'}}>
+                    <CircularProgress />
+                </Box>:
+                <TableItem 
+                      columns={columns} 
+                      rows={rows} 
+                      page={page} 
+                      setPage={setPage}
+                      tablePagin={true} 
+                      totalPages = {totalPages}
+                      getData = {fetchData}
+                />
+                    }
+                        
           </Grid>
         </Grid>:
         <Grid>{importItem}</Grid>

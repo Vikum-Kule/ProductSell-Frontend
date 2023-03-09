@@ -146,6 +146,34 @@ const getImportsByCategory = async (cat_id)=>{
     }
 }
 
+
+//get categories by category id
+const getCategoryById = async (cat_id)=>{
+
+    //check access tocken expiry function
+    let tocken_valid_result = await tocken_valid();
+    if(tocken_valid_result){
+    
+        let token = getToken();
+        return axios.get("/api/import/category/"+cat_id,
+        {
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": "Bearer "+token
+        }}
+        ).then(response=>{
+            console.log(response);
+            console.log("Response all--",response.data);
+            return response.data;
+        }).catch(error =>{
+            // return "Something went wrong...";
+            console.log("get imports "+ error);
+            return "Something went wrong..."
+            
+        });
+    }
+}
+
 // search import items
  const searchImportItem= async(val)=>{
 
@@ -512,6 +540,37 @@ const getImportStockUpdateById = async (intakeId)=>{
 }
 
 
+//get import stock update by id
+const getImportStockUpdateByImportId = async (importId)=>{
+
+    //check access tocken expiry function
+    let tocken_valid_result = await tocken_valid();
+    if(tocken_valid_result){
+
+       let token = getToken();
+       return axios.get("/api/stockintake/import/"+ importId,
+       {
+           headers: { 
+               "Content-Type": "application/json",
+               "Authorization": "Bearer "+token
+       }}
+       ).then(response=>{
+           console.log(response);
+           console.log("Response --",response.data);
+           return response.data;
+       }).catch(error =>{
+           // return "Something went wrong...";
+           console.log("get imports "+ error);
+           return "Something went wrong..."
+           
+           
+       });
+    }
+}
+
+
+
+
 
 // /////////////////////////////////////////////////////
 
@@ -528,4 +587,6 @@ export {getImportData,
     getImportBillById,
     getStockUpdateData,
     getImportStockUpdateById,
+    getImportStockUpdateByImportId,
+    getCategoryById,
     getImportsByCategory, addNewCategory, searchImportItem};

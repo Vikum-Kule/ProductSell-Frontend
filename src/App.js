@@ -51,10 +51,10 @@ function App() {
                 <Route path="/template/ex_products">
                   <Ex_Products/>
                 </Route>
-                <Route path="/template/im_item_view:importId">
+                <Route path="/template/im_item_view/:importId">
                   <ImportItemView/>
                 </Route>
-                <Route path="/template/im_category_view">
+                <Route path="/template/im_category_view/:cat_id">
                   <CategoryView/>
                 </Route>
                 <Route path="/template/stock_update_view/:intakeId">

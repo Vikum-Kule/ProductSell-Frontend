@@ -9,6 +9,8 @@ import Im_CategoryForm from '../components/Im_CategoryForm';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import Im_addBill from '../components/Im_addBill';
+import { useHistory } from 'react-router';
+
 const useStyles = makeStyles({
     container:{
         padding:"10px"
@@ -30,6 +32,7 @@ const useStyles = makeStyles({
 
 function Im_Bill() {
     const classes = useStyles();
+    const history = useHistory();
 
     const [rows, setRows]= React.useState([]);
     const [page, setPage] = React.useState(0);
@@ -88,8 +91,8 @@ function Im_Bill() {
       }
 
       //creating data for rows according to Id
-      function createDataForBills( bill_num, added_by, date, shop, billId) {        
-        return {  bill_num, added_by, date, shop, billId};
+      function createDataForBills( bill_num, added_by, date, shop, action, billId) {        
+        return {  bill_num, added_by, date, shop, action, billId};
       }
 
       //creating data for selected bill items
@@ -103,6 +106,7 @@ function Im_Bill() {
         { id: 'added_by', label: 'Added By', minWidth: 100 },
         { id: 'date', label: 'Date', minWidth: 100 },
         { id: 'shop', label: 'Shop', minWidth: 100 },
+        { id: 'action', label: 'Actions', minWidth: 100 },
         
       ];
     const columns_bill_view = [
@@ -185,6 +189,20 @@ function Im_Bill() {
     console.log(event.target.value);
     await fetchData(event.target.value,0);
     
+}
+
+const handleAction= (event, id)=>{
+  switch(event) {
+    case 'view':
+      history.push('/template/stock_update_view/'+id);
+      break;
+    case 'edit':
+      return 'bar';
+    case 'delete':
+      return 'bar';
+    default:
+      return 'foo';
+  }
 }
 
 
@@ -313,6 +331,7 @@ function Im_Bill() {
                                 tablePagin={false}
                                 setPage={setPage} 
                                 rowsPerPage={rowsPerPage} 
+                                handleAction = {handleAction}
                                 setRowsPerPage={setRowsPerPage}/>: null
                               }
                               
