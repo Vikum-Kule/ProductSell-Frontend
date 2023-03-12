@@ -90,42 +90,6 @@ useEffect(async () => {
       return { date ,item, brand, qty, billNo, total, id};
     }
       const [page, setPage] = React.useState(0);
-      const [rowsPerPage, setRowsPerPage] = React.useState(10);
-    
-      const handleChange = async(event, value) => {
-        setPage(value-1);
-        console.log("Page", page);
-        await fetchData(value-1);
-      };
-
-      // //fetch data for pagination actions
-      // const fetchIntakeData = async()=>{
-      //   setLoading(true);
-      //   console.log(filter);
-      //   //get import items data when page loading...
-      //  let result = await getStockUpdateData(page, rowsPerPage, filter);
-      //  let stockUpdateSet = result.content;
-       
-      // //set total rows and pages
-      // setTotalPages(result.totalPages);
-      // setTotalRows(result.totalElements);
-
-      //   const newSet = []
-      // if(stockUpdateSet){
-      //   for(let x=0; x< stockUpdateSet.length; x++){
-      //     //set data in new set list to display in the table
-      //     newSet.push( createData(
-      //       stockUpdateSet[x].addedDate,
-      //       stockUpdateSet[x].imports.itemName, 
-      //       stockUpdateSet[x].imports.brand,
-      //       stockUpdateSet[x].billNo,
-      //       stockUpdateSet[x].qty,
-      //       stockUpdateSet[x].totalPrice,
-      //       stockUpdateSet[x].intakeId));
-      //   }
-      // }
-      // } 
-    
 
   return (
     <Paper className={classes.container} elevation={8}>

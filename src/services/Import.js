@@ -364,7 +364,7 @@ const getImportCategoryData = async (offset, pageSize, search)=>{
 }
 
 //get import bill data with pagination
-const getImportBillData = async (offset, pageSize, search)=>{
+const getImportBillData = async (offset, pageSize, filter)=>{
 
      //check access tocken expiry function
      let tocken_valid_result = await tocken_valid();
@@ -372,7 +372,11 @@ const getImportBillData = async (offset, pageSize, search)=>{
 
         let token = getToken();
         return axios.post("/api/import/bill/all/"+ offset +"/"+pageSize,{
-            "search":search.trim()
+            "ProductCode":filter._productCode ? filter._productCode.trim():null,
+            "itemName":filter._itemName ? filter._itemName.trim():null,
+            "shop":filter._shop ? filter._shop.trim():null,
+            "addedBy":filter._addedBy ? filter._addedBy.trim():null,
+            "billNo":filter._billNo ? filter._billNo.trim():null,
         },
         {
             headers: { 

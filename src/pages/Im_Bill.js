@@ -1,15 +1,14 @@
 import { Button, Grid, IconButton, InputBase, Modal, Pagination, Paper, Stack, Typography } from '@mui/material'
 import { typography } from '@mui/system'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { makeStyles } from '@mui/styles';
 import TableItem from '../components/TableItem';
 import { getImportBillData, getImportBillById, searchImportItem } from '../services/Import';
-import SearchIcon from '@mui/icons-material/Search';
-import Im_CategoryForm from '../components/Im_CategoryForm';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import Im_addBill from '../components/Im_addBill';
 import { useHistory } from 'react-router';
+import InputField from '../FormComponents/InputField';
 
 const useStyles = makeStyles({
     container:{
@@ -44,23 +43,22 @@ function Im_Bill() {
     const [search, setSearch] = React.useState("");
 
     useEffect(async () => {
-        await fetchData(search, page);
+        await fetchData();
       }, [])
 
 
       //get bill data
-      const fetchData = async(keyword, pageNo)=>{
+      const fetchData = async()=>{
           //get import Categories data when page loading...
         set_billLoading(true);
-        let result = await getImportBillData(pageNo, rowsPerPage, keyword);
-
+        let result = await getImportBillData(page, rowsPerPage, filter);
+        console.log(result);
         let billSet = result.content;
        
         //set total rows and pages
         setTotalPages(result.totalPages);
 
-          const newSet = []
-        console.log(billSet.length);
+        const newSet = []
         if(billSet.length != 0){
           for(let x=0; x< billSet.length; x++){
             
@@ -83,22 +81,11 @@ function Im_Bill() {
       }
 
 
-      //search item
-      const[searchVal, setSearchVal]= React.useState('');
-
-      const searchBar = async(val)=>{
-          let searchResults = await searchImportItem(val);
-      }
-
       //creating data for rows according to Id
       function createDataForBills( bill_num, added_by, date, shop, action, billId) {        
         return {  bill_num, added_by, date, shop, action, billId};
       }
 
-      //creating data for selected bill items
-      function createDataForBillItems( item, MCategory, tag_1, tag_2, tag_3, tag_4, tag_5, qty, discount, price) {        
-        return {  item, MCategory, tag_1, tag_2, tag_3, tag_4, tag_5, qty, discount, price};
-      }
 
     //columns for table
     const columns_bill = [
@@ -107,20 +94,6 @@ function Im_Bill() {
         { id: 'date', label: 'Date', minWidth: 100 },
         { id: 'shop', label: 'Shop', minWidth: 100 },
         { id: 'action', label: 'Actions', minWidth: 100 },
-        
-      ];
-    const columns_bill_view = [
-        { id: 'item', label: 'Item', minWidth: 200 },
-        { id: 'MCategory', label: 'Category', minWidth: 50 },
-        { id: 'tag_1', label: 'Tag 1', minWidth: 50 },
-        { id: 'tag_2', label: 'Tag 2', minWidth: 50 },
-        { id: 'tag_3', label: 'Tag 3', minWidth: 50 },
-        { id: 'tag_4', label: 'Tag 4', minWidth: 50 },
-        { id: 'tag_5', label: 'Tag 5', minWidth: 50 },
-        { id: 'qty', label: 'qty', minWidth: 30 },
-        { id: 'discount', label: 'discount', minWidth: 30 },
-        { id: 'price', label: 'price', minWidth: 30 },
-
         
       ];
 
@@ -133,68 +106,48 @@ function Im_Bill() {
 
       ];
 
-    //when select a bill table row
-    const getSelectedRow = async(Row)=>{
-        set_itemLoading(true);
-        console.log("Selected Row", Row);
-        let bill_data = await getImportBillById(Row.billId);
-        let billItemSet = bill_data.import_billItems;
-        
-        
-        setBill(bill_data);
-        const newSet = []
-        if(billItemSet){
-          for(let x=0; x< billItemSet.length; x++){
-            // let splitDate = billSet[x].createdDate.split("T");
-            let categorySet = billItemSet[x].imports.im_category;
-            console.log("categorySet", billItemSet[x].imports.im_category);
-            newSet.push( createDataForBillItems(
-              billItemSet[x].itemName+" : "+ billItemSet[x].brand,
-              categorySet.category, 
-              categorySet.subCat_1,
-              categorySet.subCat_2, 
-              categorySet.subCat_3, 
-              categorySet.subCat_4, 
-              categorySet.subCat_5,
-              billItemSet[x].bill_qty+" "+billItemSet[x].unitType,
-              billItemSet[x].discount_perItem,
-              billItemSet[x].price
-                ));
-          }
-          setBillItems(newSet);
-
-        }
-                set_itemLoading(false);
-        
-    }
-
-    // set selected bill data
-    const[slectedBill, setBill]= React.useState(null);
-
-    const[selectedBillItems, setBillItems ] = React.useState(null);
-
-    const handleCloseTable=()=>{
-      setBill(null);
-  }
-
   const handleChange = async(event, value) => {
     setPage(value-1);
     console.log("Page", page);
-    await fetchData(search, value-1);
+    await fetchData();
   }
 
-  const searchItem= async(event, value)=>{
-    setPage(0);
-    setSearch(event.target.value);
-    console.log(event.target.value);
-    await fetchData(event.target.value,0);
-    
-}
+  // filter values
+  const[filter, setFilter]= useState({
+    _productCode:'',
+    _itemName:'',
+    _shop:'',
+    _addedBy:'',
+    _billNo:'',
+
+  });
+
+  //reset filters
+  const resetFilters =()=>{
+  setFilter({
+    _productCode:'',
+    _itemName:'',
+    _shop:'',
+    _addedBy:'',
+    _billNo:'',
+  });
+
+  fetchData(page);
+  }
+
+  //to handle changing filters
+  const handleFilterChange =(name, val)=>{
+  setFilter({
+      ...filter,
+      [name]: val,
+  });
+  }
 
 const handleAction= (event, id)=>{
+  console.log(event);
   switch(event) {
     case 'view':
-      history.push('/template/stock_update_view/'+id);
+      history.push('/template/im_bill_view/'+id);
       break;
     case 'edit':
       return 'bar';
@@ -210,26 +163,8 @@ const handleAction= (event, id)=>{
         <Paper className={classes.container}>
             {openForm? <Im_addBill setOpenForm={setOpenForm}/> :
                 <Grid container spacing={4}>
-                <Grid item xs={12} sm={11} sx={12}>
-                    <Typography mt={1} variant="h6"> Import Bills </Typography>
-                </Grid>
                 <Grid item xs={12} sm={9} sx={12}>
-                          <Paper
-                            variant="outlined" 
-                            component="form"
-                            sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 400 }}
-                            >
-                            <InputBase
-                                sx={{ ml: 1, flex: 1 }}
-                                placeholder="Search Bills"
-                                inputProps={{ 'aria-label': 'search google maps' }}
-                                value={search}
-                                onChange={searchItem}
-                            />
-                            <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
-                                <SearchIcon />
-                            </IconButton>
-                        </Paper>
+                    <Typography mt={1} variant="h6"> Import Bills </Typography>
                 </Grid>
                 <Grid item xs={12} sm={3} sx={12}>
                       <Button 
@@ -238,7 +173,72 @@ const handleAction= (event, id)=>{
                       >
                         Add New Bill
                       </Button>
-                    </Grid>
+                </Grid>
+                <Grid item xs={12} sm={12} sx={12}>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} sm={3} sx={12}>
+                          <InputField
+                            name="_productCode"
+                            value={filter._productCode} 
+                            onChange={(event, newInputValue) => handleFilterChange(event, newInputValue)} 
+                            type="text" 
+                            label="Product Code"
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={4} sx={12}>
+                          <InputField
+                            name="_itemName"
+                            value={filter._itemName} 
+                            onChange={(event, newInputValue) => handleFilterChange(event, newInputValue)} 
+                            type="text" 
+                            label="Item Name"
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={4} sx={12}>
+                          <InputField
+                            name="_shop"
+                            value={filter._shop} 
+                            onChange={(event, newInputValue) => handleFilterChange(event, newInputValue)} 
+                            type="text" 
+                            label="Shop"
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={4} sx={12}>
+                          <InputField
+                            name="_addedBy"
+                            value={filter._addedBy} 
+                            onChange={(event, newInputValue) => handleFilterChange(event, newInputValue)} 
+                            type="text" 
+                            label="Added By"
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={4} sx={12}>
+                          <InputField
+                            name="_billNo"
+                            value={filter._billNo} 
+                            onChange={(event, newInputValue) => handleFilterChange(event, newInputValue)} 
+                            type="text" 
+                            label="Bill Number"
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={4} sx={12}>
+                          <Stack direction="row" spacing={2}>
+                            <Button 
+                              variant="contained" 
+                              onClick={()=>{resetFilters()}}
+                            >
+                             Reset
+                            </Button>
+                            <Button 
+                              variant="contained" 
+                              onClick={()=>{fetchData()}}
+                            >
+                             Filter
+                            </Button>
+                          </Stack>
+                        </Grid>
+                      </Grid>  
+                </Grid>
                 <Grid item xs={12} sm={12} sx={12}>
                   {billLoading?
                     <Box sx={{ display: 'flex' , justifyContent: 'center'}}>
@@ -249,7 +249,8 @@ const handleAction= (event, id)=>{
                       dropDown={false}
                       columns={columns_bill} 
                       rows={rows} 
-                      getRow={getSelectedRow}/>
+                      handleAction = {handleAction}
+                      />
                   }
                     
                 </Grid>
@@ -264,85 +265,6 @@ const handleAction= (event, id)=>{
                         />
                     </Stack>
                 </Grid>
-                <Modal
-                        keepMounted
-                        open={slectedBill}
-                        onClose={handleCloseTable}
-                        aria-labelledby="keep-mounted-modal-title"
-                        aria-describedby="keep-mounted-modal-description"
-                    >
-                        <Paper  sx={style} >
-                        {slectedBill?
-                      <Grid>
-                      {itemLoading?
-                        <Box sx={{ display: 'flex' , justifyContent: 'center'}}>
-                          <CircularProgress />
-                        </Box>:
-                        <Grid container> 
-                          <Grid item xs={12} sm={2} sx={12}>
-                            <Typography variant="subtitle2" gutterBottom component="div">Bill No :</Typography>
-                          </Grid>
-                          <Grid item xs={12} sm={10} sx={12}>
-                            <Typography variant="subtitle2" gutterBottom component="div">{slectedBill.billNo}</Typography>
-                          </Grid>
-                          <Grid item xs={12} sm={2} sx={12}>
-                            <Typography variant="subtitle2" gutterBottom component="div">Shop :</Typography>
-                          </Grid>
-                          <Grid item xs={12} sm={10} sx={12}>
-                            <Typography variant="subtitle2" gutterBottom component="div">{slectedBill.shop}</Typography>
-                          </Grid>
-                          <Grid item xs={12} sm={2} sx={12}>
-                            <Typography variant="subtitle2" gutterBottom component="div">Date :</Typography>
-                          </Grid>
-                          <Grid item xs={12} sm={10} sx={12}>
-                            <Typography variant="subtitle2" gutterBottom component="div">{slectedBill.createdDate}</Typography>
-                          </Grid>
-                          <Grid item xs={12} sm={2} sx={12}>
-                            <Typography variant="subtitle2" gutterBottom component="div">Added By :</Typography>
-                          </Grid>
-                          <Grid item xs={12} sm={10} sx={12}>
-                            <Typography variant="subtitle2" gutterBottom component="div">{slectedBill.addedBy}</Typography>
-                          </Grid>
-                          <Grid item xs={12} sm={2} sx={12}>
-                            <Typography variant="subtitle2" gutterBottom component="div">Payment Status</Typography>
-                          </Grid>
-                          <Grid item xs={12} sm={10} sx={12}>
-                            <Typography variant="subtitle2" gutterBottom component="div"></Typography>
-                          </Grid>
-                          <Grid item xs={12} sm={2} sx={12}>
-                            <Typography variant="subtitle2" gutterBottom component="div">discount:</Typography>
-                          </Grid>
-                          <Grid item xs={12} sm={10} sx={12}>
-                            <Typography variant="subtitle2" gutterBottom component="div">{slectedBill.discount}</Typography>
-                          </Grid>
-                          <Grid item xs={12} sm={2} sx={12}>
-                            <Typography variant="subtitle2" gutterBottom component="div">Total: </Typography>
-                          </Grid>
-                          <Grid item xs={12} sm={10} sx={12}>
-                            <Typography variant="subtitle2" gutterBottom component="div">{slectedBill.total}</Typography>
-                          </Grid>
-                            <Grid item xs={12} sm={12} sx={12}>
-                              {selectedBillItems?
-                                <TableItem
-                                dropDown={false}
-                                columns={columns_bill_view} 
-                                rows={selectedBillItems} 
-                                page={page} 
-                                tablePagin={false}
-                                setPage={setPage} 
-                                rowsPerPage={rowsPerPage} 
-                                handleAction = {handleAction}
-                                setRowsPerPage={setRowsPerPage}/>: null
-                              }
-                              
-                              </Grid>
-                            </Grid>
-                      }
-                      
-                      </Grid>:<Typography > Not selected bill</Typography>
-                    }
-                        </Paper>
-                    </Modal>
             </Grid>
             }
             

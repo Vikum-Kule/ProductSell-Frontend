@@ -11,6 +11,11 @@ import {getImportData} from '../services/Import';
 import {getUser} from "../Utils/Common"
 import WritableTable from './WritableTable';
 import FormAlert from './FormAlert';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import SyncIcon from '@mui/icons-material/Sync';
 
 
 const style = {
@@ -73,7 +78,8 @@ function Im_addBill({setOpenForm}) {
         _shop:'',
         _discount:0.00,
         _total:0.00,
-        _billNote:''
+        _billNote:'',
+        _payment:''
     });
 
     //Reset values
@@ -85,7 +91,8 @@ function Im_addBill({setOpenForm}) {
             _shop:'',
             _discount:0.00,
             _total:0.00,
-            _billNote:''
+            _billNote:'',
+            _payment:''
         })
     }
 
@@ -125,6 +132,10 @@ function Im_addBill({setOpenForm}) {
 
     const handleChange =(name, val)=>{
         console.log(name, val);
+        // if(event.target.name ==='_payment'){
+
+        // }
+
         setValues({
             ...values,
             [name]: val,
@@ -167,6 +178,7 @@ function Im_addBill({setOpenForm}) {
         {id: 'category_m', label: 'Main category', minWidth: 100 , editable: false},
         {id: 'qty', label: 'Qty', minWidth: 100, editable: true, type:'number', isDecimal: false},
         {id: 'unitType', label: 'Unit', minWidth: 100, editable: false},
+        {id: 'unitPrice', label: 'Unit Price', minWidth: 100, editable: true, type:'number', isDecimal: true},
         {id: 'discountPerItem', label: 'Discount', minWidth: 100, editable: true, type:'number', isDecimal: true},
         {id: 'price', label: 'Price', minWidth: 100, editable: true, type:'number', isDecimal: true}
       ];
@@ -187,9 +199,20 @@ function Im_addBill({setOpenForm}) {
       const [writeable_page, set_writeable_Page] = React.useState(0);
       const [writeable_rowsPerPage, set_writeable_RowsPerPage] = React.useState(100);
       const [totalPages, setTotalPages] = React.useState(0);
+      const [payment, setPayment] = React.useState('');
 
-      //search item to add bill
-      const [search, setSearch] = React.useState("");
+      const handlePaymentChange = (event) => {
+        console.log(event);
+        setPayment(event.target.value);
+        console.log(payment);
+
+        setValues({
+            ...values,
+            ['_payment']: event.target.value,
+        });
+        
+      };
+
 
     const fetchData = async()=>{
         setOpenTable(true);
@@ -232,8 +255,16 @@ function Im_addBill({setOpenForm}) {
         for(let x=0; x<selectedItems.length; x++ ){
             let importItem = await getImportItemById(selectedItems[x]);
             console.log("importItem", importItem);
-            selectedArray.push(createDataForSelectedTable(importItem.itemName,
-            importItem.brand, "category", 0,importItem.unitType, 0.00, 0.00, importItem.importId ));
+            selectedArray.push(createDataForSelectedTable(
+                importItem.itemName,
+                importItem.brand, 
+                "category", 
+                0,
+                importItem.unitType,
+                0.00, 
+                0.00, 
+                0.00, 
+                importItem.importId ));
            
         }
         console.log("selectedArray", selectedArray);
@@ -241,8 +272,8 @@ function Im_addBill({setOpenForm}) {
         console.log("Selected Rows", selectedRows);
     }
 
-    function createDataForSelectedTable( item, brand, category_m, qty,unitType, discountPerItem, price, importId) {
-        return {  item, brand, category_m, qty,unitType, discountPerItem, price, importId };
+    function createDataForSelectedTable( item, brand, category_m, qty,unitType, unitPrice, discountPerItem, price, importId) {
+        return {  item, brand, category_m, qty,unitType, unitPrice, discountPerItem, price, importId };
       }
 
       
@@ -261,7 +292,7 @@ function Im_addBill({setOpenForm}) {
                 importBillItems.push(item);
             }
             
-            //create bill body
+            ////create bill body
             
             //get user name 
             let user = getUser();
@@ -269,9 +300,9 @@ function Im_addBill({setOpenForm}) {
                 "addedBy":user.username,
                 "billNo":values._billNo,
                 "shop":values._shop,
-                "paymentStatus":"Cash",
+                "paymentStatus":values._payment,
                 "note":values._billNote,
-                "total": 100,
+                "total": values._total,
                 "discount": values._discount,
                 "import_billItems":importBillItems
             }
@@ -370,7 +401,23 @@ function Im_addBill({setOpenForm}) {
                         type="text" 
                         label="Discount" />
             </Grid>
-            <Grid item xs={12} sm={9} sx={12}></Grid>
+            <Grid item xs={12} sm={12} sx={12}>
+                <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
+                    <InputLabel id="demo-select-small">Payment Method</InputLabel>
+                        <Select
+                            labelId="demo-select-small"
+                            id="demo-select-small"
+                            name='_payment'
+                            value={values._payment}
+                            label="Payment Method"
+                            onChange={handlePaymentChange}
+                        >
+                            <MenuItem value={"cash"}>Cash</MenuItem>
+                            <MenuItem value={"card"}>Card</MenuItem>
+                            <MenuItem value={"cheque"}>Cheque</MenuItem>
+                        </Select>
+                </FormControl>
+            </Grid>
             <Grid item xs={12} sm={1} sx={12}>
                 <Typography variant="subtitle2" gutterBottom component="div">Total :</Typography>
             </Grid>
@@ -383,6 +430,13 @@ function Im_addBill({setOpenForm}) {
                         label="Total" />
 
                 {/* <Typography variant="subtitle2" gutterBottom component="div">{values._total}</Typography> */}
+            </Grid>
+            <Grid item xs={12} sm={3} sx={12}>
+                <Tooltip title="Calculate">
+                    <IconButton aria-label="calculate" size="small">
+                        <SyncIcon />
+                    </IconButton>
+                </Tooltip>
             </Grid>
             <Grid item xs={12} sm={9} sx={12}>
                     <InputField

@@ -25,6 +25,8 @@ import Badge from '@mui/material/Badge';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
+import {getUser} from "../Utils/Common"
+import { useEffect } from 'react';
 
 const drawerWidth = 240;
 
@@ -44,6 +46,12 @@ function Template({children}) {
   const [openExport, setOpenExport] = React.useState(false);
   const [openImport, setOpenImport] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
+  const [user, setUser] = React.useState("") 
+
+  useEffect(async () => {
+    let userData = getUser();
+    setUser(userData.fname+" "+userData.lname);
+  })
 
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -59,7 +67,7 @@ function Template({children}) {
     <Menu
       anchorEl={anchorEl}
       anchorOrigin={{
-        vertical: 'top',
+        vertical: 'bottom',
         horizontal: 'right',
       }}
       id={menuId}
@@ -72,7 +80,8 @@ function Template({children}) {
       onClose={handleMenuClose}
     >
       <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem onClick={handleMenuClose}>My Account</MenuItem>
+      <MenuItem onClick={handleMenuClose}>Log Out</MenuItem>
     </Menu>
   );
 
@@ -147,6 +156,9 @@ function Template({children}) {
               <AccountCircle />
             </IconButton>
           </Box>
+          <Typography variant="h9" noWrap component="div">
+              Logged in as {user}
+            </Typography>
         </Toolbar>
       </AppBar>
       {renderMenu}

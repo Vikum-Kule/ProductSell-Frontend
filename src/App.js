@@ -16,6 +16,7 @@ import Im_Stockupdates from './pages/Im_stockupdates';
 import CategoryView from './pages/CategoryView';
 import ImportItemView from './pages/Im_ItemView';
 import StockUpdateView from './pages/StockUpdateView';
+import ImportBillView from './pages/Im_BillView';
 
 const theme = createTheme({
 
@@ -59,6 +60,9 @@ function App() {
                 </Route>
                 <Route path="/template/stock_update_view/:intakeId">
                   <StockUpdateView/>
+                </Route>
+                <Route path="/template/im_bill_view/:billId">
+                  <ImportBillView/>
                 </Route>
             </Switch>
         </Template>

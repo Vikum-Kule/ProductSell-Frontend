@@ -62,7 +62,7 @@ function WritableTable({
                                id="outlined-size-small"
                                size="small"
                                type={column.type}
-                               value={column.isDecimal? parseFloat(value).toFixed(2)
+                               value={column.isDecimal? parseFloat(value)
                                   : value
                                 }
                              />:(column.editable === false && column.format && typeof value === 'number'
