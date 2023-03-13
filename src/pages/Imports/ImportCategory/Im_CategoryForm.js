@@ -1,15 +1,15 @@
-import Validation from '../Validation/Validation';
+import Validation from '../../../Validation/Validation';
 import React, { Fragment, useState } from 'react'
-import InputField from '../FormComponents/InputField'
-import { getAllCategories, checkCategory, addNewCategory} from '../services/Import';
-import { Validators } from '../Validation/FormValidation';
+import InputField from '../../../FormComponents/InputField'
+import { getAllCategories, checkCategory, addNewCategory} from '../../../services/Import';
+import { Validators } from '../../../Validation/FormValidation';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import Divider from '@mui/material/Divider';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import { Button, Grid, IconButton, Tooltip, Typography } from '@mui/material';
-import AutoCompleteFeild from '../FormComponents/AutoCompleteFeild';
-import FormAlert from './FormAlert';
+import AutoCompleteFeild from '../../../FormComponents/AutoCompleteFeild';
+import FormAlert from '../../../components/FormAlert';
 
 function Im_CategoryForm({setOpenForm}) {
     //for input feild values

@@ -1,18 +1,18 @@
 import { Autocomplete, Button, CircularProgress, Grid, IconButton, Paper, TextField, Tooltip, Typography } from '@mui/material'
 import React, { Fragment, useState } from 'react'
-import AutoCompleteFeild from '../FormComponents/AutoCompleteFeild';
-import InputField from '../FormComponents/InputField'
-import { getAllCategories, getAllImportData, checkCategory, addNewCategory } from '../services/Import';
-import { Validators } from '../Validation/FormValidation';
+import AutoCompleteFeild from '../../../FormComponents/AutoCompleteFeild';
+import InputField from '../../../FormComponents/InputField'
+import { getAllCategories, getAllImportData, checkCategory, addNewCategory } from '../../../services/Import';
+import { Validators } from '../../../Validation/FormValidation';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import Divider from '@mui/material/Divider';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import RestartAltOutlinedIcon from '@mui/icons-material/RestartAltOutlined';
-import {FormValidation} from '../Validation/FormValidation';
-import Validation from '../Validation/Validation';
-import {addIm_Item} from '../services/Import'
-import FormAlert from './FormAlert';
+import {FormValidation} from '../../../Validation/FormValidation';
+import Validation from '../../../Validation/Validation';
+import {addIm_Item} from '../../../services/Import'
+import FormAlert from '../../../components/FormAlert';
 
 function ImportFrom({setOpenForm}) {
     //for input feild values

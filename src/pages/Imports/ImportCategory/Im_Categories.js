@@ -2,10 +2,10 @@ import { Button, Grid, IconButton, InputBase, Pagination, Paper, Stack, Typograp
 import { typography } from '@mui/system'
 import React, { useEffect } from 'react'
 import { makeStyles } from '@mui/styles';
-import TableItem from '../components/TableItem';
-import { getImportCategoryData, getImportsByCategory } from '../services/Import';
+import TableItem from '../../../components/TableItem';
+import { getImportCategoryData, getImportsByCategory } from '../../../services/Import';
 import SearchIcon from '@mui/icons-material/Search';
-import Im_CategoryForm from '../components/Im_CategoryForm';
+import Im_CategoryForm from './Im_CategoryForm';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import { useHistory } from 'react-router';
@@ -206,6 +206,7 @@ function Im_Categories() {
                       columns={columns} 
                       handleAction = {handleAction}
                       rows={rows}
+                      showActions={['view', 'edit', 'delete']}
                     />
                     }
                     

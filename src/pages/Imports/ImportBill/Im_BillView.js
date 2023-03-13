@@ -1,12 +1,12 @@
 import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import { useParams } from "react-router-dom";
-import {getImportBillById} from '../services/Import';
+import {getImportBillById} from '../../../services/Import';
 import { Grid,Paper,Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
-import TableItem from '../components/TableItem';
+import TableItem from '../../../components/TableItem';
 
 
 const useStyles = makeStyles({

@@ -2,13 +2,13 @@ import { Button, Grid, IconButton, InputBase, Modal, Pagination, Paper, Stack, T
 import { typography } from '@mui/system'
 import React, { useEffect, useState } from 'react'
 import { makeStyles } from '@mui/styles';
-import TableItem from '../components/TableItem';
-import { getImportBillData, getImportBillById, searchImportItem } from '../services/Import';
+import TableItem from '../../../components/TableItem';
+import { getImportBillData, getImportBillById, searchImportItem } from '../../../services/Import';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
-import Im_addBill from '../components/Im_addBill';
+import Im_addBill from './Im_addBill';
 import { useHistory } from 'react-router';
-import InputField from '../FormComponents/InputField';
+import InputField from '../../../FormComponents/InputField';
 
 const useStyles = makeStyles({
     container:{
@@ -250,6 +250,7 @@ const handleAction= (event, id)=>{
                       columns={columns_bill} 
                       rows={rows} 
                       handleAction = {handleAction}
+                      showActions={['view', 'edit', 'delete']}
                       />
                   }
                     

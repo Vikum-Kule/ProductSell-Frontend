@@ -1,28 +1,25 @@
 import { Button, Divider, Grid, IconButton, InputBase, Pagination, Paper, Stack, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import SearchIcon from '@mui/icons-material/Search';
-import TableItem from '../components/TableItem';
-import React, {useEffect, useState} from 'react'
-import {getImportData, getAllImportData} from '../services/Import';
-import ImportFrom from '../components/ImportFrom';
+import TableItem from '../../../components/TableItem';
+import React, {useEffect,useState} from 'react'
+import {getStockUpdateData} from '../../../services/Import';
+import ImportFrom from '../../Imports/ImportItem/ImportFrom';
 import CircularProgress from '@mui/material/CircularProgress';
-import { useHistory } from 'react-router';
 import Box from '@mui/material/Box';
-import InputField from '../FormComponents/InputField'
-
+import { useHistory } from 'react-router';
+import InputField from '../../../FormComponents/InputField'
 
 const useStyles = makeStyles({
-    container:{
-        padding:"5px"
-    }
-  
-  });
+  container:{
+      padding:"10px"
+  }
 
-  
-// import items all functionalties..
-function Im_Items() {
-    const classes = useStyles();
-    const history = useHistory();
+});
+
+function Im_stockupdates() {
+  const classes = useStyles();
+  const history = useHistory();
 
     useEffect(async () => {
       
@@ -37,26 +34,27 @@ function Im_Items() {
 
     //columns for table
     const columns = [
-        { id: 'code', label: 'Code', minWidth: 80 },
+        { id: 'date', label: 'Date', minWidth: 80 },
         { id: 'item', label: 'Item', minWidth: 100 },
         { id: 'brand', label: 'Brand', minWidth: 100 },
-        {
-          id: 'category_m',
-          label: 'Main Category',
-          minWidth: 100,
-          format: (value) => value.toLocaleString('en-US'),
-        },
+        { id: 'billNo', label: 'Bill', minWidth: 100 },
         {
           id: 'qty',
           label: 'Qty',
           minWidth: 100,
           format: (value) => value.toLocaleString('en-US'),
         },
+        {
+          id: 'total',
+          label: 'Total',
+          minWidth: 100,
+          format: (value) => value.toLocaleString('en-US'),
+        },
         { id: 'action', label: 'Actions', minWidth: 100 },
       ];
       
-      function createData( code, item, brand, category_m, qty, action, im_id) {
-        return { code, item, brand, category_m, qty, action, im_id };
+      function createData( date ,item, brand, billNo, qty, total, action, id) {
+        return { date ,item, brand, qty, billNo, total, action, id};
       }
 
       const [page, setPage] = React.useState(0);
@@ -65,32 +63,34 @@ function Im_Items() {
 
       const handleChange = async(event, value) => {
         setPage(value-1);
-        await fetchData();
+        console.log("Page", page);
+        await fetchData(filter, value-1);
       };
 
       //fetch data for pagination actions
       const fetchData = async()=>{
         setLoading(true);
+        console.log(filter);
         //get import items data when page loading...
-       let result = await getImportData(page, rowsPerPage, filter);
-       let importSet = result.content;
+       let result = await getStockUpdateData(page, rowsPerPage, filter);
+       let stockUpdateSet = result.content;
        
       //set total rows and pages
       setTotalPages(result.totalPages);
       setTotalRows(result.totalElements);
 
         const newSet = []
-      if(importSet){
-        for(let x=0; x< importSet.length; x++){
-          let category_list = importSet[x].im_category;
+      if(stockUpdateSet){
+        for(let x=0; x< stockUpdateSet.length; x++){
           //set data in new set list to display in the table
           newSet.push( createData(
-            importSet[x].product_code,
-            importSet[x].itemName, 
-            importSet[x].brand, 
-            category_list.category,
-            importSet[x].qty,
-            importSet[x].importId));
+            stockUpdateSet[x].addedDate,
+            stockUpdateSet[x].imports.itemName, 
+            stockUpdateSet[x].imports.brand,
+            stockUpdateSet[x].billNo,
+            stockUpdateSet[x].qty,
+            stockUpdateSet[x].totalPrice,
+            stockUpdateSet[x].intakeId));
         }
       }  
         
@@ -102,10 +102,41 @@ function Im_Items() {
 
       }
 
+      // filter values
+      const[filter, setFilter]= useState({
+        _productCode:'',
+        _itemName:'',
+        _brand:'',
+        _addedBy:'',
+        _billNo:'',
+
+    });
+
+    //reset filters
+    const resetFilters =()=>{
+      setFilter({
+        _productCode:'',
+        _itemName:'',
+        _brand:'',
+        _addedBy:'',
+        _billNo:'',
+    });
+
+    fetchData();
+    }
+
+     //to handle changing filters
+     const handleFilterChange =(name, val)=>{
+      setFilter({
+          ...filter,
+          [name]: val,
+      });
+    }
+
     const handleAction= (event, id)=>{
       switch(event) {
         case 'view':
-          history.push('/template/im_item_view/'+id);
+          history.push('/template/stock_update_view/'+id);
           break;
         case 'edit':
           return 'bar';
@@ -116,41 +147,6 @@ function Im_Items() {
       }
     }
 
-     // filter values
-     const[filter, setFilter]= useState({
-      _productCode:'',
-      _itemName:'',
-      _brand:'',
-      _addedBy:'',
-      _billNo:'',
-      _category:'',
-      _unitType:''
-
-  });
-
-  //reset filters
-  const resetFilters =()=>{
-    setFilter({
-      _productCode:'',
-      _itemName:'',
-      _brand:'',
-      _addedBy:'',
-      _billNo:'',
-      _category:'',
-      _unitType:''
-  });
-
-  fetchData();
-  }
-
-   //to handle changing filters
-   const handleFilterChange =(name, val)=>{
-    setFilter({
-        ...filter,
-        [name]: val,
-    });
-  }
-
     return (
         
             <Paper className={classes.container} elevation={8}>
@@ -159,19 +155,19 @@ function Im_Items() {
               {openForm ? <ImportFrom setOpenForm={setOpenForm} />:
                 <Grid container spacing={5}>
                     <Grid item xs={12} sm={10} sx={12}>
-                      <Typography mt={1} variant="h6"> Import Inventory </Typography>
+                      <Typography mt={1} variant="h6"> Import Stock Updates </Typography>
                     </Grid>
                     <Grid item xs={12} sm={2} sx={12}>
-                    <Button 
-                        variant="contained" 
-                        onClick={()=>{setOpenForm(true)}}
-                      >
-                        Add Import
+                      <Button 
+                          variant="contained" 
+                          onClick={()=>{setOpenForm(true)}}
+                        >
+                          Add Intake
                       </Button>
                     </Grid>
-                    <Grid item xs={12} sm={12} sx={12}>
+                    <Grid item xs={12} sm={9} sx={12}>
                       <Grid container spacing={2}>
-                        <Grid item xs={12} sm={2} sx={12}>
+                        <Grid item xs={12} sm={3} sx={12}>
                           <InputField
                             name="_productCode"
                             value={filter._productCode} 
@@ -180,7 +176,7 @@ function Im_Items() {
                             label="Product Code"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={3} sx={12}>
+                        <Grid item xs={12} sm={4} sx={12}>
                           <InputField
                             name="_itemName"
                             value={filter._itemName} 
@@ -189,31 +185,13 @@ function Im_Items() {
                             label="Item Name"
                           />
                         </Grid>
-                        <Grid item xs={12} sm={2} sx={12}>
+                        <Grid item xs={12} sm={4} sx={12}>
                           <InputField
                             name="_brand"
                             value={filter._brand} 
                             onChange={(event, newInputValue) => handleFilterChange(event, newInputValue)} 
                             type="text" 
                             label="Brand"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={2} sx={12}>
-                          <InputField
-                            name="_category"
-                            value={filter._category} 
-                            onChange={(event, newInputValue) => handleFilterChange(event, newInputValue)} 
-                            type="text" 
-                            label="Category"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={2} sx={12}>
-                          <InputField
-                            name="_unitType"
-                            value={filter._unitType} 
-                            onChange={(event, newInputValue) => handleFilterChange(event, newInputValue)} 
-                            type="text" 
-                            label="Unit Type"
                           />
                         </Grid>
                         <Grid item xs={12} sm={4} sx={12}>
@@ -266,6 +244,7 @@ function Im_Items() {
                       totalPages = {totalPages}
                       getData = {fetchData}
                       handleAction = {handleAction}
+                      showActions={['view', 'edit', 'delete']}
                       />
                     }
                         
@@ -288,4 +267,4 @@ function Im_Items() {
     )
 }
 
-export default Im_Items;
+export default Im_stockupdates
