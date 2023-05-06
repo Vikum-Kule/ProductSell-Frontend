@@ -1,76 +1,73 @@
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import './App.css';
-import { createTheme } from '@mui/material/styles';
-import { ThemeProvider } from '@mui/private-theming';
-import Login from './components/Login';
-import Template  from './components/Template';
-import Home from './pages/Home';
-import ImItems from './pages/Imports/ImportItem/Im_Items';
-import Im_Categories from './pages/Imports/ImportCategory/Im_Categories';
-import Im_Bill from './pages/Imports/ImportBill/Im_addBill';
-import Ex_Products from './pages/Ex_Products';
-import Im_Stockupdates from './pages/Imports/ImportStockIntake/Im_stockupdates';
-import CategoryView from './pages/Imports/ImportCategory/CategoryView';
-import ImportItemView from './pages/Imports/ImportItem/Im_ItemView';
-import StockUpdateView from './pages/Imports/ImportStockIntake/StockUpdateView';
-import ImportBillView from './pages/Imports/ImportBill/Im_BillView';
-import Im_ItemEdit from './pages/Imports/ImportItem/Im_ItemEdit';
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import "./App.css";
+import { createTheme } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/private-theming";
+import Login from "./components/Login";
+import Template from "./components/Template";
+import Home from "./pages/Home";
+import ImItems from "./pages/Imports/ImportItem/Im_Items";
+import Im_Categories from "./pages/Imports/ImportCategory/Im_Categories";
+import Im_Bill from "./pages/Imports/ImportBill/Im_Bill";
+import Ex_Products from "./pages/Ex_Products";
+import Im_Stockupdates from "./pages/Imports/ImportStockIntake/Im_stockupdates";
+import CategoryView from "./pages/Imports/ImportCategory/CategoryView";
+import ImportItemView from "./pages/Imports/ImportItem/Im_ItemView";
+import StockUpdateView from "./pages/Imports/ImportStockIntake/StockUpdateView";
+import ImportBillView from "./pages/Imports/ImportBill/Im_BillView";
+import Im_ItemEdit from "./pages/Imports/ImportItem/Im_ItemEdit";
 
-const theme = createTheme({
-
-})
-
+const theme = createTheme({});
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
-    <Router>
-      <Switch>
-        <Route exact path="/">
-        <Login/>
-        </Route>
-        <Route path="/template">
-        <Template>
-            <Switch>
+      <Router>
+        <Switch>
+          <Route exact path="/">
+            <Login />
+          </Route>
+          <Route path="/template">
+            <Template>
+              <Switch>
                 <Route path="/template/home">
-                  <Home/>
+                  <Home />
                 </Route>
                 <Route path="/template/im_items">
-                  <ImItems/>
+                  <ImItems />
                 </Route>
                 <Route path="/template/im_categories">
-                  <Im_Categories/>
+                  <Im_Categories />
                 </Route>
                 <Route path="/template/im_bills">
-                  <Im_Bill/>
+                  <Im_Bill />
                 </Route>
                 <Route path="/template/im_stockupdates">
-                  <Im_Stockupdates/>
+                  <Im_Stockupdates />
                 </Route>
                 <Route path="/template/ex_products">
-                  <Ex_Products/>
+                  <Ex_Products />
                 </Route>
                 <Route path="/template/im_item_view/:importId">
-                  <ImportItemView/>
+                  <ImportItemView />
                 </Route>
                 <Route path="/template/im_category_view/:cat_id">
-                  <CategoryView/>
+                  <CategoryView />
                 </Route>
                 <Route path="/template/stock_update_view/:intakeId">
-                  <StockUpdateView/>
+                  <StockUpdateView />
                 </Route>
                 <Route path="/template/im_bill_view/:billId">
-                  <ImportBillView/>
+                  <ImportBillView />
                 </Route>
                 <Route path="/template/im_item_edit/:importId">
-                  <Im_ItemEdit/>
+                  <Im_ItemEdit />
                 </Route>
-            </Switch>
-        </Template>
-        </Route>
-      </Switch>
-    </Router>
-    </ThemeProvider>  
+              </Switch>
+            </Template>
+          </Route>
+        </Switch>
+      </Router>
+    </ThemeProvider>
   );
 }
 

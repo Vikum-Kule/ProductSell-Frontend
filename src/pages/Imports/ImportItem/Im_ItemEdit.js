@@ -71,6 +71,7 @@ function Im_ItemEdit({history}) {
 
     const fetchData = async()=>{
         let importData = await getImportItemById(importId);
+        console.log(importData)
         setValue({
             _importName:importData.itemName,
             _importBrand:importData.brand,
@@ -82,7 +83,7 @@ function Im_ItemEdit({history}) {
             _subCat_4:importData.im_category.subCat_4,
             _subCat_5:importData.im_category.subCat_5,
             _importQty:importData.qty,
-            _importUnitType:importData.unitTyp,
+            _importUnitType:importData.unitType,
             _minRate:importData.refillRate,
             _importNote:importData.note
         })
@@ -197,7 +198,7 @@ function Im_ItemEdit({history}) {
     }
 
     //to create sub category feilds dynamically
-    const [counter, setCounter] = useState(0);
+    const [counter, setCounter] = useState(5);
 
     const handleClickSubCategory = () => {
         if(counter!= 5){
@@ -236,20 +237,21 @@ function Im_ItemEdit({history}) {
 
 
     return (
+        <Paper className={classes.container} elevation={8}>
             <Grid container spacing={2}>
                 <Grid item xs={12} sm={11} sx={12}>
                     <Typography mt={1} variant="h6"> Add Import Item </Typography>
                 </Grid>
-                {/* <Grid item xs={12} sm={1} sx={12}>
+                <Grid item xs={12} sm={1} sx={12}>
                 <Tooltip title="Close"> 
                    <IconButton
-                   onClick={()=>{setOpenForm(false)}} 
+                   onClick={()=>{history.goBack()}} 
                    aria-label="close" 
                    size="small">
                         <CloseIcon fontSize="small" />
                     </IconButton>
                 </Tooltip>
-                </Grid> */}
+                </Grid>
                 <Grid item xs={12} sm={9} sx={12}>
                     <AutoCompleteFeild 
                         name="_importName"
@@ -399,6 +401,7 @@ function Im_ItemEdit({history}) {
                 </Grid>
 
             </Grid>
+        </Paper>
     )
 }
 
