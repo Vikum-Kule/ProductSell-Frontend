@@ -1,57 +1,55 @@
-import React from 'react';
-import Box from '@mui/material/Box';
-import Drawer from '@mui/material/Drawer';
-import AppBar from '@mui/material/AppBar';
-import CssBaseline from '@mui/material/CssBaseline';
-import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
-import { Collapse, IconButton, ListItemButton } from '@mui/material';
-import HomeIcon from '@mui/icons-material/Home';
-import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
-import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import { makeStyles } from '@mui/styles';
-import { useHistory } from 'react-router';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import Badge from '@mui/material/Badge';
-import MenuItem from '@mui/material/MenuItem';
-import Menu from '@mui/material/Menu';
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import {getUser} from "../Utils/Common"
-import { useEffect } from 'react';
+import React from "react";
+import Box from "@mui/material/Box";
+import Drawer from "@mui/material/Drawer";
+import AppBar from "@mui/material/AppBar";
+import CssBaseline from "@mui/material/CssBaseline";
+import Toolbar from "@mui/material/Toolbar";
+import List from "@mui/material/List";
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+import ListItem from "@mui/material/ListItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import InboxIcon from "@mui/icons-material/MoveToInbox";
+import MailIcon from "@mui/icons-material/Mail";
+import { Collapse, IconButton, ListItemButton } from "@mui/material";
+import HomeIcon from "@mui/icons-material/Home";
+import ArrowCircleDownIcon from "@mui/icons-material/ArrowCircleDown";
+import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import { makeStyles } from "@mui/styles";
+import { useHistory } from "react-router";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import Badge from "@mui/material/Badge";
+import MenuItem from "@mui/material/MenuItem";
+import Menu from "@mui/material/Menu";
+import AccountCircle from "@mui/icons-material/AccountCircle";
+import { getUser } from "../Utils/Common";
+import { useEffect } from "react";
 
 const drawerWidth = 240;
 
 const useStyles = makeStyles({
-  page:{
-    backgroundColor:"#f6f6f6",
-    marginTop:"8vh"
-  }
-
-
+  page: {
+    backgroundColor: "#f6f6f6",
+    marginTop: "8vh",
+  },
 });
 
-function Template({children}) {
+function Template({ children }) {
   const history = useHistory();
   const classes = useStyles();
-  const menuId = 'primary-search-account-menu';
+  const menuId = "primary-search-account-menu";
   const [openExport, setOpenExport] = React.useState(false);
   const [openImport, setOpenImport] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
-  const [user, setUser] = React.useState("") 
+  const [user, setUser] = React.useState("");
 
   useEffect(async () => {
     let userData = getUser();
-    setUser(userData.fname+" "+userData.lname);
-  })
+    setUser(userData.fname + " " + userData.lname);
+  });
 
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -67,14 +65,14 @@ function Template({children}) {
     <Menu
       anchorEl={anchorEl}
       anchorOrigin={{
-        vertical: 'bottom',
-        horizontal: 'right',
+        vertical: "bottom",
+        horizontal: "right",
       }}
       id={menuId}
       keepMounted
       transformOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
+        vertical: "top",
+        horizontal: "right",
       }}
       open={isMenuOpen}
       onClose={handleMenuClose}
@@ -85,52 +83,57 @@ function Template({children}) {
     </Menu>
   );
 
-  const handleListItemClick = (event, index,path) => {
+  const handleListItemClick = (event, index, path) => {
     setSelectedIndex(index);
     history.push(path);
-    if(index===1){
+    if (index === 1) {
       handleClickImport();
-    }
-    else if(index ===6){
+    } else if (index === 6) {
       handleClickExport();
     }
   };
 
   const handleClickExport = () => {
-    if(openImport){
+    if (openImport) {
       setOpenImport(false);
     }
     setOpenExport(!openExport);
   };
 
   const handleClickImport = () => {
-    if(openExport){
+    if (openExport) {
       setOpenExport(false);
     }
     setOpenImport(!openImport);
   };
 
   const text = {
-    fontSize:"15px",
-    fontWeight:"bold"
-
+    fontSize: "15px",
+    fontWeight: "bold",
   };
   const sub = {
-    fontSize:"15px",
-
+    fontSize: "15px",
   };
 
-    return (
-        <Box sx={{ display: 'flex' }}>
+  return (
+    <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar style={{backgroundColor:"#2f3c66"}} position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+      <AppBar
+        style={{ backgroundColor: "#2f3c66" }}
+        position="fixed"
+        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      >
         <Toolbar>
           <Typography variant="h6" noWrap component="div">
-            Business 
+            Business
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-            <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+          <Box sx={{ display: { xs: "none", md: "flex" } }}>
+            <IconButton
+              size="large"
+              aria-label="show 4 new mails"
+              color="inherit"
+            >
               <Badge badgeContent={4} color="error">
                 <MailIcon />
               </Badge>
@@ -157,8 +160,8 @@ function Template({children}) {
             </IconButton>
           </Box>
           <Typography variant="h9" noWrap component="div">
-              Logged in as {user}
-            </Typography>
+            Logged in as {user}
+          </Typography>
         </Toolbar>
       </AppBar>
       {renderMenu}
@@ -167,135 +170,172 @@ function Template({children}) {
         sx={{
           width: drawerWidth,
           flexShrink: 0,
-          [`& .MuiDrawer-paper`]: { width: drawerWidth, 
-            boxSizing: 'border-box', 
-            backgroundColor:"#2f3c66",
-            color:"white"
-            },
-          
+          [`& .MuiDrawer-paper`]: {
+            width: drawerWidth,
+            boxSizing: "border-box",
+            backgroundColor: "#2f3c66",
+            color: "white",
+          },
         }}
       >
         <Toolbar />
-        <Box sx={{ overflow: 'auto' }}>
+        <Box sx={{ overflow: "auto" }}>
           <List>
             <ListItemButton
               classes={{ selected: classes.active }}
-              selected={selectedIndex==0}
-              onClick={(event) => handleListItemClick(event, 0,"/template/home")}
-              style={
-                {
-                  backgroundColor:selectedIndex==0?"#15285c":"#2f3c66"
-                }
+              selected={selectedIndex == 0}
+              onClick={(event) =>
+                handleListItemClick(event, 0, "/template/home")
               }
+              style={{
+                backgroundColor: selectedIndex == 0 ? "#15285c" : "#2f3c66",
+              }}
             >
               <ListItemIcon>
                 <HomeIcon color="primary" />
               </ListItemIcon>
-              <ListItemText primaryTypographyProps={{ style: text }} primary="Home" />
+              <ListItemText
+                primaryTypographyProps={{ style: text }}
+                primary="Home"
+              />
             </ListItemButton>
-            <ListItemButton 
-            // onClick={handleClickImport}
-            selected={selectedIndex==1 || selectedIndex==2 || selectedIndex==3 || selectedIndex==4 || selectedIndex==5}
-              onClick={(event) => handleListItemClick(event, 1,"/template/im_items")}
-              style={
-                {
-                  backgroundColor:(
-                    selectedIndex==1 || 
-                    selectedIndex==2 || 
-                    selectedIndex==3 || 
-                    selectedIndex==4 ||
-                    selectedIndex==5
-                    )?"#15285c":"#2f3c66"
-                }
+            <ListItemButton
+              // onClick={handleClickImport}
+              selected={
+                selectedIndex == 1 ||
+                selectedIndex == 2 ||
+                selectedIndex == 3 ||
+                selectedIndex == 4 ||
+                selectedIndex == 5
               }
+              onClick={(event) =>
+                handleListItemClick(event, 1, "/template/im_items")
+              }
+              style={{
+                backgroundColor:
+                  selectedIndex == 1 ||
+                  selectedIndex == 2 ||
+                  selectedIndex == 3 ||
+                  selectedIndex == 4 ||
+                  selectedIndex == 5
+                    ? "#15285c"
+                    : "#2f3c66",
+              }}
             >
               <ListItemIcon>
                 <ArrowCircleDownIcon color="primary" />
               </ListItemIcon>
-              <ListItemText primaryTypographyProps={{ style: text }} primary="Import" />
+              <ListItemText
+                primaryTypographyProps={{ style: text }}
+                primary="Import"
+              />
               {openImport ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
             <Collapse in={openImport} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
-                <ListItemButton sx={{ pl: 4 }}
-                  selected={selectedIndex==2}
-                  onClick={(event) => handleListItemClick(event, 2,"/template/im_items")}
+                <ListItemButton
+                  sx={{ pl: 4 }}
+                  selected={selectedIndex == 2}
+                  onClick={(event) =>
+                    handleListItemClick(event, 2, "/template/im_items")
+                  }
                 >
-                  <ListItemIcon>
-                    {/* <StarBorder /> */}
-                  </ListItemIcon>
-                  <ListItemText primaryTypographyProps={{ style: sub }} primary="Items" />
+                  <ListItemIcon>{/* <StarBorder /> */}</ListItemIcon>
+                  <ListItemText
+                    primaryTypographyProps={{ style: sub }}
+                    primary="Items"
+                  />
                 </ListItemButton>
-                <ListItemButton sx={{ pl: 4 }}
-                  selected={selectedIndex==3}
-                  onClick={(event) => handleListItemClick(event, 3,"/template/im_categories")}
+                <ListItemButton
+                  sx={{ pl: 4 }}
+                  selected={selectedIndex == 3}
+                  onClick={(event) =>
+                    handleListItemClick(event, 3, "/template/im_categories")
+                  }
                 >
-                  <ListItemIcon>
-                    {/* <StarBorder /> */}
-                  </ListItemIcon>
-                  <ListItemText primaryTypographyProps={{ style: sub }} primary="Categories" />
+                  <ListItemIcon>{/* <StarBorder /> */}</ListItemIcon>
+                  <ListItemText
+                    primaryTypographyProps={{ style: sub }}
+                    primary="Categories"
+                  />
                 </ListItemButton>
-                <ListItemButton sx={{ pl: 4 }}
-                  selected={selectedIndex==4}
-                  onClick={(event) => handleListItemClick(event, 4,"/template/im_bills")}
+                <ListItemButton
+                  sx={{ pl: 4 }}
+                  selected={selectedIndex == 4}
+                  onClick={(event) =>
+                    handleListItemClick(event, 4, "/template/im_bills")
+                  }
                 >
-                  <ListItemIcon>
-                    {/* <StarBorder /> */}
-                  </ListItemIcon>
-                  <ListItemText primaryTypographyProps={{ style: sub }} primary="Bills" />
+                  <ListItemIcon>{/* <StarBorder /> */}</ListItemIcon>
+                  <ListItemText
+                    primaryTypographyProps={{ style: sub }}
+                    primary="Bills"
+                  />
                 </ListItemButton>
-                <ListItemButton sx={{ pl: 4 }}
-                  selected={selectedIndex==5}
-                  onClick={(event) => handleListItemClick(event, 5,"/template/im_stockupdates")}
+                <ListItemButton
+                  sx={{ pl: 4 }}
+                  selected={selectedIndex == 5}
+                  onClick={(event) =>
+                    handleListItemClick(event, 5, "/template/im_stockupdates")
+                  }
                 >
-                  <ListItemIcon>
-                    {/* <StarBorder /> */}
-                  </ListItemIcon>
-                  <ListItemText primaryTypographyProps={{ style: sub }} primary="Stock Updates" />
+                  <ListItemIcon>{/* <StarBorder /> */}</ListItemIcon>
+                  <ListItemText
+                    primaryTypographyProps={{ style: sub }}
+                    primary="Stock Updates"
+                  />
                 </ListItemButton>
               </List>
             </Collapse>
-            <ListItemButton 
-            selected={selectedIndex==6 || selectedIndex==7}
-            onClick={(event) => handleListItemClick(event, 6,"/template/ex_products")}
-            style={
-              {
-                backgroundColor:(
-                  selectedIndex==6 ||
-                  selectedIndex==7
-                  )?"#15285c":"#2f3c66"
+            <ListItemButton
+              selected={selectedIndex == 6 || selectedIndex == 7}
+              onClick={(event) =>
+                handleListItemClick(event, 6, "/template/ex_categories")
               }
-            }
+              style={{
+                backgroundColor:
+                  selectedIndex == 6 || selectedIndex == 7
+                    ? "#15285c"
+                    : "#2f3c66",
+              }}
             >
               <ListItemIcon>
-                <ArrowCircleUpIcon color="primary"/>
+                <ArrowCircleUpIcon color="primary" />
               </ListItemIcon>
-              <ListItemText primaryTypographyProps={{ style: text }} primary="Export" />
+              <ListItemText
+                primaryTypographyProps={{ style: text }}
+                primary="Export"
+              />
               {openExport ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
             <Collapse in={openExport} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
-              <ListItemButton sx={{ pl: 4 }}
-                  selected={selectedIndex==7}
-                  onClick={(event) => handleListItemClick(event, 7,"/template/ex_products")}
+                <ListItemButton
+                  sx={{ pl: 4 }}
+                  selected={selectedIndex == 7}
+                  onClick={(event) =>
+                    handleListItemClick(event, 7, "/template/ex_categories")
+                  }
                 >
-                  <ListItemIcon>
-                    {/* <StarBorder /> */}
-                  </ListItemIcon>
-                  <ListItemText className={classes.menuText} primary="Products" />
+                  <ListItemIcon>{/* <StarBorder /> */}</ListItemIcon>
+                  <ListItemText
+                    className={classes.menuText}
+                    primary="Categories"
+                  />
                 </ListItemButton>
                 <ListItemButton sx={{ pl: 4 }}>
-                  <ListItemIcon>
-                    {/* <StarBorder /> */}
-                  </ListItemIcon>
-                  <ListItemText className={classes.menuText} primary="Starred" />
+                  <ListItemIcon>{/* <StarBorder /> */}</ListItemIcon>
+                  <ListItemText
+                    className={classes.menuText}
+                    primary="Starred"
+                  />
                 </ListItemButton>
               </List>
             </Collapse>
           </List>
           <Divider />
           <List>
-            {['Reports', 'Trash', 'Spam'].map((text, index) => (
+            {["Reports", "Trash", "Spam"].map((text, index) => (
               <ListItem button key={text}>
                 <ListItemIcon>
                   {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
@@ -310,7 +350,7 @@ function Template({children}) {
         {children}
       </Box>
     </Box>
-    )
+  );
 }
 
-export default Template
+export default Template;

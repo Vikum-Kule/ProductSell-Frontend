@@ -15,6 +15,7 @@ import ImportItemView from "./pages/Imports/ImportItem/Im_ItemView";
 import StockUpdateView from "./pages/Imports/ImportStockIntake/StockUpdateView";
 import ImportBillView from "./pages/Imports/ImportBill/Im_BillView";
 import Im_ItemEdit from "./pages/Imports/ImportItem/Im_ItemEdit";
+import Ex_Category from "./pages/Exports/ExportCategory/Ex_Categories";
 
 const theme = createTheme({});
 
@@ -61,6 +62,9 @@ function App() {
                 </Route>
                 <Route path="/template/im_item_edit/:importId">
                   <Im_ItemEdit />
+                </Route>
+                <Route path="/template/ex_categories">
+                  <Ex_Category />
                 </Route>
               </Switch>
             </Template>
