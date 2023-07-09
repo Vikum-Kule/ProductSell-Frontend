@@ -290,7 +290,7 @@ function Template({ children }) {
             <ListItemButton
               selected={selectedIndex == 6 || selectedIndex == 7}
               onClick={(event) =>
-                handleListItemClick(event, 6, "/template/ex_categories")
+                handleListItemClick(event, 6, "/template/ex_items")
               }
               style={{
                 backgroundColor:
@@ -310,11 +310,24 @@ function Template({ children }) {
             </ListItemButton>
             <Collapse in={openExport} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
-                <ListItemButton
+              <ListItemButton
                   sx={{ pl: 4 }}
                   selected={selectedIndex == 7}
                   onClick={(event) =>
-                    handleListItemClick(event, 7, "/template/ex_categories")
+                    handleListItemClick(event, 7, "/template/ex_items")
+                  }
+                >
+                  <ListItemIcon>{/* <StarBorder /> */}</ListItemIcon>
+                  <ListItemText
+                    className={classes.menuText}
+                    primary="Products"
+                  />
+                </ListItemButton>
+                <ListItemButton
+                  sx={{ pl: 4 }}
+                  selected={selectedIndex == 8}
+                  onClick={(event) =>
+                    handleListItemClick(event, 8, "/template/ex_categories")
                   }
                 >
                   <ListItemIcon>{/* <StarBorder /> */}</ListItemIcon>

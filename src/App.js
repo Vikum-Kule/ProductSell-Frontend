@@ -16,6 +16,8 @@ import StockUpdateView from "./pages/Imports/ImportStockIntake/StockUpdateView";
 import ImportBillView from "./pages/Imports/ImportBill/Im_BillView";
 import Im_ItemEdit from "./pages/Imports/ImportItem/Im_ItemEdit";
 import Ex_Category from "./pages/Exports/ExportCategory/Ex_Categories";
+import Ex_CategoryView from "./pages/Exports/ExportCategory/Ex_CategoyView";
+import Ex_Items from "./pages/Exports/ExportItem/Ex_Items";
 
 const theme = createTheme({});
 
@@ -65,6 +67,12 @@ function App() {
                 </Route>
                 <Route path="/template/ex_categories">
                   <Ex_Category />
+                </Route>
+                <Route path="/template/ex_category_view/:cat_id">
+                  <Ex_CategoryView />
+                </Route>
+                <Route path="/template/ex_items">
+                  <Ex_Items />
                 </Route>
               </Switch>
             </Template>

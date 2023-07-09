@@ -155,7 +155,7 @@ const getImportsByCategory = async (cat_id) => {
   if (token_valid_result) {
     let token = getToken();
     return axios
-      .get("/api/import/find/category/" + cat_id, {
+      .get("/api/import/find/items?category=" + cat_id, {
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + token,
@@ -328,7 +328,7 @@ const addIm_Item = async (values, catId) => {
 
     return axios
       .post(
-        "/api/import/add/category/" + catId,
+        "/api/import/add/items?category=" + catId,
         {
           product_code: values._productCode ? values._productCode : "-",
           itemName: values._importName,
@@ -338,6 +338,8 @@ const addIm_Item = async (values, catId) => {
           brand: values._importBrand,
           note: values._importNote,
           addedBy: user.username,
+          unitPriceMethod:values.unitPriceMethod,
+          unitPrice: 0.0
         },
         {
           headers: {

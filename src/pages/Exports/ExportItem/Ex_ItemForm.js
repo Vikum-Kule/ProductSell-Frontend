@@ -14,26 +14,14 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import React, { useState } from "react";
-import {
-  getAllBills,
-  getImportItemById,
-  addImportBill,
-} from "../../../services/Import";
-import AutoCompleteFeild from "../../../FormComponents/AutoCompleteFeild";
+import { getImportItemById, addImportBill } from "../../../services/Import";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
-import { Box } from "@mui/system";
 import InputField from "../../../FormComponents/InputField";
-import SelectingTable from "../../../FormComponents/SelectingTable";
-import { getImportData } from "../../../services/Import";
 import { getUser } from "../../../Utils/Common";
-import BillWritableTable from "../../../components/BillWritableTable";
+import ExportProductItemWritableTable from "../../../components/ExportProductItemWritableTable";
 import FormAlert from "../../../components/FormAlert";
-import InputLabel from "@mui/material/InputLabel";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import SyncIcon from "@mui/icons-material/Sync";
 import ItemSelectingPopup from "../../../components/ItemSelectingPopup";
+import { makeStyles } from "@mui/styles";
 
 const style = {
   position: "absolute",
@@ -47,21 +35,17 @@ const style = {
   p: 4,
 };
 
-function Im_addBill({ setOpenForm }) {
-  //load shop names
-  const getShopNames = async () => {
-    let bill_list = await getAllBills();
-    setBills(bill_list);
-  };
-
+function Ex_ItemForm({ setOpenForm }) {
+  // const classes = useStyles();
   //for input feild values
   const [values, setValues] = useState({
-    _billNo: "",
-    _shop: "",
-    _discount: 0.0,
-    _total: 0.0,
-    _billNote: "",
-    _payment: "",
+    _barcode: "",
+    _productName: "",
+    _itemCost: 0.0,
+    _extraCost: 0.0,
+    _totalCost: 0.0,
+    _profit: 0.0,
+    _ProductNote: "",
   });
 
   //Reset values
@@ -69,12 +53,13 @@ function Im_addBill({ setOpenForm }) {
     closeAlert();
     setSelectedItems([]);
     setValues({
-      _billNo: "",
-      _shop: "",
-      _discount: 0.0,
-      _total: 0.0,
-      _billNote: "",
-      _payment: "",
+      _barcode: "",
+      _productName: "",
+      _itemCost: 0.0,
+      _extraCost: 0.0,
+      _totalCost: 0.0,
+      _profit: 0.0,
+      _ProductNote: "",
     });
   };
 
@@ -99,16 +84,13 @@ function Im_addBill({ setOpenForm }) {
 
   //////////////////////////////////////////////
 
-  //dataset for bills
-  const [bills, setBills] = useState([]);
-
   // set open table
   const [openTable, setOpenTable] = useState(false);
 
   // errors for inputfeild
   const [error, setError] = useState({
-    _billNo: "",
-    _shop: "",
+    __barcode: "",
+    _productName: "",
   });
 
   const handleChange = (name, val) => {
@@ -135,13 +117,12 @@ function Im_addBill({ setOpenForm }) {
     },
     {
       id: "qty",
-      label: "Qty",
+      label: "Required Qty",
       minWidth: 100,
       editable: true,
       type: "number",
       isDecimal: false,
     },
-    { id: "unitType", label: "Unit", minWidth: 100, editable: false },
     {
       id: "unitPrice",
       label: "Unit Price",
@@ -151,16 +132,8 @@ function Im_addBill({ setOpenForm }) {
       isDecimal: true,
     },
     {
-      id: "discountPerItem",
-      label: "Discount",
-      minWidth: 100,
-      editable: true,
-      type: "number",
-      isDecimal: true,
-    },
-    {
       id: "price",
-      label: "Price",
+      label: "cost",
       minWidth: 100,
       editable: true,
       type: "number",
@@ -171,24 +144,12 @@ function Im_addBill({ setOpenForm }) {
   const [selectedItems, setSelectedItems] = React.useState([]);
   const [selectedRows, setSelectedRows] = React.useState([]);
   const [rows, setRows] = React.useState([]);
+  const [totalCounts, setTotalCount] = React.useState([]);
 
   //just hard coded...
   const [writeable_page, set_writeable_Page] = React.useState(0);
   const [writeable_rowsPerPage, set_writeable_RowsPerPage] =
     React.useState(100);
-
-  const [payment, setPayment] = React.useState("");
-
-  const handlePaymentChange = (event) => {
-    console.log(event);
-    setPayment(event.target.value);
-    console.log(payment);
-
-    setValues({
-      ...values,
-      _payment: event.target.value,
-    });
-  };
 
   const handleOpenTable = async () => {
     setOpenTable(true);
@@ -197,10 +158,8 @@ function Im_addBill({ setOpenForm }) {
   const handleCloseTable = async () => {
     setOpenTable(false);
     const selectedArray = [];
-    console.log("selectedItems", selectedItems);
     for (let x = 0; x < selectedItems.length; x++) {
       let importItem = await getImportItemById(selectedItems[x]);
-      console.log("importItem", importItem);
       selectedArray.push(
         createDataForSelectedTable(
           importItem.itemName,
@@ -215,9 +174,7 @@ function Im_addBill({ setOpenForm }) {
         )
       );
     }
-    console.log("selectedArray", selectedArray);
     setSelectedRows(selectedArray);
-    console.log("Selected Rows", selectedRows);
   };
 
   function createDataForSelectedTable(
@@ -298,7 +255,7 @@ function Im_addBill({ setOpenForm }) {
       <Grid item xs={12} sm={11} sx={12}>
         <Typography mt={1} variant="h6">
           {" "}
-          Add Import Bill{" "}
+          Add Export Product{" "}
         </Typography>
       </Grid>
       <Grid item xs={12} sm={1} sx={12}>
@@ -316,28 +273,26 @@ function Im_addBill({ setOpenForm }) {
       </Grid>
       <Grid item xs={12} sm={4} sx={12}>
         <InputField
-          name="_billNo"
-          errorMsg={error._billNo}
-          value={values._billNo}
+          name="_barcode"
+          errorMsg={error._barcode}
+          value={values._barcode}
           onChange={(event, newInputValue) =>
             handleChange(event, newInputValue)
           }
           type="text"
-          label="Bill Number"
+          label="Barcode"
         />
       </Grid>
       <Grid item xs={12} sm={9} sx={12}>
-        <AutoCompleteFeild
-          _key="shop"
-          name="_shop"
-          value={values._shop}
-          dataSet={bills}
-          label="Shop"
-          onClick={getShopNames}
-          errorMsg={error._shop}
-          onchange={(event, newInputValue) =>
+        <InputField
+          name="_productName"
+          errorMsg={error._productName}
+          value={values._productName}
+          onChange={(event, newInputValue) =>
             handleChange(event, newInputValue)
           }
+          type="text"
+          label="Product Name"
         />
       </Grid>
       <Grid item xs={12} sm={9} sx={12} sx={{ mt: 2 }}>
@@ -353,7 +308,7 @@ function Im_addBill({ setOpenForm }) {
       <Grid item xs={12} sm={12} sx={12}>
         {/* selected table */}
         {selectedItems.length != 0 ? (
-          <BillWritableTable
+          <ExportProductItemWritableTable
             columns={selectedColumns}
             rows={selectedRows}
             setRows={setRows}
@@ -362,41 +317,42 @@ function Im_addBill({ setOpenForm }) {
             rowsPerPage={writeable_rowsPerPage}
             tablePagin={false}
             setRowsPerPage={set_writeable_RowsPerPage}
+            setTotalCount={setTotalCount}
           />
         ) : null}
       </Grid>
       <Grid item xs={12} sm={3} sx={12}>
         <InputField
-          name="_discount"
-          value={values._discount}
+          name="_itemCost"
+          value={values._itemCost}
           onChange={(event, newInputValue) =>
             handleChange(event, newInputValue)
           }
           type="text"
-          label="Discount"
+          label="Item Total Cost"
         />
       </Grid>
-      <Grid item xs={12} sm={12} sx={12}>
-        <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
-          <InputLabel id="demo-select-small">Payment Method</InputLabel>
-          <Select
-            labelId="demo-select-small"
-            id="demo-select-small"
-            name="_payment"
-            value={values._payment}
-            label="Payment Method"
-            onChange={handlePaymentChange}
-          >
-            <MenuItem value={"cash"}>Cash</MenuItem>
-            <MenuItem value={"card"}>Card</MenuItem>
-            <MenuItem value={"cheque"}>Cheque</MenuItem>
-          </Select>
-        </FormControl>
+      <Grid item xs={12} sm={3} sx={12}>
+        <InputField
+          name="_extraCost"
+          value={values._extraCost}
+          onChange={(event, newInputValue) =>
+            handleChange(event, newInputValue)
+          }
+          type="text"
+          label="Extra Cost"
+        />
       </Grid>
-      <Grid item xs={12} sm={1} sx={12}>
-        <Typography variant="subtitle2" gutterBottom component="div">
-          Total :
-        </Typography>
+      <Grid item xs={12} sm={3} sx={12}>
+        <InputField
+          name="_totalCost"
+          value={values._totalCost}
+          onChange={(event, newInputValue) =>
+            handleChange(event, newInputValue)
+          }
+          type="text"
+          label="Total Cost"
+        />
       </Grid>
       <Grid item xs={12} sm={3} sx={12}>
         <InputField
@@ -408,20 +364,11 @@ function Im_addBill({ setOpenForm }) {
           type="text"
           label="Total"
         />
-
-        {/* <Typography variant="subtitle2" gutterBottom component="div">{values._total}</Typography> */}
-      </Grid>
-      <Grid item xs={12} sm={3} sx={12}>
-        <Tooltip title="Calculate">
-          <IconButton aria-label="calculate" size="small">
-            <SyncIcon />
-          </IconButton>
-        </Tooltip>
       </Grid>
       <Grid item xs={12} sm={9} sx={12}>
         <InputField
-          name="_billNote"
-          value={values._billNote}
+          name="_ProductNote"
+          value={values._ProductNote}
           // onChange={(event, newInputValue) => handleChange(event, newInputValue)}
           type="text"
           label="Note"
@@ -464,4 +411,4 @@ function Im_addBill({ setOpenForm }) {
   );
 }
 
-export default Im_addBill;
+export default Ex_ItemForm;

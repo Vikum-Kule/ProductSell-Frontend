@@ -1,14 +1,4 @@
-import {
-  Autocomplete,
-  Button,
-  CircularProgress,
-  Grid,
-  IconButton,
-  Paper,
-  TextField,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { Button, Grid, IconButton, Tooltip, Typography } from "@mui/material";
 import React, { Fragment, useState } from "react";
 import AutoCompleteFeild from "../../../FormComponents/AutoCompleteFeild";
 import InputField from "../../../FormComponents/InputField";
@@ -28,8 +18,15 @@ import { FormValidation } from "../../../Validation/FormValidation";
 import Validation from "../../../Validation/Validation";
 import { addIm_Item } from "../../../services/Import";
 import FormAlert from "../../../components/FormAlert";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormControl from "@mui/material/FormControl";
+import FormLabel from "@mui/material/FormLabel";
 
 function ImportFrom({ setOpenForm }) {
+
+  const [unitPriceMethod, setUnitPriceMethod] = useState('_topMost');
   //for input feild values
   const [value, setValue] = useState({
     _importName: "",
@@ -45,10 +42,12 @@ function ImportFrom({ setOpenForm }) {
     _importUnitType: "",
     _minRate: 0,
     _importNote: "",
+    _sellPriceMethod: unitPriceMethod,
   });
 
   //Reset values
   const resetValues = () => {
+    setUnitPriceMethod('_topMost')
     setValue({
       _importName: "",
       _importBrand: "",
@@ -63,8 +62,10 @@ function ImportFrom({ setOpenForm }) {
       _importUnitType: "",
       _minRate: 0,
       _importNote: "",
+      _sellPriceMethod: unitPriceMethod,
     });
   };
+
 
   // errors for inputfeild
   const [error, setError] = useState({
@@ -107,7 +108,6 @@ function ImportFrom({ setOpenForm }) {
       !error._importMCategory &&
       !error._importBrand
     ) {
-      console.log("Submit");
 
       let data = { ...value };
       for (let x = 1; x < 6; x++) {
@@ -209,6 +209,11 @@ function ImportFrom({ setOpenForm }) {
     let categroySet = await getAllCategories();
     console.log(categroySet);
     setCategory(categroySet);
+  };
+
+  const handleUnitPriceMethodChange = (event) => {
+    setUnitPriceMethod(event.target.value);
+    console.log(event.target.value)
   };
 
   return (
@@ -373,6 +378,31 @@ function ImportFrom({ setOpenForm }) {
           type="number"
           label="Minimum Range"
         />
+      </Grid>
+      <Grid item xs={12} sm={12} sx={12}>
+        <FormControl>
+          <FormLabel id="demo-row-radio-buttons-group-label">
+            Sell Price Method
+          </FormLabel>
+          <RadioGroup
+            row
+            aria-labelledby="demo-row-radio-buttons-group-label"
+            name="row-radio-buttons-group"
+            value={unitPriceMethod}
+            onChange={handleUnitPriceMethodChange}
+          >
+            <FormControlLabel
+              value="_topMost"
+              control={<Radio />}
+              label="Top Most Value"
+            />
+            <FormControlLabel
+              value="_average"
+              control={<Radio />}
+              label="Average Value"
+            />
+          </RadioGroup>
+        </FormControl>
       </Grid>
       <Grid item xs={12} sm={9} sx={12}>
         <InputField

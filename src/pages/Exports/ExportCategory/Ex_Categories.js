@@ -144,7 +144,7 @@ function Ex_Categories() {
     if (categorySet) {
       for (let x = 0; x < categorySet.length; x++) {
         let exportProductList = await getExportProductsByCategory(categorySet[x].cat_id);
-        console.log("Imports ", exportProductList);
+        console.log("Exports ", exportProductList);
         //set data in new set list to display in the table
         newSet.push(
           createData(
@@ -179,7 +179,8 @@ function Ex_Categories() {
 
     switch (event) {
       case "view":
-        history.push("/template/im_category_view/" + id);
+        console.log("/template/ex_category_view/" + id)
+        history.push("/template/ex_category_view/" + id);
         break;
       case "edit":
         return "bar";
