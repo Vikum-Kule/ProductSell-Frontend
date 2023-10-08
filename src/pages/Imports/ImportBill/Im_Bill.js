@@ -71,8 +71,8 @@ function Im_Bill() {
     setTotalPages(result.totalPages);
 
     const newSet = [];
-    if (billSet.length != 0) {
-      for (let x = 0; x < billSet.length; x++) {
+    if (billSet?.length != 0) {
+      for (let x = 0; x < billSet?.length; x++) {
         let splitDate = billSet[x].createdDate.split("T");
 
         newSet.push(

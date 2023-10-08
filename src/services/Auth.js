@@ -1,9 +1,8 @@
 import axios from "axios";
-import { getRefreshToken, getToken, setAccessToken, setRefreshToken, setUserSession } from "../Utils/Common";
+import { getRefreshToken, setAccessToken, setUserSession, removeUserSession } from "../Utils/Common";
 
 const userLogin =async(email, password)=>{
     console.log(email+" "+password);
-    let apiResponse="Not";
 
     return axios.post("/api/users/login",{
         "email":email,
@@ -23,7 +22,7 @@ const userLogin =async(email, password)=>{
     .catch(error =>{
         // return error.response.data.message.toString;
          console.log(error.response.status );
-        if (error.response.status == 403 || error.response.status == 400) {
+        if (error.response.status === 403 || error.response.status === 400) {
             return "Invalid credentials."
         } else {
           return "Something went wrong..."
@@ -50,17 +49,10 @@ const getUserData = async(token_data, email)=>{
         return "done";
     }).catch(error =>{
         return "Something went wrong...";
-        //  console.log(error);
-        // if (error.response.statuscode == 403) {
-        //     console.log(error);
-        // } else {
-        //   console.log("something else");
-        // }
     });
 }
 
 const RefreshToken = async()=>{
-    console.log("Refreshhhh")
 
     let refresh_token = getRefreshToken();
     return axios.get("/api/users/token/refresh",
@@ -75,8 +67,16 @@ const RefreshToken = async()=>{
         setAccessToken(response.data);
         return "done";
     }).catch(error =>{
-        return "Something went wrong...";
-        //  console.log(error);
+        if (error.response) {
+            if (error.response.status === 403) {
+                const errorMessage = error.response.data.error_message;
+                console.log("Token expired:", errorMessage);
+                return "Token expired";
+            } else {
+                console.log("Server error:", error.response.data);
+                return "Server error";
+            }
+        }
     });
 }
 

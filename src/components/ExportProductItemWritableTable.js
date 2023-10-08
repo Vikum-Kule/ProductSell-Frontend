@@ -12,6 +12,8 @@ function ExportProductItemWritableTable({ columns, rows, setRows, setTotalCount 
   const handleChange = (event, row, column_id, value) => {
     console.log(row, column_id);
     row[column_id] = value;
+    row.price = (value*row.unitPrice).toFixed(2);
+
     setRows([...rows]);
   };
 

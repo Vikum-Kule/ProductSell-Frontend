@@ -5,6 +5,13 @@ const regex = {
 
 export class Validators {
 
+    static requiredNumberMoreThanZero(value, message){
+        if (!value || parseFloat(value)<=0) {
+            return { error: true, message };
+        }
+        return false;
+    }
+
     static required(value, message) {
         if (!value || !value.toString().trim().length) {
             return { error: true, message };

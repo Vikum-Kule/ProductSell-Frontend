@@ -1,4 +1,11 @@
-import { Button, Grid, IconButton, Tooltip, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  IconButton,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import React, { Fragment, useState } from "react";
 import AutoCompleteFeild from "../../../FormComponents/AutoCompleteFeild";
 import InputField from "../../../FormComponents/InputField";
@@ -14,7 +21,6 @@ import Divider from "@mui/material/Divider";
 import RemoveCircleOutlineOutlinedIcon from "@mui/icons-material/RemoveCircleOutlineOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 import RestartAltOutlinedIcon from "@mui/icons-material/RestartAltOutlined";
-import { FormValidation } from "../../../Validation/FormValidation";
 import Validation from "../../../Validation/Validation";
 import { addIm_Item } from "../../../services/Import";
 import FormAlert from "../../../components/FormAlert";
@@ -25,8 +31,7 @@ import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 
 function ImportFrom({ setOpenForm }) {
-
-  const [unitPriceMethod, setUnitPriceMethod] = useState('_topMost');
+  const [unitPriceMethod, setUnitPriceMethod] = useState("_define");
   //for input feild values
   const [value, setValue] = useState({
     _importName: "",
@@ -43,11 +48,13 @@ function ImportFrom({ setOpenForm }) {
     _minRate: 0,
     _importNote: "",
     _sellPriceMethod: unitPriceMethod,
+    _duration: "",
+    _unitPrice:0.00
   });
 
   //Reset values
   const resetValues = () => {
-    setUnitPriceMethod('_topMost')
+    setUnitPriceMethod("_default");
     setValue({
       _importName: "",
       _importBrand: "",
@@ -63,9 +70,10 @@ function ImportFrom({ setOpenForm }) {
       _minRate: 0,
       _importNote: "",
       _sellPriceMethod: unitPriceMethod,
+      _duration: "",
+      _unitPrice:0.00
     });
   };
-
 
   // errors for inputfeild
   const [error, setError] = useState({
@@ -108,7 +116,6 @@ function ImportFrom({ setOpenForm }) {
       !error._importMCategory &&
       !error._importBrand
     ) {
-
       let data = { ...value };
       for (let x = 1; x < 6; x++) {
         if (value["_subCat_" + x] == "") {
@@ -178,7 +185,7 @@ function ImportFrom({ setOpenForm }) {
   const [counter, setCounter] = useState(0);
 
   const handleClickSubCategory = () => {
-    if (counter != 5) {
+    if (counter !== 5) {
       setCounter(counter + 1);
     }
     console.log(value._subCat_2);
@@ -213,7 +220,7 @@ function ImportFrom({ setOpenForm }) {
 
   const handleUnitPriceMethodChange = (event) => {
     setUnitPriceMethod(event.target.value);
-    console.log(event.target.value)
+    console.log(event.target.value);
   };
 
   return (
@@ -379,7 +386,7 @@ function ImportFrom({ setOpenForm }) {
           label="Minimum Range"
         />
       </Grid>
-      <Grid item xs={12} sm={12} sx={12}>
+      <Grid item xs={12} sm={6} sx={6}>
         <FormControl>
           <FormLabel id="demo-row-radio-buttons-group-label">
             Sell Price Method
@@ -392,6 +399,11 @@ function ImportFrom({ setOpenForm }) {
             onChange={handleUnitPriceMethodChange}
           >
             <FormControlLabel
+              value="_define"
+              control={<Radio />}
+              label="Define Value"
+            />
+            <FormControlLabel
               value="_topMost"
               control={<Radio />}
               label="Top Most Value"
@@ -403,6 +415,37 @@ function ImportFrom({ setOpenForm }) {
             />
           </RadioGroup>
         </FormControl>
+      </Grid>
+      <Grid item xs={12} sm={3} sx={3}>
+        {unitPriceMethod === "_average" || unitPriceMethod === "_topMost" ? (
+          <>
+            <Box mt={3}></Box>
+            <InputField
+              name="_duration"
+              value={value._duration}
+              onChange={(event, newInputValue) =>
+                handleChange(event, newInputValue)
+              }
+              type="number"
+              label="Duration"
+              sm={{ mt: 3, ml: 2 }}
+            />
+          </>
+        ) : (
+          <>
+            <Box mt={3}></Box>
+            <InputField
+              name="_unitPrice"
+              value={value._unitPrice}
+              onChange={(event, newInputValue) =>
+                handleChange(event, newInputValue)
+              }
+              type="number"
+              label="unitPrice"
+              sm={{ mt: 3, ml: 2 }}
+            />
+          </>
+        )}
       </Grid>
       <Grid item xs={12} sm={9} sx={12}>
         <InputField

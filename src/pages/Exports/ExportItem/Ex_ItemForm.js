@@ -3,18 +3,12 @@ import {
   Divider,
   Grid,
   IconButton,
-  InputBase,
-  Modal,
-  Pagination,
-  Paper,
-  Stack,
-  TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import React, { useState } from "react";
-import { getImportItemById, addImportBill } from "../../../services/Import";
+import React, { useEffect, useState } from "react";
+import { getImportItemById } from "../../../services/Import";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import InputField from "../../../FormComponents/InputField";
 import { getUser } from "../../../Utils/Common";
@@ -22,6 +16,9 @@ import ExportProductItemWritableTable from "../../../components/ExportProductIte
 import FormAlert from "../../../components/FormAlert";
 import ItemSelectingPopup from "../../../components/ItemSelectingPopup";
 import { makeStyles } from "@mui/styles";
+import { addExportProduct, checkBarcode } from "../../../services/Export";
+import { Validators } from "../../../Validation/FormValidation";
+import Ex_ItemFormValidation from "../../../Validation/Ex_ItemFormValidation";
 
 const style = {
   position: "absolute",
@@ -41,28 +38,20 @@ function Ex_ItemForm({ setOpenForm }) {
   const [values, setValues] = useState({
     _barcode: "",
     _productName: "",
-    _itemCost: 0.0,
-    _extraCost: 0.0,
-    _totalCost: 0.0,
-    _profit: 0.0,
     _ProductNote: "",
   });
 
   //Reset values
   const resetValues = () => {
+    setError({});
     closeAlert();
     setSelectedItems([]);
     setValues({
       _barcode: "",
       _productName: "",
-      _itemCost: 0.0,
-      _extraCost: 0.0,
-      _totalCost: 0.0,
-      _profit: 0.0,
       _ProductNote: "",
     });
   };
-
   // Alerts ////////////////////////////////////
 
   //display alert...
@@ -89,16 +78,12 @@ function Ex_ItemForm({ setOpenForm }) {
 
   // errors for inputfeild
   const [error, setError] = useState({
-    __barcode: "",
+    _barcode: "",
     _productName: "",
   });
 
   const handleChange = (name, val) => {
-    console.log(name, val);
-    // if(event.target.name ==='_payment'){
-
-    // }
-
+    setError({});
     setValues({
       ...values,
       [name]: val,
@@ -122,23 +107,7 @@ function Ex_ItemForm({ setOpenForm }) {
       editable: true,
       type: "number",
       isDecimal: false,
-    },
-    {
-      id: "unitPrice",
-      label: "Unit Price",
-      minWidth: 100,
-      editable: true,
-      type: "number",
-      isDecimal: true,
-    },
-    {
-      id: "price",
-      label: "cost",
-      minWidth: 100,
-      editable: true,
-      type: "number",
-      isDecimal: true,
-    },
+    }
   ];
 
   const [selectedItems, setSelectedItems] = React.useState([]);
@@ -164,10 +133,10 @@ function Ex_ItemForm({ setOpenForm }) {
         createDataForSelectedTable(
           importItem.itemName,
           importItem.brand,
-          "category",
+          importItem.im_category.category,
           0,
           importItem.unitType,
-          0.0,
+          importItem.unitPrice,
           0.0,
           0.0,
           importItem.importId
@@ -202,50 +171,60 @@ function Ex_ItemForm({ setOpenForm }) {
   }
 
   const submitValue = async () => {
-    if (rows) {
-      //set bill items according to the bill body
-      const importBillItems = [];
-      for (let x = 0; x < rows.length; x++) {
-        const item = {
-          qty: parseInt(rows[x].qty),
-          discount_perItem: parseFloat(rows[x].discountPerItem),
-          price: parseFloat(rows[x].price),
-          importId: rows[x].importId,
-        };
-        importBillItems.push(item);
+    console.log(values);
+    setError(Ex_ItemFormValidation(values));
+    console.log(error);
+    if (!error._productName && !error._barcode) {
+      let _barcode = await checkBarcode(values._barcode);
+      if (_barcode) {
+        setError((error._barcode = "Barcode Allready exist"));
+      } else if(!_barcode){
+        if (selectedRows) {
+          //set product items according to the Product body
+          const importItems = [];
+          for (let x = 0; x < selectedRows?.length; x++) {
+            const item = {
+              useQty: parseInt(selectedRows[x].qty),
+              itemId: selectedRows[x].importId,
+            };
+            importItems.push(item);
+          }
+
+          ////create product body
+
+          //get user name
+          let user = getUser();
+          const productBody = {
+            name: values._productName,
+            barcode: values._barcode,
+            status: "ACTIVE",
+            addedBy: user,
+            note: values._ProductNote,
+            items: importItems,
+          };
+
+          console.log(productBody);
+
+          let result = await addExportProduct(productBody);
+
+          // if (result) {
+          //   resetValues();
+          //   setAlertData({
+          //     type: "success",
+          //     message: "Item submitted..",
+          //   });
+          //   setAlert(true);
+          // } else {
+          //   setAlertData({
+          //     type: "error",
+          //     message: "Something went wrong...",
+          //   });
+          //   setAlert(true);
+          // }
+        }
       }
-
-      ////create bill body
-
-      //get user name
-      let user = getUser();
-      const billBody = {
-        addedBy: user.username,
-        billNo: values._billNo,
-        shop: values._shop,
-        paymentStatus: values._payment,
-        note: values._billNote,
-        total: values._total,
-        discount: values._discount,
-        import_billItems: importBillItems,
-      };
-
-      console.log(billBody);
-      let result = await addImportBill(billBody);
-
-      if (result) {
-        resetValues();
-        setAlertData({
-          type: "success",
-          message: "Item submitted..",
-        });
-        setAlert(true);
-      } else {
-        setAlertData({
-          type: "error",
-          message: "Something went wrong...",
-        });
-        setAlert(true);
+      else{
+        //server error
       }
     }
   };
@@ -281,6 +260,7 @@ function Ex_ItemForm({ setOpenForm }) {
           }
           type="text"
           label="Barcode"
+          validators={[{ check: Validators.required }]}
         />
       </Grid>
       <Grid item xs={12} sm={9} sx={12}>
@@ -293,6 +273,7 @@ function Ex_ItemForm({ setOpenForm }) {
           }
           type="text"
           label="Product Name"
+          validators={[{ check: Validators.required }]}
         />
       </Grid>
       <Grid item xs={12} sm={9} sx={12} sx={{ mt: 2 }}>
@@ -307,7 +288,7 @@ function Ex_ItemForm({ setOpenForm }) {
       </Grid>
       <Grid item xs={12} sm={12} sx={12}>
         {/* selected table */}
-        {selectedItems.length != 0 ? (
+        {selectedItems.length !== 0 ? (
           <ExportProductItemWritableTable
             columns={selectedColumns}
             rows={selectedRows}
@@ -320,50 +301,6 @@ function Ex_ItemForm({ setOpenForm }) {
             setTotalCount={setTotalCount}
           />
         ) : null}
-      </Grid>
-      <Grid item xs={12} sm={3} sx={12}>
-        <InputField
-          name="_itemCost"
-          value={values._itemCost}
-          onChange={(event, newInputValue) =>
-            handleChange(event, newInputValue)
-          }
-          type="text"
-          label="Item Total Cost"
-        />
-      </Grid>
-      <Grid item xs={12} sm={3} sx={12}>
-        <InputField
-          name="_extraCost"
-          value={values._extraCost}
-          onChange={(event, newInputValue) =>
-            handleChange(event, newInputValue)
-          }
-          type="text"
-          label="Extra Cost"
-        />
-      </Grid>
-      <Grid item xs={12} sm={3} sx={12}>
-        <InputField
-          name="_totalCost"
-          value={values._totalCost}
-          onChange={(event, newInputValue) =>
-            handleChange(event, newInputValue)
-          }
-          type="text"
-          label="Total Cost"
-        />
-      </Grid>
-      <Grid item xs={12} sm={3} sx={12}>
-        <InputField
-          name="_total"
-          value={values._total}
-          onChange={(event, newInputValue) =>
-            handleChange(event, newInputValue)
-          }
-          type="text"
-          label="Total"
-        />
       </Grid>
       <Grid item xs={12} sm={9} sx={12}>
         <InputField

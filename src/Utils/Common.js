@@ -22,6 +22,5 @@ export const setAccessToken=(token_data)=>{
 }
 
 export const removeUserSession = ()=>{
-    sessionStorage.removeItem("token");
-    sessionStorage.removeItem("user");
+    sessionStorage.clear();
 }

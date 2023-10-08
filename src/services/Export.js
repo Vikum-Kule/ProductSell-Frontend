@@ -6,7 +6,7 @@ const getExportProducts = async (offset, pageSize, search) => {
   let token = getToken();
   return axios
     .post(
-      "/api/Export/product/all/" + offset + "/" + pageSize,
+      "/api/export/product/all/" + offset + "/" + pageSize,
       {
         search: search.trim(),
       },
@@ -34,6 +34,78 @@ const getExportProducts = async (offset, pageSize, search) => {
 };
 
 //////////////////export products /////////////////////////
+//check barcode 
+const checkBarcode = async (barcode) =>{
+  //check access tocken expiry function
+  let token_valid_result = await token_valid();
+  if (token_valid_result) {
+    let token = getToken();
+    return axios
+      .get("/api/export/product/check/barcode/" + barcode, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        console.log("Response all--", response.data);
+        return response.data;
+      })
+      .catch((error) => {
+        // return "Something went wrong...";
+        console.log("get imports " + error);
+        return "Something went wrong...";
+      });
+  }
+}
+
+//add export product
+const addExportProduct = async (values, catId) => {
+  //check access tocken expiry function
+  let token_valid_result = await token_valid();
+  if (token_valid_result) {
+    let token = getToken();
+
+    //get user name
+    let user = getUser();
+    console.log("User" + user.username);
+
+    return axios
+      .post(
+        "/api/import/add/items?category=" + catId,
+        {
+          product_code: values._productCode ? values._productCode : "-",
+          itemName: values._importName,
+          unitType: values._importUnitType,
+          qty: values._importQty,
+          refillRate: values._minRate,
+          brand: values._importBrand,
+          note: values._importNote,
+          addedBy: user.username,
+          unitPriceMethod:values.unitPriceMethod,
+          unitPrice: 0.0
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+        }
+      )
+      .then(async (response) => {
+        console.log(response);
+        // setUserSession(response.data.token, response.data.user)
+        return true;
+      })
+      .catch((error) => {
+        // return "Something went wrong...";
+        console.log("get imports " + error);
+        return false;
+      });
+  }
+};
+
 
 //get imports by category
 const getExportProductsByCategory = async (cat_id) => {
@@ -42,7 +114,7 @@ const getExportProductsByCategory = async (cat_id) => {
   if (token_valid_result) {
     let token = getToken();
     return axios
-      .get("/api/Export/product/find/category/" + cat_id, {
+      .get("/api/export/product/find/category/" + cat_id, {
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + token,
@@ -222,9 +294,49 @@ const getExCategoryById = async (cat_id) => {
   }
 };
 
+//get Export Category data with pagination by filetring
+const getExCategoryDataByFilter = async (offset, pageSize, filter) => {
+  //check access tocken expiry function
+  let token_valid_result = await token_valid();
+  if (token_valid_result) {
+    let token = getToken();
+
+    return axios
+      .post(
+        "/api/export/category/search/" + offset + "/" + pageSize,
+        {
+          category: filter._category ? filter._category.trim() : null,
+          subCat_1: filter._subCat_1 ? filter._subCat_1.trim() : null,
+          subCat_2: filter._subCat_2 ? filter._subCat_2.trim() : null,
+          subCat_3: filter._subCat_3 ? filter._subCat_3.trim() : null,
+          subCat_4: filter._subCat_4 ? filter._subCat_4.trim() : null,
+          subCat_5: filter._subCat_5 ? filter._subCat_5.trim() : null,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+        }
+      )
+      .then((response) => {
+        console.log(response);
+        console.log("Response --", response.data.content);
+        return response.data;
+      })
+      .catch(async (error) => {
+        // return "Something went wrong...";
+        console.log("get ex Categories " + error);
+        return "Something went wrong...";
+      });
+  }
+};
+
 ///////////////////////////////////////////////////////////
 
 export {
+  addExportProduct,
+  checkBarcode,
   getExportCategoryData,
   getExportProductsByCategory,
   getExportProducts,
@@ -232,4 +344,5 @@ export {
   getAllCategories,
   checkCategory,
   getExCategoryById,
+  getExCategoryDataByFilter,
 };

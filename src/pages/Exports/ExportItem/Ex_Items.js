@@ -219,7 +219,7 @@ function Ex_Items() {
             <Grid item xs={12} sm={10} sx={12}>
               <Typography mt={1} variant="h6">
                 {" "}
-                Import Inventory{" "}
+                Export Items{" "}
               </Typography>
             </Grid>
             <Grid item xs={12} sm={2} sx={12}>
@@ -229,7 +229,7 @@ function Ex_Items() {
                   setOpenForm(true);
                 }}
               >
-                Add Import
+                Add Peoduct
               </Button>
             </Grid>
             <Grid item xs={12} sm={12} sx={12}>

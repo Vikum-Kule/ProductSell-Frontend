@@ -2,7 +2,7 @@ import { Button, Grid, Modal, Pagination, Paper, Stack } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import InputField from "../FormComponents/InputField";
 import SelectingTable from "../FormComponents/SelectingTable";
-import { getImportData } from "../services/Import";
+import { getExCategoryDataByFilter } from "../services/Export";
 
 const style = {
   position: "absolute",
@@ -16,29 +16,29 @@ const style = {
   p: 4,
 };
 
-export default function ItemSelectingPopup({
-  setOpenTable,
-  openTable,
-  handleCloseTable,
-  setSelectedItems,
-  selectedItems,
-  rows,
-  setRows,
+export default function Ex_CategorySelectingPopup({
+  setOpenCatgoryTable,
+  openCatgoryTable,
+  handleCloseCatgoryTable,
+  setSelectedCatgory,
+  selectedCatgory,
+  catgoryRows,
+  setCatgoryRows,
 }) {
   const [page, setPage] = React.useState(0);
   const [totalPages, setTotalPages] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
-  
   /// filter area /////////////////////////////////
 
   // filter values
   const [filter, setFilter] = useState({
-    _productCode: "",
-    _itemName: "",
-    _brand: "",
     _category: "",
-    _unitType: "",
+    _subCat_1: "",
+    _subCat_2: "",
+    _subCat_3: "",
+    _subCat_4: "",
+    _subCat_5: "",
   });
 
   //to handle changing filters
@@ -49,14 +49,15 @@ export default function ItemSelectingPopup({
     });
   };
 
-   //reset filters
-   const resetFilters = () => {
+  //reset filters
+  const resetFilters = () => {
     setFilter({
-      _productCode: "",
-      _itemName: "",
-      _brand: "",
       _category: "",
-      _unitType: "",
+      _subCat_1: "",
+      _subCat_2: "",
+      _subCat_3: "",
+      _subCat_4: "",
+      _subCat_5: "",
     });
   };
 
@@ -69,63 +70,73 @@ export default function ItemSelectingPopup({
   useEffect(async () => {
     await fetchData();
   }, [page, filter]);
- 
 
   const fetchData = async () => {
-    setOpenTable(true);
+    setOpenCatgoryTable(true);
     //get import items data when page loading...
-    let result = await getImportData(page, 3, filter);
+    let result = await getExCategoryDataByFilter(page, 3, filter);
 
-    let importSet = result.content;
+    let categorySet = result.content;
 
     //set total rows and pages
     setTotalPages(result.totalPages);
 
     const newSet = [];
 
-    for (let x = 0; x < importSet?.length; x++) {
-      let category_list = importSet[x].im_category;
-      console.log(category_list);
+    for (let x = 0; x < categorySet?.length; x++) {
       //set data in new set list to display in the table
       newSet.push(
         createData(
-          importSet[x].itemName,
-          importSet[x].brand,
-          category_list.category,
-          importSet[x].qty,
-          importSet[x].importId
+          categorySet[x].category,
+          categorySet[x].subCat_1,
+          categorySet[x].subCat_2,
+          categorySet[x].subCat_3,
+          categorySet[x].subCat_4,
+          categorySet[x].subCat_5
         )
       );
     }
     // console.log("ImportSet",newSet);
     // set rows to table
-    setRows(newSet);
+    setCatgoryRows(newSet);
   };
 
   const columns = [
     {
-      id: "item",
+      id: "category",
       numeric: false,
       disablePadding: true,
-      label: "Item",
+      label: "Category",
     },
     {
-      id: "brand",
+      id: "subcategory_1",
       numeric: false,
       disablePadding: true,
-      label: "Brand",
+      label: "Subcategory 1",
     },
     {
-      id: "category_m",
+      id: "subcategory_2",
       numeric: false,
       disablePadding: true,
-      label: "Main Category",
+      label: "Subcategory 2",
     },
     {
-      id: "qty",
-      numeric: true,
+      id: "subcategory_3",
+      numeric: false,
       disablePadding: true,
-      label: "Qty",
+      label: "Subcategory 3",
+    },
+    {
+      id: "subcategory_4",
+      numeric: false,
+      disablePadding: true,
+      label: "Subcategory 4",
+    },
+    {
+      id: "subcategory_5",
+      numeric: false,
+      disablePadding: true,
+      label: "Subcategory 5",
     },
   ];
 
@@ -137,8 +148,8 @@ export default function ItemSelectingPopup({
     <Grid item xs={12} sm={9} sx={12} sx={{ mt: 2 }}>
       <Modal
         keepMounted
-        open={openTable}
-        onClose={handleCloseTable}
+        open={openCatgoryTable}
+        onClose={handleCloseCatgoryTable}
         aria-labelledby="keep-mounted-modal-title"
         aria-describedby="keep-mounted-modal-description"
       >
@@ -147,39 +158,6 @@ export default function ItemSelectingPopup({
             <Grid item xs={12} sm={12} sx={12}>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={4} sx={12}>
-                  <InputField
-                    name="_productCode"
-                    value={filter._productCode}
-                    onChange={(event, newInputValue) =>
-                      handleFilterChange(event, newInputValue)
-                    }
-                    type="text"
-                    label="Product Code"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={4} sx={12}>
-                  <InputField
-                    name="_itemName"
-                    value={filter._itemName}
-                    onChange={(event, newInputValue) =>
-                      handleFilterChange(event, newInputValue)
-                    }
-                    type="text"
-                    label="Item Name"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={4} sx={12}>
-                  <InputField
-                    name="_brand"
-                    value={filter._brand}
-                    onChange={(event, newInputValue) =>
-                      handleFilterChange(event, newInputValue)
-                    }
-                    type="text"
-                    label="Brand"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={3} sx={12}>
                   <InputField
                     name="_category"
                     value={filter._category}
@@ -190,15 +168,59 @@ export default function ItemSelectingPopup({
                     label="Category"
                   />
                 </Grid>
-                <Grid item xs={12} sm={3} sx={12}>
+                <Grid item xs={12} sm={4} sx={12}>
                   <InputField
-                    name="_unitType"
-                    value={filter._unitType}
+                    name="_subCat_1"
+                    value={filter._subCat_1}
                     onChange={(event, newInputValue) =>
                       handleFilterChange(event, newInputValue)
                     }
                     type="text"
-                    label="Unit Type"
+                    label="Subcategory 1"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4} sx={12}>
+                  <InputField
+                    name="_subCat_2"
+                    value={filter._subCat_2}
+                    onChange={(event, newInputValue) =>
+                      handleFilterChange(event, newInputValue)
+                    }
+                    type="text"
+                    label="Subcategory 2"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4} sx={12}>
+                  <InputField
+                    name="_subCat_3"
+                    value={filter._subCat_3}
+                    onChange={(event, newInputValue) =>
+                      handleFilterChange(event, newInputValue)
+                    }
+                    type="text"
+                    label="Subcategory 3"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4} sx={12}>
+                  <InputField
+                    name="_subCat_4"
+                    value={filter._subCat_4}
+                    onChange={(event, newInputValue) =>
+                      handleFilterChange(event, newInputValue)
+                    }
+                    type="text"
+                    label="Subcategory 4"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4} sx={12}>
+                  <InputField
+                    name="_subCat_5"
+                    value={filter._subCat_5}
+                    onChange={(event, newInputValue) =>
+                      handleFilterChange(event, newInputValue)
+                    }
+                    type="text"
+                    label="Subcategory 5"
                   />
                 </Grid>
                 <Grid item xs={12} sm={4} sx={12}>
@@ -231,11 +253,11 @@ export default function ItemSelectingPopup({
                 setRowsPerPage={setRowsPerPage}
                 title="Import Items"
                 columns={columns}
-                rows={rows}
-                setSelected={setSelectedItems}
-                selected={selectedItems}
+                rows={catgoryRows}
+                setSelected={setSelectedCatgory}
+                selected={selectedCatgory}
                 _key="im_id"
-                setOpenTable={setOpenTable}
+                setOpenTable={setOpenCatgoryTable}
               />
             </Grid>
 
