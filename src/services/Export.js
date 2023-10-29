@@ -61,7 +61,7 @@ const checkBarcode = async (barcode) =>{
 }
 
 //add export product
-const addExportProduct = async (values, catId) => {
+const addExportProduct = async (values) => {
   //check access tocken expiry function
   let token_valid_result = await token_valid();
   if (token_valid_result) {
@@ -73,19 +73,8 @@ const addExportProduct = async (values, catId) => {
 
     return axios
       .post(
-        "/api/import/add/items?category=" + catId,
-        {
-          product_code: values._productCode ? values._productCode : "-",
-          itemName: values._importName,
-          unitType: values._importUnitType,
-          qty: values._importQty,
-          refillRate: values._minRate,
-          brand: values._importBrand,
-          note: values._importNote,
-          addedBy: user.username,
-          unitPriceMethod:values.unitPriceMethod,
-          unitPrice: 0.0
-        },
+        "/api/export/product/add",
+        values,
         {
           headers: {
             "Content-Type": "application/json",

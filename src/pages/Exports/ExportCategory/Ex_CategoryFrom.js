@@ -131,7 +131,7 @@ function Ex_CategoryForm({setOpenForm}) {
     const [counter, setCounter] = useState(0);
 
     const handleClickSubCategory = () => {
-        if(counter!= 5){
+        if(counter!== 5){
             setCounter(counter + 1);
         }
         console.log(values._subCat_2);

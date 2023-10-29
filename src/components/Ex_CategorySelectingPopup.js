@@ -74,7 +74,8 @@ export default function Ex_CategorySelectingPopup({
   const fetchData = async () => {
     setOpenCatgoryTable(true);
     //get import items data when page loading...
-    let result = await getExCategoryDataByFilter(page, 3, filter);
+    let result = await getExCategoryDataByFilter(page, 2, filter);
+    console.log(result);
 
     let categorySet = result.content;
 
@@ -87,6 +88,7 @@ export default function Ex_CategorySelectingPopup({
       //set data in new set list to display in the table
       newSet.push(
         createData(
+          categorySet[x].cat_id,
           categorySet[x].category,
           categorySet[x].subCat_1,
           categorySet[x].subCat_2,
@@ -140,8 +142,24 @@ export default function Ex_CategorySelectingPopup({
     },
   ];
 
-  function createData(item, brand, category_m, qty, im_id) {
-    return { item, brand, category_m, qty, im_id };
+  function createData(
+    cat_id,
+    category,
+    subcategory_1,
+    subcategory_2,
+    subcategory_3,
+    subcategory_4,
+    subcategory_5
+  ) {
+    return {
+      cat_id,
+      category,
+      subcategory_1,
+      subcategory_2,
+      subcategory_3,
+      subcategory_4,
+      subcategory_5,
+    };
   }
 
   return (
@@ -251,13 +269,14 @@ export default function Ex_CategorySelectingPopup({
                 setPage={setPage}
                 rowsPerPage={rowsPerPage}
                 setRowsPerPage={setRowsPerPage}
-                title="Import Items"
+                title="Export Categories"
                 columns={columns}
                 rows={catgoryRows}
                 setSelected={setSelectedCatgory}
                 selected={selectedCatgory}
-                _key="im_id"
+                _key="cat_id"
                 setOpenTable={setOpenCatgoryTable}
+                isOneChoise = {true}
               />
             </Grid>
 

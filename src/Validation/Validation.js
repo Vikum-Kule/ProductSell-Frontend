@@ -29,6 +29,9 @@ const Validation=(values)=> {
     if(!values._importUnitType){
         errors._importUnitType = "This is a required feild."
     }
+    if(!values._exportMCategory){
+        errors._exportMCategory= "This is a required feild."
+    }
 
     return errors;
 }

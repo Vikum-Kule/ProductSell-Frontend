@@ -16,9 +16,14 @@ import ExportProductItemWritableTable from "../../../components/ExportProductIte
 import FormAlert from "../../../components/FormAlert";
 import ItemSelectingPopup from "../../../components/ItemSelectingPopup";
 import { makeStyles } from "@mui/styles";
-import { addExportProduct, checkBarcode } from "../../../services/Export";
+import {
+  addExportProduct,
+  checkBarcode,
+  getExCategoryById,
+} from "../../../services/Export";
 import { Validators } from "../../../Validation/FormValidation";
 import Ex_ItemFormValidation from "../../../Validation/Ex_ItemFormValidation";
+import Ex_CategorySelectingPopup from "../../../components/Ex_CategorySelectingPopup";
 
 const style = {
   position: "absolute",
@@ -73,8 +78,14 @@ function Ex_ItemForm({ setOpenForm }) {
 
   //////////////////////////////////////////////
 
-  // set open table
+  // set open item table
   const [openTable, setOpenTable] = useState(false);
+
+  // set open category table
+  const [openCatgoryTable, setOpenCatgoryTable] = useState(false);
+  const [selectedCatgory, setSelectedCatgory] = useState([]);
+  const [exportCategory, setExportCategory] = useState();
+  const [catgoryRows, setCatgoryRows] = useState([]);
 
   // errors for inputfeild
   const [error, setError] = useState({
@@ -107,7 +118,7 @@ function Ex_ItemForm({ setOpenForm }) {
       editable: true,
       type: "number",
       isDecimal: false,
-    }
+    },
   ];
 
   const [selectedItems, setSelectedItems] = React.useState([]);
@@ -122,6 +133,10 @@ function Ex_ItemForm({ setOpenForm }) {
 
   const handleOpenTable = async () => {
     setOpenTable(true);
+  };
+
+  const handleOpenCategoryTable = async () => {
+    setOpenCatgoryTable(true);
   };
 
   const handleCloseTable = async () => {
@@ -144,6 +159,13 @@ function Ex_ItemForm({ setOpenForm }) {
       );
     }
     setSelectedRows(selectedArray);
+  };
+
+  const handleCloseCatgoryTable = async () => {
+    let categoryData = await getExCategoryById(selectedCatgory[0]);
+    console.log(categoryData);
+    setExportCategory(categoryData);
+    setOpenCatgoryTable(false);
   };
 
   function createDataForSelectedTable(
@@ -178,7 +200,7 @@ function Ex_ItemForm({ setOpenForm }) {
       let _barcode = await checkBarcode(values._barcode);
       if (_barcode) {
         setError((error._barcode = "Barcode Allready exist"));
-      } else if(!_barcode){
+      } else if (!_barcode) {
         if (selectedRows) {
           //set product items according to the Product body
           const importItems = [];
@@ -197,8 +219,9 @@ function Ex_ItemForm({ setOpenForm }) {
           const productBody = {
             name: values._productName,
             barcode: values._barcode,
+            categoryId: exportCategory?.cat_id,
             status: "ACTIVE",
-            addedBy: user,
+            addedBy: user.username,
             note: values._ProductNote,
             items: importItems,
           };
@@ -207,23 +230,22 @@ function Ex_ItemForm({ setOpenForm }) {
 
           let result = await addExportProduct(productBody);
 
-          // if (result) {
-          //   resetValues();
-          //   setAlertData({
-          //     type: "success",
-          //     message: "Item submitted..",
-          //   });
-          //   setAlert(true);
-          // } else {
-          //   setAlertData({
-          //     type: "error",
-          //     message: "Something went wrong...",
-          //   });
-          //   setAlert(true);
-          // }
+          if (result) {
+            resetValues();
+            setAlertData({
+              type: "success",
+              message: "Item submitted..",
+            });
+            setAlert(true);
+          } else {
+            setAlertData({
+              type: "error",
+              message: "Something went wrong...",
+            });
+            setAlert(true);
+          }
         }
-      }
-      else{
+      } else {
         //server error
       }
     }
@@ -276,15 +298,73 @@ function Ex_ItemForm({ setOpenForm }) {
           validators={[{ check: Validators.required }]}
         />
       </Grid>
-      <Grid item xs={12} sm={9} sx={12} sx={{ mt: 2 }}>
-        <Divider variant="middle" />
+      <Grid item xs={12} sm={9} sx={12}>
+        <Button onClick={handleOpenCategoryTable} variant="outlined">
+          Select Category
+        </Button>
       </Grid>
-      <Grid item xs={12} sm={3} sx={12}>
-        <Tooltip title="Add Items">
-          <IconButton onClick={handleOpenTable} aria-label="add" size="small">
-            <AddCircleOutlineOutlinedIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
+      {selectedCatgory.length !== 0 ? (
+        <>
+          <Grid item xs={12} sm={9} sx={12}>
+            <InputField
+              name="_category"
+              value={exportCategory?.category}
+              type="text"
+              label="Category"
+              isdisabled={true}
+            />
+          </Grid>
+          <Grid item xs={12} sm={9} sx={12}>
+            <InputField
+              name="_subCat_1"
+              value={exportCategory?.subCat_1}
+              type="text"
+              label="Subcategory 1"
+              isdisabled={true}
+            />
+          </Grid>
+          <Grid item xs={12} sm={9} sx={12}>
+            <InputField
+              name="_subCat_2"
+              value={exportCategory?.subCat_2}
+              type="text"
+              label="Subcategory 2"
+              isdisabled={true}
+            />
+          </Grid>
+          <Grid item xs={12} sm={9} sx={12}>
+            <InputField
+              name="_subCat_3"
+              value={exportCategory?.subCat_3}
+              type="text"
+              label="Subcategory 3"
+              isdisabled={true}
+            />
+          </Grid>
+          <Grid item xs={12} sm={9} sx={12}>
+            <InputField
+              name="_subCat_4"
+              value={exportCategory?.subCat_4}
+              type="text"
+              label="Subcategory 4"
+              isdisabled={true}
+            />
+          </Grid>
+          <Grid item xs={12} sm={9} sx={12}>
+            <InputField
+              name="_subCat_5"
+              value={exportCategory?.subCat_5}
+              type="text"
+              label="Subcategory 5"
+              isdisabled={true}
+            />
+          </Grid>
+        </>
+      ) : null}
+      <Grid item xs={12} sm={9} sx={12}>
+        <Button onClick={handleOpenTable} variant="outlined">
+          Select Import Items
+        </Button>
       </Grid>
       <Grid item xs={12} sm={12} sx={12}>
         {/* selected table */}
@@ -330,6 +410,19 @@ function Ex_ItemForm({ setOpenForm }) {
             </Button>
           </Grid>
         </Grid>
+      </Grid>
+      <Grid>
+        {openCatgoryTable ? (
+          <Ex_CategorySelectingPopup
+            setOpenCatgoryTable={setOpenCatgoryTable}
+            openCatgoryTable={openCatgoryTable}
+            handleCloseCatgoryTable={handleCloseCatgoryTable}
+            setSelectedCatgory={setSelectedCatgory}
+            selectedCatgory={selectedCatgory}
+            setCatgoryRows={setCatgoryRows}
+            catgoryRows={catgoryRows}
+          />
+        ) : null}
       </Grid>
       <Grid>
         {openTable ? (
