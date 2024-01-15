@@ -18,7 +18,7 @@ const getImportData = async (offset, pageSize, filter) => {
           brand: filter._brand ? filter._brand.trim() : null,
           addedBy: filter._addedBy ? filter._addedBy.trim() : null,
           unitType: filter._unitType ? filter._unitType.trim() : null,
-          category: filter._category ? filter._category.trim() : null,
+          category: filter._category,
         },
         {
           headers: {
@@ -338,8 +338,8 @@ const addIm_Item = async (values, catId) => {
           brand: values._importBrand,
           note: values._importNote,
           addedBy: user.username,
-          unitPriceMethod:values.unitPriceMethod,
-          unitPrice: 0.0
+          unitPriceMethod: values.unitPriceMethod,
+          unitPrice: 0.0,
         },
         {
           headers: {
@@ -361,17 +361,25 @@ const addIm_Item = async (values, catId) => {
   }
 };
 
-//get import category data with pagination
-const getImportCategoryData = async (offset, pageSize, search) => {
+//get Export Category data with pagination by filetring
+const getImCategoryDataByFilter = async (offset, pageSize, filter) => {
   //check access tocken expiry function
   let token_valid_result = await token_valid();
   if (token_valid_result) {
     let token = getToken();
+
+    console.log(token);
+
     return axios
       .post(
-        "/api/import/category/all/" + offset + "/" + pageSize,
+        "/api/import/category/search/" + offset + "/" + pageSize,
         {
-          search: search.trim(),
+          category: filter._category ? filter._category.trim() : null,
+          subCat_1: filter._subCat_1 ? filter._subCat_1.trim() : null,
+          subCat_2: filter._subCat_2 ? filter._subCat_2.trim() : null,
+          subCat_3: filter._subCat_3 ? filter._subCat_3.trim() : null,
+          subCat_4: filter._subCat_4 ? filter._subCat_4.trim() : null,
+          subCat_5: filter._subCat_5 ? filter._subCat_5.trim() : null,
         },
         {
           headers: {
@@ -382,12 +390,12 @@ const getImportCategoryData = async (offset, pageSize, search) => {
       )
       .then((response) => {
         console.log(response);
-        console.log("Response --", response.data);
+        console.log("Response --", response.data.content);
         return response.data;
       })
-      .catch((error) => {
+      .catch(async (error) => {
         // return "Something went wrong...";
-        console.log("get imports " + error);
+        console.log("get im Categories " + error);
         return "Something went wrong...";
       });
   }
@@ -610,7 +618,7 @@ export {
   getCategoryById,
   getImportBillById,
   getImportBillData,
-  getImportCategoryData,
+  getImCategoryDataByFilter,
   getImportData,
   getImportItemById,
   getImportsByCategory,

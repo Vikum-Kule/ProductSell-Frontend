@@ -111,17 +111,6 @@ function Ex_Categories() {
     { id: "action", label: "Actions", minWidth: 100 },
   ];
 
-  const myFunc = (row) => {
-    console.log("My func", row);
-  };
-
-  //Drop down list for table
-  const popUpList = [
-    { id: 1, label: "View Items", func: myFunc },
-    { id: 2, label: "Edit", func: myFunc },
-    { id: 3, label: "Delete", func: myFunc },
-  ];
-
   const handleChange = async (event, value) => {
     setPage(value - 1);
     console.log("Page", page);

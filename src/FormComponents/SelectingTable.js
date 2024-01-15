@@ -213,6 +213,7 @@ export default function SelectingTable({
 
     setSelected(newSelected);
     console.log(selected);
+    console.log(newSelected);
   };
 
   const isSelected = (row) => selected?.indexOf(row) !== -1;
@@ -250,7 +251,6 @@ export default function SelectingTable({
                 // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
                   const isItemSelected = isSelected(row[_key]);
-                  console.log(isItemSelected);
                   const labelId = `enhanced-table-checkbox-${index}`;
 
                   return (

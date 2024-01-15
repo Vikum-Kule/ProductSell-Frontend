@@ -1,6 +1,5 @@
 import {
   Button,
-  Divider,
   Grid,
   IconButton,
   Tooltip,
@@ -9,7 +8,6 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import React, { useEffect, useState } from "react";
 import { getImportItemById } from "../../../services/Import";
-import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import InputField from "../../../FormComponents/InputField";
 import { getUser } from "../../../Utils/Common";
 import ExportProductItemWritableTable from "../../../components/ExportProductItemWritableTable";
@@ -48,7 +46,9 @@ function Ex_ItemForm({ setOpenForm }) {
 
   //Reset values
   const resetValues = () => {
-    setError({});
+    setError({ _barcode: "", _productName: "" });
+    setSelectedCatgory([]);
+    setExportCategory({});
     closeAlert();
     setSelectedItems([]);
     setValues({
@@ -94,7 +94,11 @@ function Ex_ItemForm({ setOpenForm }) {
   });
 
   const handleChange = (name, val) => {
-    setError({});
+    setError({
+      _barcode: "",
+      _productName: "",
+    });
+    closeAlert();
     setValues({
       ...values,
       [name]: val,
@@ -150,10 +154,6 @@ function Ex_ItemForm({ setOpenForm }) {
           importItem.brand,
           importItem.im_category.category,
           0,
-          importItem.unitType,
-          importItem.unitPrice,
-          0.0,
-          0.0,
           importItem.importId
         )
       );
@@ -173,10 +173,6 @@ function Ex_ItemForm({ setOpenForm }) {
     brand,
     category_m,
     qty,
-    unitType,
-    unitPrice,
-    discountPerItem,
-    price,
     importId
   ) {
     return {
@@ -184,22 +180,23 @@ function Ex_ItemForm({ setOpenForm }) {
       brand,
       category_m,
       qty,
-      unitType,
-      unitPrice,
-      discountPerItem,
-      price,
       importId,
     };
   }
 
   const submitValue = async () => {
     console.log(values);
-    setError(Ex_ItemFormValidation(values));
-    console.log(error);
-    if (!error._productName && !error._barcode) {
+    let errorMsg = Ex_ItemFormValidation(values);
+    setError(errorMsg);
+    console.log(exportCategory);
+    if (!errorMsg._barcode && !errorMsg._productName) {
+      console.log(errorMsg);
       let _barcode = await checkBarcode(values._barcode);
       if (_barcode) {
-        setError((error._barcode = "Barcode Allready exist"));
+        setError({
+          ...error,
+          _barcode: "Barcode Allready exist",
+        });
       } else if (!_barcode) {
         if (selectedRows) {
           //set product items according to the Product body

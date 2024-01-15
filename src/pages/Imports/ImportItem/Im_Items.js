@@ -9,18 +9,26 @@ import {
 import { makeStyles } from "@mui/styles";
 import TableItem from "../../../components/TableItem";
 import React, { useEffect, useState } from "react";
-import { getImportData, DiactivateItemById } from "../../../services/Import";
+import {
+  getImportData,
+  DiactivateItemById,
+  getCategoryById,
+} from "../../../services/Import";
 import ImportFrom from "./ImportFrom";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useHistory } from "react-router";
 import Box from "@mui/material/Box";
 import InputField from "../../../FormComponents/InputField";
 import Alart from "../../../components/Alart";
+import Im_CategorySelectingPopup from "../../../components/Im_CategorySelectingPopup";
 
 const useStyles = makeStyles({
   container: {
-    padding: "5px",
+    padding: "20px",
   },
+  categoryContainer:{
+    padding: "10px"
+  }
 });
 
 // import items all functionalties..
@@ -115,6 +123,12 @@ function Im_Items() {
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [openForm, setOpenForm] = React.useState(false);
 
+  // set open category table
+  const [openCatgoryTable, setOpenCatgoryTable] = useState(false);
+  const [selectedCatgory, setSelectedCatgory] = useState([]);
+  const [importCategory, setImportCategory] = useState();
+  const [catgoryRows, setCatgoryRows] = useState([]);
+
   const handleChange = async (event, value) => {
     setPage(value - 1);
     await fetchData();
@@ -177,7 +191,7 @@ function Im_Items() {
     _itemName: "",
     _brand: "",
     _addedBy: "",
-    _category: "",
+    _category: [],
     _unitType: "",
     _status: "",
   });
@@ -189,12 +203,26 @@ function Im_Items() {
       _itemName: "",
       _brand: "",
       _addedBy: "",
-      _category: "",
+      _category: [],
       _unitType: "",
       _status: "",
     });
 
     fetchData();
+  };
+
+  // handle categories
+  const handleOpenCategoryTable = async () => {
+    setOpenCatgoryTable(true);
+  };
+
+  const handleCloseCatgoryTable = async () => {
+    // let categoryData = await getCategoryById(selectedCatgory[0]);
+    setOpenCatgoryTable(false);
+    setFilter({
+      ...filter,
+      _category: selectedCatgory,
+    });
   };
 
   //to handle changing filters
@@ -258,7 +286,7 @@ function Im_Items() {
                     label="Item Name"
                   />
                 </Grid>
-                <Grid item xs={12} sm={2} sx={12}>
+                <Grid item xs={12} sm={3} sx={12}>
                   <InputField
                     name="_brand"
                     value={filter._brand}
@@ -269,18 +297,7 @@ function Im_Items() {
                     label="Brand"
                   />
                 </Grid>
-                <Grid item xs={12} sm={2} sx={12}>
-                  <InputField
-                    name="_category"
-                    value={filter._category}
-                    onChange={(event, newInputValue) =>
-                      handleFilterChange(event, newInputValue)
-                    }
-                    type="text"
-                    label="Category"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={2} sx={12}>
+                <Grid item xs={12} sm={3} sx={12}>
                   <InputField
                     name="_unitType"
                     value={filter._unitType}
@@ -312,6 +329,11 @@ function Im_Items() {
                     type="text"
                     label="Status"
                   />
+                </Grid>
+                <Grid item xs={12} sm={4} sx={12}>
+                  <Button onClick={handleOpenCategoryTable} variant="outlined">
+                    Select Category
+                  </Button>
                 </Grid>
                 <Grid item xs={12} sm={4} sx={12}>
                   <Stack direction="row" spacing={2}>
@@ -364,6 +386,19 @@ function Im_Items() {
                   onChange={handleChange}
                 />
               </Stack>
+            </Grid>
+            <Grid>
+              {openCatgoryTable ? (
+                <Im_CategorySelectingPopup
+                  setOpenCatgoryTable={setOpenCatgoryTable}
+                  openCatgoryTable={openCatgoryTable}
+                  handleCloseCatgoryTable={handleCloseCatgoryTable}
+                  setSelectedCatgory={setSelectedCatgory}
+                  selectedCatgory={selectedCatgory}
+                  setCatgoryRows={setCatgoryRows}
+                  catgoryRows={catgoryRows}
+                />
+              ) : null}
             </Grid>
           </Grid>
         )}

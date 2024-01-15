@@ -12,6 +12,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import CloseIcon from '@mui/icons-material/Close';
 import { Grid, List, ListItem, ListItemButton, ListItemText, Pagination, Popover, Stack } from '@mui/material';
@@ -110,10 +111,19 @@ function TableItem({dropDown,
                                   </IconButton>
                                 </Grid>:null
                               }
-                            
-                            
-                            
-                            
+                              {showActions.includes("production")?
+                                <Grid item>
+                                  <IconButton 
+                                    aria-label="AddCircleOutlineIcon" 
+                                    size="small"
+                                    onClick={() => {
+                                      handleAction("production",value );
+                                    }}
+                                  >
+                                    <AddCircleOutlineIcon fontSize="inherit" />
+                                  </IconButton>
+                                </Grid>:null
+                              }
                           </Grid>  
                         );
                         }

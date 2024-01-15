@@ -2,13 +2,17 @@ import axios from "axios";
 import { getToken, getUser } from "../Utils/Common";
 import token_valid from "./TokenValid";
 
-const getExportProducts = async (offset, pageSize, search) => {
+const getExportProducts = async (offset, pageSize, filter) => {
   let token = getToken();
   return axios
     .post(
       "/api/export/product/all/" + offset + "/" + pageSize,
       {
-        search: search.trim(),
+        barcode: filter._barcode ? filter._barcode.trim() : null,
+        productName: filter._product ? filter._product.trim() : null,
+        addedBy: filter._addedBy ? filter._addedBy.trim() : null,
+        category: filter._category ? filter._category.trim() : null,
+        status: filter._status ? filter._status.trim() : null,
       },
       {
         headers: {
@@ -34,8 +38,8 @@ const getExportProducts = async (offset, pageSize, search) => {
 };
 
 //////////////////export products /////////////////////////
-//check barcode 
-const checkBarcode = async (barcode) =>{
+//check barcode
+const checkBarcode = async (barcode) => {
   //check access tocken expiry function
   let token_valid_result = await token_valid();
   if (token_valid_result) {
@@ -58,7 +62,7 @@ const checkBarcode = async (barcode) =>{
         return "Something went wrong...";
       });
   }
-}
+};
 
 //add export product
 const addExportProduct = async (values) => {
@@ -72,16 +76,12 @@ const addExportProduct = async (values) => {
     console.log("User" + user.username);
 
     return axios
-      .post(
-        "/api/export/product/add",
-        values,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + token,
-          },
-        }
-      )
+      .post("/api/export/product/add", values, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      })
       .then(async (response) => {
         console.log(response);
         // setUserSession(response.data.token, response.data.user)
@@ -95,6 +95,62 @@ const addExportProduct = async (values) => {
   }
 };
 
+//add export product
+const updateExportProduct = async (values, productId) => {
+  //check access tocken expiry function
+  let token_valid_result = await token_valid();
+  if (token_valid_result) {
+    let token = getToken();
+
+    //get user name
+    let user = getUser();
+    console.log("User" + user.username);
+
+    return axios
+      .put("/api/export/product/" + productId, values, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      })
+      .then(async (response) => {
+        console.log(response);
+        // setUserSession(response.data.token, response.data.user)
+        return true;
+      })
+      .catch((error) => {
+        // return "Something went wrong...";
+        console.log("get imports " + error);
+        return false;
+      });
+  }
+};
+
+//find export Product by id
+const getExportProductById = async (productId) => {
+  //check access tocken expiry function
+  let token_valid_result = await token_valid();
+  if (token_valid_result) {
+    let token = getToken();
+    return axios
+      .get("/api/export/product/" + productId, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        console.log("Response all--", response.data);
+        return response.data;
+      })
+      .catch((error) => {
+        // return "Something went wrong...";
+        console.log("get imports " + error);
+        return "Something went wrong...";
+      });
+  }
+};
 
 //get imports by category
 const getExportProductsByCategory = async (cat_id) => {
@@ -327,6 +383,7 @@ export {
   addExportProduct,
   checkBarcode,
   getExportCategoryData,
+  getExportProductById,
   getExportProductsByCategory,
   getExportProducts,
   addNewCategory,
@@ -334,4 +391,5 @@ export {
   checkCategory,
   getExCategoryById,
   getExCategoryDataByFilter,
+  updateExportProduct,
 };

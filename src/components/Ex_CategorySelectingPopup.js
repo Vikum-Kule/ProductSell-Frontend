@@ -74,7 +74,7 @@ export default function Ex_CategorySelectingPopup({
   const fetchData = async () => {
     setOpenCatgoryTable(true);
     //get import items data when page loading...
-    let result = await getExCategoryDataByFilter(page, 2, filter);
+    let result = await getExCategoryDataByFilter(page, 10, filter);
     console.log(result);
 
     let categorySet = result.content;
@@ -276,7 +276,6 @@ export default function Ex_CategorySelectingPopup({
                 selected={selectedCatgory}
                 _key="cat_id"
                 setOpenTable={setOpenCatgoryTable}
-                isOneChoise = {true}
               />
             </Grid>
 

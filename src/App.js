@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Switch, Route, useHistory } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  useHistory,
+} from "react-router-dom";
 import "./App.css";
 import { createTheme } from "@mui/material/styles";
 import { ThemeProvider } from "@mui/private-theming";
@@ -18,11 +23,12 @@ import Im_ItemEdit from "./pages/Imports/ImportItem/Im_ItemEdit";
 import Ex_Category from "./pages/Exports/ExportCategory/Ex_Categories";
 import Ex_CategoryView from "./pages/Exports/ExportCategory/Ex_CategoyView";
 import Ex_Items from "./pages/Exports/ExportItem/Ex_Items";
+import Ex_ProductEdit from "./pages/Exports/ExportItem/Ex_ItemEdit";
+import Ex_Production from "./pages/Exports/ExportItem/Ex_Production";
 
 const theme = createTheme({});
 
 function App() {
-
   return (
     <ThemeProvider theme={theme}>
       <Router>
@@ -74,6 +80,12 @@ function App() {
                 </Route>
                 <Route path="/template/ex_items">
                   <Ex_Items />
+                </Route>
+                <Route path="/template/ex_product_edit/:productId">
+                  <Ex_ProductEdit />
+                </Route>
+                <Route path="/template/ex_product_production/:productId">
+                  <Ex_Production />
                 </Route>
               </Switch>
             </Template>

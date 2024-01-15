@@ -9,13 +9,13 @@ import {
 import { makeStyles } from "@mui/styles";
 import TableItem from "../../../components/TableItem";
 import React, { useEffect, useState } from "react";
-import { getImportData, DiactivateItemById } from "../../../services/Import";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useHistory } from "react-router";
 import Box from "@mui/material/Box";
 import InputField from "../../../FormComponents/InputField";
 import Alart from "../../../components/Alart";
 import Ex_ItemForm from "./Ex_ItemForm";
+import { getExportProducts } from "../../../services/Export";
 
 const useStyles = makeStyles({
   container: {
@@ -45,7 +45,7 @@ function Ex_Items() {
       <>
         <Button
           onClick={async () => {
-            await DiactivateItemById(disableItemId);
+            // await DiactivateItemById(disableItemId);
             setOpenDisableWarning(false);
             await fetchData();
           }}
@@ -79,8 +79,8 @@ function Ex_Items() {
 
   //columns for table
   const columns = [
-    { id: "code", label: "Code", minWidth: 80 },
-    { id: "item", label: "Item", minWidth: 100 },
+    { id: "barcode", label: "Barcode", minWidth: 80 },
+    { id: "name", label: "Product", minWidth: 100 },
     {
       id: "category_m",
       label: "Main Category",
@@ -88,8 +88,8 @@ function Ex_Items() {
       format: (value) => value.toLocaleString("en-US"),
     },
     {
-      id: "qty",
-      label: "Remaining Qty",
+      id: "existingQty",
+      label: "Existing Qty",
       minWidth: 100,
       format: (value) => value.toLocaleString("en-US"),
     },
@@ -98,15 +98,23 @@ function Ex_Items() {
   ];
 
   function createData(
-    code,
-    item,
+    barcode,
+    name,
     category_m,
-    qty,
+    existingQty,
     status,
     action,
-    ex_id
+    product_id
   ) {
-    return { code, item, category_m, qty, status, action, ex_id };
+    return {
+      barcode,
+      name,
+      category_m,
+      existingQty,
+      status,
+      action,
+      product_id,
+    };
   }
 
   const [page, setPage] = React.useState(0);
@@ -122,27 +130,26 @@ function Ex_Items() {
   const fetchData = async () => {
     setLoading(true);
     //get import items data when page loading...
-    let result = await getImportData(page, rowsPerPage, filter);
-    let importSet = result.content;
+    let result = await getExportProducts(page, rowsPerPage, filter);
+    let exportProductSet = result.content;
 
     //set total rows and pages
     setTotalPages(result.totalPages);
     setTotalRows(result.totalElements);
 
     const newSet = [];
-    if (importSet) {
-      for (let x = 0; x < importSet.length; x++) {
-        let category_list = importSet[x].im_category;
+    if (exportProductSet) {
+      for (let x = 0; x < exportProductSet?.length; x++) {
+        let category_list = exportProductSet[x].ex_category;
         //set data in new set list to display in the table
         newSet.push(
           createData(
-            importSet[x].product_code,
-            importSet[x].itemName,
-            importSet[x].brand,
+            exportProductSet[x].barcode,
+            exportProductSet[x].name,
             category_list.category,
-            importSet[x].qty,
-            importSet[x].status,
-            importSet[x].importId
+            exportProductSet[x].existingQty,
+            exportProductSet[x].status,
+            exportProductSet[x].product_id
           )
         );
       }
@@ -156,13 +163,17 @@ function Ex_Items() {
   const handleAction = async (event, id) => {
     switch (event) {
       case "view":
-        history.push("/template/im_item_view/" + id);
+        // history.push("/template/im_item_view/" + id);
         break;
       case "edit":
-        history.push("/template/im_item_edit/" + id);
+        console.log("Id: " + id);
+        history.push("/template/ex_product_edit/" + id);
         break;
       case "disable":
-        disableProduct(id);
+        // disableProduct(id);
+        break;
+      case "production":
+        history.push("/template/ex_product_production/" + id);
         break;
       default:
         return "foo";
@@ -171,24 +182,20 @@ function Ex_Items() {
 
   // filter values
   const [filter, setFilter] = useState({
-    _productCode: "",
-    _itemName: "",
-    _brand: "",
+    _barcode: "",
+    _product: "",
     _addedBy: "",
     _category: "",
-    _unitType: "",
     _status: "",
   });
 
   //reset filters
   const resetFilters = () => {
     setFilter({
-      _productCode: "",
-      _itemName: "",
-      _brand: "",
+      _barcode: "",
+      _product: "",
       _addedBy: "",
       _category: "",
-      _unitType: "",
       _status: "",
     });
 
@@ -236,35 +243,24 @@ function Ex_Items() {
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={2} sx={12}>
                   <InputField
-                    name="_productCode"
-                    value={filter._productCode}
+                    name="_barcode"
+                    value={filter._barcode}
                     onChange={(event, newInputValue) =>
                       handleFilterChange(event, newInputValue)
                     }
                     type="text"
-                    label="Product Code"
+                    label="Barcode"
                   />
                 </Grid>
                 <Grid item xs={12} sm={3} sx={12}>
                   <InputField
-                    name="_itemName"
-                    value={filter._itemName}
+                    name="_product"
+                    value={filter._product}
                     onChange={(event, newInputValue) =>
                       handleFilterChange(event, newInputValue)
                     }
                     type="text"
-                    label="Item Name"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={2} sx={12}>
-                  <InputField
-                    name="_brand"
-                    value={filter._brand}
-                    onChange={(event, newInputValue) =>
-                      handleFilterChange(event, newInputValue)
-                    }
-                    type="text"
-                    label="Brand"
+                    label="Product Name"
                   />
                 </Grid>
                 <Grid item xs={12} sm={2} sx={12}>
@@ -276,17 +272,6 @@ function Ex_Items() {
                     }
                     type="text"
                     label="Category"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={2} sx={12}>
-                  <InputField
-                    name="_unitType"
-                    value={filter._unitType}
-                    onChange={(event, newInputValue) =>
-                      handleFilterChange(event, newInputValue)
-                    }
-                    type="text"
-                    label="Unit Type"
                   />
                 </Grid>
                 <Grid item xs={12} sm={4} sx={12}>
@@ -348,7 +333,7 @@ function Ex_Items() {
                   totalPages={totalPages}
                   getData={fetchData}
                   handleAction={handleAction}
-                  showActions={["view", "edit", "disable"]}
+                  showActions={["view", "edit", "disable", "production"]}
                 />
               )}
             </Grid>
