@@ -15,7 +15,6 @@ import {
   getImCategoryDataByFilter,
   getImportsByCategory,
 } from "../../../services/Import";
-import SearchIcon from "@mui/icons-material/Search";
 import Im_CategoryForm from "./Im_CategoryForm";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
@@ -144,7 +143,6 @@ function Im_Categories() {
 
   const handleChange = async (event, value) => {
     setPage(value - 1);
-    console.log("Page", page);
     await fetchData(filter, value - 1);
   };
 

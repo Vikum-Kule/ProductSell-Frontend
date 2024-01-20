@@ -12,7 +12,6 @@ import React, { useEffect, useState } from "react";
 import {
   getImportData,
   DiactivateItemById,
-  getCategoryById,
 } from "../../../services/Import";
 import ImportFrom from "./ImportFrom";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -91,12 +90,6 @@ function Im_Items() {
     { id: "item", label: "Item", minWidth: 100 },
     { id: "brand", label: "Brand", minWidth: 100 },
     {
-      id: "category_m",
-      label: "Main Category",
-      minWidth: 100,
-      format: (value) => value.toLocaleString("en-US"),
-    },
-    {
       id: "qty",
       label: "Qty",
       minWidth: 100,
@@ -110,13 +103,12 @@ function Im_Items() {
     code,
     item,
     brand,
-    category_m,
     qty,
     status,
     action,
     im_id
   ) {
-    return { code, item, brand, category_m, qty, status, action, im_id };
+    return { code, item, brand, qty, status, action, im_id };
   }
 
   const [page, setPage] = React.useState(0);
@@ -126,7 +118,6 @@ function Im_Items() {
   // set open category table
   const [openCatgoryTable, setOpenCatgoryTable] = useState(false);
   const [selectedCatgory, setSelectedCatgory] = useState([]);
-  const [importCategory, setImportCategory] = useState();
   const [catgoryRows, setCatgoryRows] = useState([]);
 
   const handleChange = async (event, value) => {
@@ -148,14 +139,12 @@ function Im_Items() {
     const newSet = [];
     if (importSet) {
       for (let x = 0; x < importSet.length; x++) {
-        let category_list = importSet[x].im_category;
         //set data in new set list to display in the table
         newSet.push(
           createData(
             importSet[x].product_code,
             importSet[x].itemName,
             importSet[x].brand,
-            category_list.category,
             importSet[x].qty,
             importSet[x].status,
             importSet[x].importId
@@ -217,7 +206,6 @@ function Im_Items() {
   };
 
   const handleCloseCatgoryTable = async () => {
-    // let categoryData = await getCategoryById(selectedCatgory[0]);
     setOpenCatgoryTable(false);
     setFilter({
       ...filter,

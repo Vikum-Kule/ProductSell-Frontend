@@ -316,7 +316,7 @@ const checkItem = async (values, catId) => {
 };
 
 //create import item
-const addIm_Item = async (values, catId) => {
+const addIm_Item = async (values) => {
   //check access tocken expiry function
   let token_valid_result = await token_valid();
   if (token_valid_result) {
@@ -328,18 +328,16 @@ const addIm_Item = async (values, catId) => {
 
     return axios
       .post(
-        "/api/import/add/items?category=" + catId,
+        "/api/import/add/item",
         {
           product_code: values._productCode ? values._productCode : "-",
           itemName: values._importName,
           unitType: values._importUnitType,
-          qty: values._importQty,
-          refillRate: values._minRate,
+          categories: values._categories,
+          refillRate: parseInt(values._refillRate),
           brand: values._importBrand,
           note: values._importNote,
           addedBy: user.username,
-          unitPriceMethod: values.unitPriceMethod,
-          unitPrice: 0.0,
         },
         {
           headers: {

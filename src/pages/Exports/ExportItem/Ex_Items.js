@@ -16,6 +16,8 @@ import InputField from "../../../FormComponents/InputField";
 import Alart from "../../../components/Alart";
 import Ex_ItemForm from "./Ex_ItemForm";
 import { getExportProducts } from "../../../services/Export";
+import ItemSelectingPopup from "../../../components/ItemSelectingPopup";
+import Ex_CategorySelectingPopup from "../../../components/Ex_CategorySelectingPopup";
 
 const useStyles = makeStyles({
   container: {
@@ -120,6 +122,16 @@ function Ex_Items() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [openForm, setOpenForm] = React.useState(false);
+  
+  // set open item table
+  const [openItemTable, setOpenItemTable] = useState(false);
+  const [selectedItems, setSelectedItems] = React.useState([]);
+  const [itemRows, setItemRows] = React.useState([]);
+
+  // set open category table
+  const [openCatgoryTable, setOpenCatgoryTable] = useState(false);
+  const [selectedCatgory, setSelectedCatgory] = useState([]);
+  const [catgoryRows, setCatgoryRows] = useState([]);
 
   const handleChange = async (event, value) => {
     setPage(value - 1);
@@ -185,7 +197,8 @@ function Ex_Items() {
     _barcode: "",
     _product: "",
     _addedBy: "",
-    _category: "",
+    _categories: [],
+    _items: [],
     _status: "",
   });
 
@@ -195,11 +208,39 @@ function Ex_Items() {
       _barcode: "",
       _product: "",
       _addedBy: "",
-      _category: "",
+      _categories: [],
+      _items: [],
       _status: "",
     });
 
     fetchData();
+  };
+
+  // handle categories
+  const handleOpenCategoryTable = async () => {
+    setOpenCatgoryTable(true);
+  };
+
+  const handleCloseCatgoryTable = async () => {
+    setOpenCatgoryTable(false);
+    setFilter({
+      ...filter,
+      _categories: selectedCatgory,
+    });
+  };
+
+  //handle open Item Table
+  const handleOpenItemTable = async () => {
+    setOpenItemTable(true);
+  };
+
+  // handle Close Item Table
+  const handleCloseItemTable = async () => {
+    setOpenItemTable(false);
+    setFilter({
+      ...filter,
+      _items: selectedItems,
+    });
   };
 
   //to handle changing filters
@@ -263,17 +304,6 @@ function Ex_Items() {
                     label="Product Name"
                   />
                 </Grid>
-                <Grid item xs={12} sm={2} sx={12}>
-                  <InputField
-                    name="_category"
-                    value={filter._category}
-                    onChange={(event, newInputValue) =>
-                      handleFilterChange(event, newInputValue)
-                    }
-                    type="text"
-                    label="Category"
-                  />
-                </Grid>
                 <Grid item xs={12} sm={4} sx={12}>
                   <InputField
                     name="_addedBy"
@@ -295,6 +325,16 @@ function Ex_Items() {
                     type="text"
                     label="Status"
                   />
+                </Grid>
+                <Grid item xs={12} sm={4} sx={12}>
+                  <Button onClick={handleOpenCategoryTable} variant="outlined">
+                    Select Category
+                  </Button>
+                </Grid>
+                <Grid item xs={12} sm={4} sx={12}>
+                  <Button onClick={handleOpenItemTable} variant="outlined">
+                    Select Item
+                  </Button>
                 </Grid>
                 <Grid item xs={12} sm={4} sx={12}>
                   <Stack direction="row" spacing={2}>
@@ -348,6 +388,32 @@ function Ex_Items() {
                 />
               </Stack>
             </Grid>
+            <Grid>
+        {openCatgoryTable ? (
+          <Ex_CategorySelectingPopup
+            setOpenCatgoryTable={setOpenCatgoryTable}
+            openCatgoryTable={openCatgoryTable}
+            handleCloseCatgoryTable={handleCloseCatgoryTable}
+            setSelectedCatgory={setSelectedCatgory}
+            selectedCatgory={selectedCatgory}
+            setCatgoryRows={setCatgoryRows}
+            catgoryRows={catgoryRows}
+          />
+        ) : null}
+      </Grid>
+      <Grid>
+        {openItemTable ? (
+          <ItemSelectingPopup
+            setOpenTable={setOpenItemTable}
+            openTable={openItemTable}
+            handleCloseTable={handleCloseItemTable}
+            setSelectedItems={setSelectedItems}
+            selectedItems={selectedItems}
+            setRows={setItemRows}
+            rows={itemRows}
+          />
+        ) : null}
+      </Grid>
           </Grid>
         )}
       </Paper>

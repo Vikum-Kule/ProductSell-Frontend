@@ -11,7 +11,8 @@ const getExportProducts = async (offset, pageSize, filter) => {
         barcode: filter._barcode ? filter._barcode.trim() : null,
         productName: filter._product ? filter._product.trim() : null,
         addedBy: filter._addedBy ? filter._addedBy.trim() : null,
-        category: filter._category ? filter._category.trim() : null,
+        categories: filter._categories,
+        items: filter._items,
         status: filter._status ? filter._status.trim() : null,
       },
       {
@@ -182,16 +183,21 @@ const getExportProductsByCategory = async (cat_id) => {
 
 /////////////////////////// category //////////////////////
 //get import category data with pagination
-const getExportCategoryData = async (offset, pageSize, search) => {
+const getExportCategoryData = async (offset, pageSize, filter) => {
   //check access tocken expiry function
   let token_valid_result = await token_valid();
   if (token_valid_result) {
     let token = getToken();
     return axios
       .post(
-        "/api/export/category/all/" + offset + "/" + pageSize,
+        "/api/export/category/search/" + offset + "/" + pageSize,
         {
-          search: search.trim(),
+          category: filter._category ? filter._category.trim() : null,
+          subCat_1: filter._subCat_1 ? filter._subCat_1.trim() : null,
+          subCat_2: filter._subCat_2 ? filter._subCat_2.trim() : null,
+          subCat_3: filter._subCat_3 ? filter._subCat_3.trim() : null,
+          subCat_4: filter._subCat_4 ? filter._subCat_4.trim() : null,
+          subCat_5: filter._subCat_5 ? filter._subCat_5.trim() : null,
         },
         {
           headers: {

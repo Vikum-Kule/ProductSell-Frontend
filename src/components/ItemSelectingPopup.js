@@ -82,14 +82,11 @@ export default function ItemSelectingPopup({
     const newSet = [];
 
     for (let x = 0; x < importSet?.length; x++) {
-      let category_list = importSet[x].im_category;
-      console.log(category_list);
       //set data in new set list to display in the table
       newSet.push(
         createData(
           importSet[x].itemName,
           importSet[x].brand,
-          category_list.category,
           importSet[x].qty,
           importSet[x].importId
         )
@@ -114,12 +111,6 @@ export default function ItemSelectingPopup({
       label: "Brand",
     },
     {
-      id: "category_m",
-      numeric: false,
-      disablePadding: true,
-      label: "Main Category",
-    },
-    {
       id: "qty",
       numeric: true,
       disablePadding: true,
@@ -127,8 +118,8 @@ export default function ItemSelectingPopup({
     },
   ];
 
-  function createData(item, brand, category_m, qty, im_id) {
-    return { item, brand, category_m, qty, im_id };
+  function createData(item, brand, qty, im_id) {
+    return { item, brand, qty, im_id };
   }
 
   return (

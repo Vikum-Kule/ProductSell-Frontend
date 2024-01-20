@@ -8,18 +8,18 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { makeStyles } from "@mui/styles";
 import TableItem from "../../../components/TableItem";
 import {
   getExportCategoryData,
   getExportProductsByCategory,
 } from "../../../services/Export";
-import SearchIcon from "@mui/icons-material/Search";
 import Ex_CategoryForm from "./Ex_CategoryFrom";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import { useHistory } from "react-router";
+import InputField from "../../../FormComponents/InputField";
 
 const useStyles = makeStyles({
   container: {
@@ -40,7 +40,7 @@ function Ex_Categories() {
   const [search, setSearch] = React.useState("");
 
   useEffect(async () => {
-    await fetchData(search, page);
+    await fetchData(filter, page);
   }, []);
 
   //creating data for rows according to Id
@@ -67,6 +67,36 @@ function Ex_Categories() {
       cat_id,
     };
   }
+
+  //category filter values
+  const [filter, setFilter] = useState({
+    _category: "",
+    _subCat_1: "",
+    _subCat_2: "",
+    _subCat_3: "",
+    _subCat_4: "",
+    _subCat_5: "",
+  });
+
+  //to handle category changing filters
+  const handleFilterChange = (name, val) => {
+    setFilter({
+      ...filter,
+      [name]: val,
+    });
+  };
+
+  //reset category filters
+  const resetFilters = () => {
+    setFilter({
+      _category: "",
+      _subCat_1: "",
+      _subCat_2: "",
+      _subCat_3: "",
+      _subCat_4: "",
+      _subCat_5: "",
+    });
+  };
 
   //columns for table
   const columns = [
@@ -117,11 +147,11 @@ function Ex_Categories() {
     await fetchData(search, value - 1);
   };
 
-  const fetchData = async (keyword, pageNo) => {
+  const fetchData = async (categoryFilter, pageNo) => {
     // set loading
     setLoading(true);
     //get import Categories data when page loading...
-    let result = await getExportCategoryData(pageNo, 10, keyword);
+    let result = await getExportCategoryData(pageNo, 10, categoryFilter);
 
     let categorySet = result.content;
 
@@ -156,13 +186,6 @@ function Ex_Categories() {
     setLoading(false);
   };
 
-  const searchItem = async (event, value) => {
-    setPage(0);
-    setSearch(event.target.value);
-    console.log(event.target.value);
-    await fetchData(event.target.value, 0);
-  };
-
   const handleAction = (event, id) => {
     console.log(event);
 
@@ -186,34 +209,11 @@ function Ex_Categories() {
         <Ex_CategoryForm setOpenForm={setOpenForm} />
       ) : (
         <Grid container spacing={4}>
-          <Grid item xs={12} sm={11} sx={12}>
+          <Grid item xs={12} sm={9} sx={12}>
             <Typography mt={1} variant="h6">
               {" "}
               Export Categories{" "}
             </Typography>
-          </Grid>
-          <Grid item xs={12} sm={9} sx={12}>
-            <Paper
-              variant="outlined"
-              component="form"
-              sx={{
-                p: "2px 4px",
-                display: "flex",
-                alignItems: "center",
-                width: 400,
-              }}
-            >
-              <InputBase
-                sx={{ ml: 1, flex: 1 }}
-                placeholder="Search items"
-                inputProps={{ "aria-label": "search google maps" }}
-                value={search}
-                onChange={searchItem}
-              />
-              <IconButton type="submit" sx={{ p: "10px" }} aria-label="search">
-                <SearchIcon />
-              </IconButton>
-            </Paper>
           </Grid>
           <Grid item xs={12} sm={3} sx={12}>
             <Button
@@ -224,6 +224,96 @@ function Ex_Categories() {
             >
               Add Category
             </Button>
+          </Grid>
+          <Grid item xs={12} sm={12} sx={12}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={3} sx={12}>
+                <InputField
+                  name="_category"
+                  value={filter._category}
+                  onChange={(event, newInputValue) =>
+                    handleFilterChange(event, newInputValue)
+                  }
+                  type="text"
+                  label="Category"
+                />
+              </Grid>
+              <Grid item xs={12} sm={3} sx={12}>
+                <InputField
+                  name="_subCat_1"
+                  value={filter._subCat_1}
+                  onChange={(event, newInputValue) =>
+                    handleFilterChange(event, newInputValue)
+                  }
+                  type="text"
+                  label="Subcategory 1"
+                />
+              </Grid>
+              <Grid item xs={12} sm={3} sx={12}>
+                <InputField
+                  name="_subCat_2"
+                  value={filter._subCat_2}
+                  onChange={(event, newInputValue) =>
+                    handleFilterChange(event, newInputValue)
+                  }
+                  type="text"
+                  label="Subcategory 2"
+                />
+              </Grid>
+              <Grid item xs={12} sm={3} sx={12}>
+                <InputField
+                  name="_subCat_3"
+                  value={filter._subCat_3}
+                  onChange={(event, newInputValue) =>
+                    handleFilterChange(event, newInputValue)
+                  }
+                  type="text"
+                  label="Subcategory 3"
+                />
+              </Grid>
+              <Grid item xs={12} sm={3} sx={12}>
+                <InputField
+                  name="_subCat_4"
+                  value={filter._subCat_4}
+                  onChange={(event, newInputValue) =>
+                    handleFilterChange(event, newInputValue)
+                  }
+                  type="text"
+                  label="Subcategory 4"
+                />
+              </Grid>
+              <Grid item xs={12} sm={3} sx={12}>
+                <InputField
+                  name="_subCat_5"
+                  value={filter._subCat_5}
+                  onChange={(event, newInputValue) =>
+                    handleFilterChange(event, newInputValue)
+                  }
+                  type="text"
+                  label="Subcategory 5"
+                />
+              </Grid>
+              <Grid item xs={12} sm={3} sx={12}>
+                <Stack direction="row" spacing={2}>
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      resetFilters();
+                    }}
+                  >
+                    Reset
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      fetchData(filter, page);
+                    }}
+                  >
+                    Filter
+                  </Button>
+                </Stack>
+              </Grid>
+            </Grid>
           </Grid>
           <Grid item xs={12} sm={12} sx={12}>
             {isLoading ? (

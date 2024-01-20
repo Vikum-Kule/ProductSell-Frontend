@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Grid,
   IconButton,
@@ -8,30 +7,17 @@ import {
   Paper,
   Chip,
 } from "@mui/material";
-import React, { Fragment, useState } from "react";
+import React, { useState } from "react";
 import AutoCompleteFeild from "../../../FormComponents/AutoCompleteFeild";
 import InputField from "../../../FormComponents/InputField";
 import {
-  getAllCategories,
   getAllImportData,
-  checkCategory,
-  addNewCategory,
   getCategoryById,
 } from "../../../services/Import";
-import { Validators } from "../../../Validation/FormValidation";
-import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
-import Divider from "@mui/material/Divider";
-import RemoveCircleOutlineOutlinedIcon from "@mui/icons-material/RemoveCircleOutlineOutlined";
 import CloseIcon from "@mui/icons-material/Close";
-import RestartAltOutlinedIcon from "@mui/icons-material/RestartAltOutlined";
 import Validation from "../../../Validation/Validation";
 import { addIm_Item } from "../../../services/Import";
 import FormAlert from "../../../components/FormAlert";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormControl from "@mui/material/FormControl";
-import FormLabel from "@mui/material/FormLabel";
 import Im_CategorySelectingPopup from "../../../components/Im_CategorySelectingPopup";
 import { makeStyles } from "@mui/styles";
 
@@ -47,47 +33,27 @@ const useStyles = makeStyles({
 function ImportFrom({ setOpenForm }) {
   const classes = useStyles();
 
-  const [unitPriceMethod, setUnitPriceMethod] = useState("_define");
   //for input feild values
   const [value, setValue] = useState({
     _importName: "",
     _importBrand: "",
     _productCode: "",
-    _importMCategory: "",
-    _subCat_1: "",
-    _subCat_2: "",
-    _subCat_3: "",
-    _subCat_4: "",
-    _subCat_5: "",
-    _importQty: 0,
+    _categories: [],
     _importUnitType: "",
-    _minRate: 0,
     _importNote: "",
-    _sellPriceMethod: unitPriceMethod,
-    _duration: "",
-    _unitPrice: 0.0,
+    _refillRate:0
   });
 
   //Reset values
   const resetValues = () => {
-    setUnitPriceMethod("_default");
     setValue({
       _importName: "",
       _importBrand: "",
       _productCode: "",
-      _importMCategory: "",
-      _subCat_1: "",
-      _subCat_2: "",
-      _subCat_3: "",
-      _subCat_4: "",
-      _subCat_5: "",
-      _importQty: 0,
+      _categories: [],
       _importUnitType: "",
-      _minRate: 0,
       _importNote: "",
-      _sellPriceMethod: unitPriceMethod,
-      _duration: "",
-      _unitPrice: 0.0,
+      _refillRate:0
     });
   };
 
@@ -108,6 +74,10 @@ function ImportFrom({ setOpenForm }) {
       categoryList.push(categoryData);
     }
     setImportCategories(categoryList);
+    setValue({
+      ...value,
+      _categories: selectedCatgory,
+    });
     setOpenCatgoryTable(false);
   };
 
@@ -118,6 +88,7 @@ function ImportFrom({ setOpenForm }) {
     _importMCategory: "",
     _importQty: "",
     _importUnitType: "",
+    _refillRate:0
   });
 
   //display alert...
@@ -153,22 +124,22 @@ function ImportFrom({ setOpenForm }) {
       !error._importBrand
     ) {
       let data = { ...value };
-        let submit_import_data = await addIm_Item(data, result.category.cat_id);
-        if (submit_import_data) {
-          resetValues();
-          setAlertData({
-            type: "success",
-            message: "Item submitted..",
-          });
-          setAlert(true);
-        } else {
-          setAlertData({
-            type: "error",
-            message: "Something went wrong...",
-          });
-          setAlert(true);
-        }
-        console.log(submit_import_data);
+      let submit_import_data = await addIm_Item(data);
+      if (submit_import_data) {
+        resetValues();
+        setAlertData({
+          type: "success",
+          message: "Item submitted..",
+        });
+        setAlert(true);
+      } else {
+        setAlertData({
+          type: "error",
+          message: "Something went wrong...",
+        });
+        setAlert(true);
+      }
+      console.log(submit_import_data);
     }
   };
 
@@ -293,12 +264,12 @@ function ImportFrom({ setOpenForm }) {
       </Grid>
       <Grid item xs={12} sm={3} sx={12}>
         <InputField
-          name="_minRate"
-          value={value._importQty}
+          name="_refillRate"
+          value={value._refillRate}
           onChange={(event, newInputValue) =>
             handleChange(event, newInputValue)
           }
-          type="number"
+          type="text"
           label="Refill Rate"
         />
       </Grid>

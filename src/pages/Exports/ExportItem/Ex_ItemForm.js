@@ -2,8 +2,10 @@ import {
   Button,
   Grid,
   IconButton,
+  Paper,
   Tooltip,
   Typography,
+  Chip
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import React, { useEffect, useState } from "react";
@@ -23,38 +25,37 @@ import { Validators } from "../../../Validation/FormValidation";
 import Ex_ItemFormValidation from "../../../Validation/Ex_ItemFormValidation";
 import Ex_CategorySelectingPopup from "../../../components/Ex_CategorySelectingPopup";
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  // height: 400,
-  bgcolor: "background.paper",
-  // border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
+const useStyles = makeStyles({
+  categoryContainer: {
+    padding: "10px",
+  },
+  categoryTag: {
+    marginRight: "10px",
+  },
+});
 
 function Ex_ItemForm({ setOpenForm }) {
-  // const classes = useStyles();
+  const classes = useStyles();
   //for input feild values
   const [values, setValues] = useState({
     _barcode: "",
     _productName: "",
     _ProductNote: "",
+    _categories: [],
   });
 
   //Reset values
   const resetValues = () => {
     setError({ _barcode: "", _productName: "" });
     setSelectedCatgory([]);
-    setExportCategory({});
+    setExportCategories([]);
     closeAlert();
     setSelectedItems([]);
     setValues({
       _barcode: "",
       _productName: "",
       _ProductNote: "",
+      _categories: [],
     });
   };
   // Alerts ////////////////////////////////////
@@ -84,7 +85,7 @@ function Ex_ItemForm({ setOpenForm }) {
   // set open category table
   const [openCatgoryTable, setOpenCatgoryTable] = useState(false);
   const [selectedCatgory, setSelectedCatgory] = useState([]);
-  const [exportCategory, setExportCategory] = useState();
+  const [exportCategories, setExportCategories] = useState([]);
   const [catgoryRows, setCatgoryRows] = useState([]);
 
   // errors for inputfeild
@@ -109,12 +110,6 @@ function Ex_ItemForm({ setOpenForm }) {
   const selectedColumns = [
     { id: "item", label: "Item", minWidth: 100, editable: false },
     { id: "brand", label: "Brand", minWidth: 100, editable: false },
-    {
-      id: "category_m",
-      label: "Main category",
-      minWidth: 100,
-      editable: false,
-    },
     {
       id: "qty",
       label: "Required Qty",
@@ -152,7 +147,6 @@ function Ex_ItemForm({ setOpenForm }) {
         createDataForSelectedTable(
           importItem.itemName,
           importItem.brand,
-          importItem.im_category.category,
           0,
           importItem.importId
         )
@@ -162,23 +156,23 @@ function Ex_ItemForm({ setOpenForm }) {
   };
 
   const handleCloseCatgoryTable = async () => {
-    let categoryData = await getExCategoryById(selectedCatgory[0]);
-    console.log(categoryData);
-    setExportCategory(categoryData);
+    const categoryList = [];
+    for (let x = 0; x < selectedCatgory.length; x++) {
+      let categoryData = await getExCategoryById(selectedCatgory[x]);
+      categoryList.push(categoryData);
+    }
+    setExportCategories(categoryList);
+    setValues({
+      ...values,
+      _categories: selectedCatgory,
+    });
     setOpenCatgoryTable(false);
   };
 
-  function createDataForSelectedTable(
-    item,
-    brand,
-    category_m,
-    qty,
-    importId
-  ) {
+  function createDataForSelectedTable(item, brand, qty, importId) {
     return {
       item,
       brand,
-      category_m,
       qty,
       importId,
     };
@@ -188,7 +182,7 @@ function Ex_ItemForm({ setOpenForm }) {
     console.log(values);
     let errorMsg = Ex_ItemFormValidation(values);
     setError(errorMsg);
-    console.log(exportCategory);
+    // console.log(exportCategory);
     if (!errorMsg._barcode && !errorMsg._productName) {
       console.log(errorMsg);
       let _barcode = await checkBarcode(values._barcode);
@@ -216,7 +210,7 @@ function Ex_ItemForm({ setOpenForm }) {
           const productBody = {
             name: values._productName,
             barcode: values._barcode,
-            categoryId: exportCategory?.cat_id,
+            categories: values._categories,
             status: "ACTIVE",
             addedBy: user.username,
             note: values._ProductNote,
@@ -295,69 +289,31 @@ function Ex_ItemForm({ setOpenForm }) {
           validators={[{ check: Validators.required }]}
         />
       </Grid>
-      <Grid item xs={12} sm={9} sx={12}>
-        <Button onClick={handleOpenCategoryTable} variant="outlined">
-          Select Category
-        </Button>
-      </Grid>
-      {selectedCatgory.length !== 0 ? (
-        <>
-          <Grid item xs={12} sm={9} sx={12}>
-            <InputField
-              name="_category"
-              value={exportCategory?.category}
-              type="text"
-              label="Category"
-              isdisabled={true}
-            />
-          </Grid>
-          <Grid item xs={12} sm={9} sx={12}>
-            <InputField
-              name="_subCat_1"
-              value={exportCategory?.subCat_1}
-              type="text"
-              label="Subcategory 1"
-              isdisabled={true}
-            />
-          </Grid>
-          <Grid item xs={12} sm={9} sx={12}>
-            <InputField
-              name="_subCat_2"
-              value={exportCategory?.subCat_2}
-              type="text"
-              label="Subcategory 2"
-              isdisabled={true}
-            />
-          </Grid>
-          <Grid item xs={12} sm={9} sx={12}>
-            <InputField
-              name="_subCat_3"
-              value={exportCategory?.subCat_3}
-              type="text"
-              label="Subcategory 3"
-              isdisabled={true}
-            />
-          </Grid>
-          <Grid item xs={12} sm={9} sx={12}>
-            <InputField
-              name="_subCat_4"
-              value={exportCategory?.subCat_4}
-              type="text"
-              label="Subcategory 4"
-              isdisabled={true}
-            />
-          </Grid>
-          <Grid item xs={12} sm={9} sx={12}>
-            <InputField
-              name="_subCat_5"
-              value={exportCategory?.subCat_5}
-              type="text"
-              label="Subcategory 5"
-              isdisabled={true}
-            />
-          </Grid>
-        </>
-      ) : null}
+      {exportCategories.length !== 0 ? (
+        <Grid item xs={12} sm={12} sx={12}>
+          <Paper
+            className={classes.categoryContainer}
+            onClick={handleOpenCategoryTable}
+          >
+            <Typography>Category</Typography>
+            <Grid container spacing={1}>
+              {exportCategories.map((category) => {
+                return (
+                  <Grid item sx={2}>
+                    <Chip label={category.category} variant="outlined" pt />
+                  </Grid>
+                );
+              })}
+            </Grid>
+          </Paper>
+        </Grid>
+      ) : (
+        <Grid item xs={12} sm={9} sx={12}>
+          <Button onClick={handleOpenCategoryTable} variant="outlined">
+            Select Category
+          </Button>
+        </Grid>
+      )}
       <Grid item xs={12} sm={9} sx={12}>
         <Button onClick={handleOpenTable} variant="outlined">
           Select Import Items
