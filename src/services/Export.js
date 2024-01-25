@@ -11,8 +11,8 @@ const getExportProducts = async (offset, pageSize, filter) => {
         barcode: filter._barcode ? filter._barcode.trim() : null,
         productName: filter._product ? filter._product.trim() : null,
         addedBy: filter._addedBy ? filter._addedBy.trim() : null,
-        categories: filter._categories,
-        items: filter._items,
+        categories: filter._categories.length !== 0 ? filter._categories : null,
+        items: filter._items.length !== 0 ? filter._items : null,
         status: filter._status ? filter._status.trim() : null,
       },
       {

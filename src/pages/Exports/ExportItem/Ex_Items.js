@@ -84,12 +84,6 @@ function Ex_Items() {
     { id: "barcode", label: "Barcode", minWidth: 80 },
     { id: "name", label: "Product", minWidth: 100 },
     {
-      id: "category_m",
-      label: "Main Category",
-      minWidth: 100,
-      format: (value) => value.toLocaleString("en-US"),
-    },
-    {
       id: "existingQty",
       label: "Existing Qty",
       minWidth: 100,
@@ -102,7 +96,6 @@ function Ex_Items() {
   function createData(
     barcode,
     name,
-    category_m,
     existingQty,
     status,
     action,
@@ -111,7 +104,6 @@ function Ex_Items() {
     return {
       barcode,
       name,
-      category_m,
       existingQty,
       status,
       action,
@@ -152,13 +144,11 @@ function Ex_Items() {
     const newSet = [];
     if (exportProductSet) {
       for (let x = 0; x < exportProductSet?.length; x++) {
-        let category_list = exportProductSet[x].ex_category;
         //set data in new set list to display in the table
         newSet.push(
           createData(
             exportProductSet[x].barcode,
             exportProductSet[x].name,
-            category_list.category,
             exportProductSet[x].existingQty,
             exportProductSet[x].status,
             exportProductSet[x].product_id

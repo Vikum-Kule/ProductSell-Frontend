@@ -9,10 +9,7 @@ import {
 import { makeStyles } from "@mui/styles";
 import TableItem from "../../../components/TableItem";
 import React, { useEffect, useState } from "react";
-import {
-  getImportData,
-  DiactivateItemById,
-} from "../../../services/Import";
+import { getImportData, DiactivateItemById } from "../../../services/Import";
 import ImportFrom from "./ImportFrom";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useHistory } from "react-router";
@@ -25,9 +22,9 @@ const useStyles = makeStyles({
   container: {
     padding: "20px",
   },
-  categoryContainer:{
-    padding: "10px"
-  }
+  categoryContainer: {
+    padding: "10px",
+  },
 });
 
 // import items all functionalties..
@@ -54,7 +51,7 @@ function Im_Items() {
           onClick={async () => {
             await DiactivateItemById(disableItemId);
             setOpenDisableWarning(false);
-            await fetchData();
+            await fetchData(filter, page);
           }}
         >
           Disable
@@ -76,7 +73,7 @@ function Im_Items() {
   };
   /////////////////////////////////////////////////////////////
   useEffect(async () => {
-    await fetchData();
+    await fetchData(filter, page);;
   }, []);
 
   const [rows, setRows] = React.useState([]);
@@ -99,15 +96,7 @@ function Im_Items() {
     { id: "action", label: "Actions", minWidth: 100 },
   ];
 
-  function createData(
-    code,
-    item,
-    brand,
-    qty,
-    status,
-    action,
-    im_id
-  ) {
+  function createData(code, item, brand, qty, status, action, im_id) {
     return { code, item, brand, qty, status, action, im_id };
   }
 
@@ -122,14 +111,15 @@ function Im_Items() {
 
   const handleChange = async (event, value) => {
     setPage(value - 1);
-    await fetchData();
+    await fetchData(filter, value - 1);
   };
 
   //fetch data for pagination actions
-  const fetchData = async () => {
+  const fetchData = async (itemFilter, pageNo) => {
     setLoading(true);
     //get import items data when page loading...
-    let result = await getImportData(page, rowsPerPage, filter);
+    console.log(page);
+    let result = await getImportData(pageNo, rowsPerPage, itemFilter);
     let importSet = result.content;
 
     //set total rows and pages
@@ -180,7 +170,7 @@ function Im_Items() {
     _itemName: "",
     _brand: "",
     _addedBy: "",
-    _category: [],
+    _category: null,
     _unitType: "",
     _status: "",
   });
@@ -192,12 +182,10 @@ function Im_Items() {
       _itemName: "",
       _brand: "",
       _addedBy: "",
-      _category: [],
+      _category: null,
       _unitType: "",
       _status: "",
     });
-
-    fetchData();
   };
 
   // handle categories
@@ -336,7 +324,7 @@ function Im_Items() {
                     <Button
                       variant="contained"
                       onClick={() => {
-                        fetchData();
+                        fetchData(filter, page);
                       }}
                     >
                       Filter
@@ -358,7 +346,6 @@ function Im_Items() {
                   setPage={setPage}
                   tablePagin={true}
                   totalPages={totalPages}
-                  getData={fetchData}
                   handleAction={handleAction}
                   showActions={["view", "edit", "disable"]}
                 />

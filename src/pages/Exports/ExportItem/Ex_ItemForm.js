@@ -243,7 +243,7 @@ function Ex_ItemForm({ setOpenForm }) {
   };
 
   return (
-    <Grid container spacing={2}>
+    <Grid container className={classes.container} spacing={2}>
       <Grid item xs={12} sm={11} sx={12}>
         <Typography mt={1} variant="h6">
           {" "}
