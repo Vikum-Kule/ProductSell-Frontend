@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
 import { getExportProductById } from "../../../services/Export";
-import { Grid, Paper, Typography } from "@mui/material";
+import { Chip, Grid, Paper, Typography } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import TableItem from "../../../components/TableItem";
-import InputField from "../../../FormComponents/InputField";
+import Ex_ItemUnitPrice from "./Ex_ItemUnitPrice";
 
 const useStyles = makeStyles({
   container: {
@@ -17,45 +17,36 @@ const useStyles = makeStyles({
 function Ex_Production({ history }) {
   const classes = useStyles();
   const { productId } = useParams();
-  const [exportProduct, setExportProduct] = React.useState([]);
-  const [itemCost, setItemCost] = useState(0.0);
+  const [product, setProduct] = React.useState([]);
 
   const fetchData = async () => {
-    setLoading(true);
     let result = await getExportProductById(productId);
-    console.log(result);
     if (result) {
-      setExportProduct(result);
-      let productCategory = result.ex_category;
-      let importItems = result.items;
+      setProduct(result);
+      console.log(result);
 
-      const newSet = [];
-      let totalItemCost = 0.0;
-      for (let x = 0; x < importItems.length; x++) {
-        // calculate Item Cost
-        let costPerItem = parseFloat(
-          importItems[x].usingQty * importItems[x].imports.qty
-        ).toFixed(1);
+      setLoading(true);
 
-        console.log(itemCost);
-        totalItemCost = parseFloat(costPerItem) + parseFloat(totalItemCost);
-        setItemCost(parseFloat(totalItemCost).toFixed(1));
-
-        //set data in new set list to display in the table
-        newSet.push(
-          createData(
-            importItems[x].imports.itemName,
-            importItems[x].imports.brand,
-            importItems[x].imports.im_category.category,
-            importItems[x].usingQty,
-            importItems[x].imports.qty,
-            costPerItem
-          )
-        );
+      const itemSet = [];
+      let productItems = result.items;
+      console.log(result.items);
+      if (productItems) {
+        for (let x = 0; x < productItems.length; x++) {
+          //set data in new set list to display in the table
+          itemSet.push(
+            createDataForSelectedTable(
+              productItems[x].imports.itemName,
+              productItems[x].imports.brand,
+              productItems[x].usingQty,
+              productItems[x].imports.unitType,
+              productItems[x].imports.importId
+            )
+          );
+        }
       }
 
       // set rows to table
-      setRows(newSet);
+      setRows(itemSet);
       setLoading(false);
     } else {
     }
@@ -72,70 +63,69 @@ function Ex_Production({ history }) {
 
   //columns for table
   const columns = [
-    { id: "item", label: "Item", minWidth: 100 },
-    { id: "brand", label: "Brand", minWidth: 100 },
-    { id: "category", label: "Main Category", minWidth: 100 },
-    {
-      id: "usingQty",
-      label: "Use Qty",
-      minWidth: 100,
-      format: (value) => value.toLocaleString("en-US"),
-    },
+    { id: "item", label: "Item", minWidth: 100, editable: false },
+    { id: "brand", label: "Brand", minWidth: 100, editable: false },
     {
       id: "qty",
-      label: "Exist Qty",
+      label: "Required Qty",
       minWidth: 100,
-      format: (value) => value.toLocaleString("en-US"),
+      editable: true,
+      type: "number",
+      isDecimal: false,
     },
-    {
-      id: "itemCost",
-      label: "Item Cost",
-      minWidth: 100,
-      format: (value) => value.toLocaleString("en-US"),
-    },
+    { id: "unitType", label: "Unit Type", minWidth: 100, editable: false },
+    { id: "action", label: "Actions", minWidth: 100 },
   ];
 
-  function createData(item, brand, category, usingQty, qty, itemCost) {
-    return { item, brand, category, usingQty, qty, itemCost };
+  function createDataForSelectedTable(
+    item,
+    brand,
+    qty,
+    unitType,
+    importId,
+    action
+  ) {
+    return {
+      item,
+      brand,
+      qty,
+      unitType,
+      importId,
+      action,
+    };
   }
-  const [page, setPage] = React.useState(0);
+  const [page, setPage] = useState(0);
+  const [enableSetting, setEnableSetting] = useState(false);
+
+  const handleAction = (event, id) => {
+    switch (event) {
+      case "settings":
+        setEnableSetting(true);
+        console.log(enableSetting);
+        break;
+      default:
+        return "foo";
+    }
+  };
 
   return (
     <Paper className={classes.container} elevation={8}>
-      {exportProduct.product_id ? (
+      {product.product_id ? (
         <Grid container spacing={3}>
           <Grid item xs={12}>
-            <Typography variant="h6">Export Production</Typography>
+            <Typography variant="h6">Production</Typography>
           </Grid>
           <Grid item xs={4}>
             <Typography variant="h7" fontWeight="700">
               Product Name
             </Typography>
-            <Typography>{exportProduct.name}</Typography>
+            <Typography>{product.name}</Typography>
           </Grid>
           <Grid item xs={4}>
             <Typography variant="h7" fontWeight="700">
-              Barcode
+              Bar Code
             </Typography>
-            <Typography>{exportProduct.barcode}</Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <Typography variant="h7" fontWeight="700">
-              Category
-            </Typography>
-            <Typography>{exportProduct.ex_category.category}</Typography>
-          </Grid>
-          <Grid item xs={8}>
-            <Typography variant="h7" fontWeight="700">
-              Sub Categories
-            </Typography>
-            <Typography>
-              {exportProduct.ex_category.subCat_1}{" "}
-              {exportProduct.ex_category.subCat_2}{" "}
-              {exportProduct.ex_category.subCat_3}{" "}
-              {exportProduct.ex_category.subCat_4}{" "}
-              {exportProduct.ex_category.subCat_5}
-            </Typography>
+            <Typography>{product.barcode}</Typography>
           </Grid>
           <Grid item xs={12} sm={12} sx={12}>
             {isLoading ? (
@@ -151,39 +141,26 @@ function Ex_Production({ history }) {
                 tablePagin={true}
                 totalPages={totalPages}
                 getData={fetchData}
+                handleAction={handleAction}
+                showActions={["settings"]}
               />
             )}
           </Grid>
-          <Grid item xs={12} sm={3} sx={12}>
-            <InputField
-              name="itemCost"
-              value={itemCost}
-              type="text"
-              label="itemCost"
-              isdisabled={true}
-            />
-          </Grid>
-          <Grid item xs={12} sm={3} sx={12}>
-            <InputField
-              name="itemCost"
-              value={itemCost}
-              type="text"
-              label="itemCost"
-              isdisabled={true}
-            />
-          </Grid>
+
+          <Ex_ItemUnitPrice
+            enableSetting={enableSetting}
+            setEnableSetting={setEnableSetting}
+          />
         </Grid>
       ) : (
-        <Grid>
-          <Typography>No Product for Production</Typography>
-        </Grid>
+        <Grid>{product}</Grid>
       )}
     </Paper>
   );
 }
 
 Ex_Production.propTypes = {
-  exportId: PropTypes.any,
+  product_id: PropTypes.any,
 };
 
 export default Ex_Production;

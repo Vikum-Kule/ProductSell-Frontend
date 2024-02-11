@@ -15,7 +15,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import CloseIcon from '@mui/icons-material/Close';
-import { Grid, List, ListItem, ListItemButton, ListItemText, Pagination, Popover, Stack } from '@mui/material';
+import SettingsIcon from '@mui/icons-material/Settings';
+import { Grid } from '@mui/material';
 
 
 
@@ -121,6 +122,19 @@ function TableItem({dropDown,
                                     }}
                                   >
                                     <AddCircleOutlineIcon fontSize="inherit" />
+                                  </IconButton>
+                                </Grid>:null
+                              }
+                              {showActions.includes("settings")?
+                                <Grid item>
+                                  <IconButton 
+                                    aria-label="SettingsIcon" 
+                                    size="small"
+                                    onClick={() => {
+                                      handleAction("settings",value );
+                                    }}
+                                  >
+                                    <SettingsIcon fontSize="inherit" />
                                   </IconButton>
                                 </Grid>:null
                               }

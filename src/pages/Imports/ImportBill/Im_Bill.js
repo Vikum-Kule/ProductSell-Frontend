@@ -156,7 +156,8 @@ function Im_Bill() {
         history.push("/template/im_bill_view/" + id);
         break;
       case "edit":
-        return "bar";
+        history.push("/template/im_bill_edit/" + id);
+        break;
       case "delete":
         return "bar";
       default:

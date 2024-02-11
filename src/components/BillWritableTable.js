@@ -10,15 +10,17 @@ import { TextField } from "@mui/material";
 
 function BillWritableTable({ columns, rows, setRows, setTotalCount }) {
   const handleChange = (event, row, column_id, value) => {
-    console.log('rowQTY: '+ row.qty );
-    if(column_id === 'unitPrice' && row.qty !== 0){
-      console.log('unitPrice');
-    }
-    else if(column_id === 'price' && row.qty !== 0){
-      console.log('price');
-    }
-    else if(column_id === 'discountPerItem' && row.qty !== 0 && row.price !== 0){
-      console.log('discountPerItem');
+    console.log("rowQTY: " + row.qty);
+    if (column_id === "unitPrice" && row.qty !== 0) {
+      console.log("unitPrice");
+    } else if (column_id === "price" && row.qty !== 0) {
+      console.log("price");
+    } else if (
+      column_id === "discountPerItem" &&
+      row.qty !== 0 &&
+      row.price !== 0
+    ) {
+      console.log("discountPerItem");
     }
     row[column_id] = value;
     setRows([...rows]);
@@ -68,6 +70,7 @@ function BillWritableTable({ columns, rows, setRows, setTotalCount }) {
                               value={
                                 column.isDecimal ? parseFloat(value) : value
                               }
+                              disabled={column.id !== "qty" && row.qty === 0 ? true : false}
                             />
                           ) : column.editable === false &&
                             column.format &&

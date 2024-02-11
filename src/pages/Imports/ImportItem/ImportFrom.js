@@ -10,10 +10,7 @@ import {
 import React, { useState } from "react";
 import AutoCompleteFeild from "../../../FormComponents/AutoCompleteFeild";
 import InputField from "../../../FormComponents/InputField";
-import {
-  getAllImportData,
-  getCategoryById,
-} from "../../../services/Import";
+import { getAllImportData, getCategoryById } from "../../../services/Import";
 import CloseIcon from "@mui/icons-material/Close";
 import Validation from "../../../Validation/Validation";
 import { addIm_Item } from "../../../services/Import";
@@ -41,7 +38,7 @@ function ImportFrom({ setOpenForm }) {
     _categories: [],
     _importUnitType: "",
     _importNote: "",
-    _refillRate:0
+    _refillRate: 0,
   });
 
   //Reset values
@@ -53,8 +50,9 @@ function ImportFrom({ setOpenForm }) {
       _categories: [],
       _importUnitType: "",
       _importNote: "",
-      _refillRate:0
+      _refillRate: 0,
     });
+    setImportCategories([]);
   };
 
   // set open category table
@@ -71,6 +69,7 @@ function ImportFrom({ setOpenForm }) {
     const categoryList = [];
     for (let x = 0; x < selectedCatgory.length; x++) {
       let categoryData = await getCategoryById(selectedCatgory[x]);
+      console.log(categoryData);
       categoryList.push(categoryData);
     }
     setImportCategories(categoryList);
@@ -79,6 +78,7 @@ function ImportFrom({ setOpenForm }) {
       _categories: selectedCatgory,
     });
     setOpenCatgoryTable(false);
+    console.log(importCategories);
   };
 
   // errors for inputfeild
@@ -88,7 +88,7 @@ function ImportFrom({ setOpenForm }) {
     _importMCategory: "",
     _importQty: "",
     _importUnitType: "",
-    _refillRate:0
+    _refillRate: 0,
   });
 
   //display alert...

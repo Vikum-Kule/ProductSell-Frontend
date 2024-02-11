@@ -33,9 +33,9 @@ function Im_BillView({ history }) {
           //set data in new set list to display in the table
           newSet.push(
             createData(
-              billItemSet[x].importStockIntake.imports.product_code,
-              billItemSet[x].importStockIntake.imports.itemName,
-              billItemSet[x].importStockIntake.imports.brand,
+              billItemSet[x].imports.product_code,
+              billItemSet[x].imports.itemName,
+              billItemSet[x].imports.brand,
               billItemSet[x].bill_qty,
               billItemSet[x].discount_perItem,
               billItemSet[x].pricePerItem,

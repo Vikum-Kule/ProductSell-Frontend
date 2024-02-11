@@ -18,7 +18,10 @@ const getImportData = async (offset, pageSize, filter) => {
           brand: filter._brand ? filter._brand.trim() : null,
           addedBy: filter._addedBy ? filter._addedBy.trim() : null,
           unitType: filter._unitType ? filter._unitType.trim() : null,
-          category: filter._category,
+          categories:
+            filter._category?.length === 0 || filter._category === null
+              ? null
+              : filter._category,
         },
         {
           headers: {

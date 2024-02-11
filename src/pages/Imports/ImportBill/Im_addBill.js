@@ -20,11 +20,7 @@ import {
   addImportBill,
 } from "../../../services/Import";
 import AutoCompleteFeild from "../../../FormComponents/AutoCompleteFeild";
-import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
-import { Box } from "@mui/system";
 import InputField from "../../../FormComponents/InputField";
-import SelectingTable from "../../../FormComponents/SelectingTable";
-import { getImportData } from "../../../services/Import";
 import { getUser } from "../../../Utils/Common";
 import BillWritableTable from "../../../components/BillWritableTable";
 import FormAlert from "../../../components/FormAlert";
@@ -128,12 +124,6 @@ function Im_addBill({ setOpenForm }) {
     { id: "item", label: "Item", minWidth: 100, editable: false },
     { id: "brand", label: "Brand", minWidth: 100, editable: false },
     {
-      id: "category_m",
-      label: "Main category",
-      minWidth: 100,
-      editable: false,
-    },
-    {
       id: "qty",
       label: "Qty",
       minWidth: 100,
@@ -205,7 +195,6 @@ function Im_addBill({ setOpenForm }) {
         createDataForSelectedTable(
           importItem.itemName,
           importItem.brand,
-          "category",
           0,
           importItem.unitType,
           0.0,
@@ -223,7 +212,6 @@ function Im_addBill({ setOpenForm }) {
   function createDataForSelectedTable(
     item,
     brand,
-    category_m,
     qty,
     unitType,
     unitPrice,
@@ -234,7 +222,6 @@ function Im_addBill({ setOpenForm }) {
     return {
       item,
       brand,
-      category_m,
       qty,
       unitType,
       unitPrice,
@@ -244,16 +231,51 @@ function Im_addBill({ setOpenForm }) {
     };
   }
 
+  //bill items price and discount operations
+  const priceDiscountOperations = () => {
+    console.log(selectedRows);
+    const billRows = [...selectedRows];
+    let _totalPrice = 0.0;
+    for (let x = 0; x < billRows.length; x++) {
+      if (billRows[x].qty !== 0 && billRows[x].price !== 0) {
+        let _unitPrice =
+          (parseFloat(billRows[x].price) -
+            parseFloat(billRows[x].discountPerItem)) /
+          parseInt(billRows[x].qty);
+        billRows[x] = { ...billRows[x], unitPrice: _unitPrice };
+        _totalPrice = _totalPrice + parseFloat(billRows[x].price);
+      } else if (
+        selectedRows[x].qty !== 0 &&
+        selectedRows[x].unitPrice !== 0 &&
+        selectedRows[x].price === 0
+      ) {
+        let _itemPrice =
+          parseInt(billRows[x].qty) * parseFloat(billRows[x].unitPrice) -
+          parseFloat(billRows[x].discountPerItem);
+        billRows[x] = { ...billRows[x], price: _itemPrice };
+        _totalPrice = _totalPrice + parseFloat(_itemPrice);
+        console.log("unit price avl");
+      }
+    }
+    setSelectedRows(billRows);
+    setValues({
+      ...values,
+      _total: _totalPrice,
+    });
+  };
+
   const submitValue = async () => {
-    if (rows) {
+    if (selectedRows) {
+      console.log(selectedRows);
       //set bill items according to the bill body
       const importBillItems = [];
-      for (let x = 0; x < rows.length; x++) {
+      for (let x = 0; x < selectedRows.length; x++) {
         const item = {
-          qty: parseInt(rows[x].qty),
-          discount_perItem: parseFloat(rows[x].discountPerItem),
-          price: parseFloat(rows[x].price),
-          importId: rows[x].importId,
+          qty: parseInt(selectedRows[x].qty),
+          discount_perItem: parseFloat(selectedRows[x].discountPerItem),
+          price: parseFloat(selectedRows[x].price),
+          importId: selectedRows[x].importId,
+          pricePerItem: selectedRows[x].unitPrice,
         };
         importBillItems.push(item);
       }
@@ -340,15 +362,10 @@ function Im_addBill({ setOpenForm }) {
           }
         />
       </Grid>
-      <Grid item xs={12} sm={9} sx={12} sx={{ mt: 2 }}>
-        <Divider variant="middle" />
-      </Grid>
-      <Grid item xs={12} sm={3} sx={12}>
-        <Tooltip title="Add Items">
-          <IconButton onClick={handleOpenTable} aria-label="add" size="small">
-            <AddCircleOutlineOutlinedIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
+      <Grid item xs={12} sm={4} sx={12}>
+        <Button onClick={handleOpenTable} variant="outlined">
+          Select Item
+        </Button>
       </Grid>
       <Grid item xs={12} sm={12} sx={12}>
         {/* selected table */}
@@ -413,7 +430,11 @@ function Im_addBill({ setOpenForm }) {
       </Grid>
       <Grid item xs={12} sm={3} sx={12}>
         <Tooltip title="Calculate">
-          <IconButton aria-label="calculate" size="small">
+          <IconButton
+            onClick={priceDiscountOperations}
+            aria-label="calculate"
+            size="small"
+          >
             <SyncIcon />
           </IconButton>
         </Tooltip>
