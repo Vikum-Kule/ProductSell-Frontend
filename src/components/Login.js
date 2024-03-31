@@ -74,7 +74,7 @@ function Login(props) {
             <Paper elevation={10} className={classes.paper}>
             <Grid align="center" className={classes.header} container spacing={{ xs: 0, sm: 1, md: 1 }} >
                 <Grid item xs={12}>
-                <h2>Product Sell </h2> 
+                <h2>NORTEL (PVT)LTD </h2> 
                 </Grid>
                 <Grid item xs={12}>   
                 <Avatar sx={{ bgcolor: pink[500] }}>

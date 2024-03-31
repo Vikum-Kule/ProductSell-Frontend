@@ -8,6 +8,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import TableItem from "../../../components/TableItem";
 import Ex_ItemUnitPrice from "./Ex_ItemUnitPrice";
+import ProductionTableItem from "../../../components/ProductionTableItem";
 
 const useStyles = makeStyles({
   container: {
@@ -39,7 +40,12 @@ function Ex_Production({ history }) {
               productItems[x].imports.brand,
               productItems[x].usingQty,
               productItems[x].imports.unitType,
-              productItems[x].imports.importId
+              productItems[x].imports.importId,
+              null,
+              null,
+              null,
+              null,
+              null
             )
           );
         }
@@ -83,7 +89,11 @@ function Ex_Production({ history }) {
     qty,
     unitType,
     importId,
-    action
+    action,
+    unitPriceMethod,
+    fromDate,
+    toDate,
+    unitPrice
   ) {
     return {
       item,
@@ -92,16 +102,21 @@ function Ex_Production({ history }) {
       unitType,
       importId,
       action,
+      unitPriceMethod,
+      fromDate,
+      toDate,
+      unitPrice,
     };
   }
   const [page, setPage] = useState(0);
   const [enableSetting, setEnableSetting] = useState(false);
+  const [editingRow, setEditingRow] = useState([]);
 
-  const handleAction = (event, id) => {
+  const handleAction = (event, row) => {
     switch (event) {
       case "settings":
+        setEditingRow(row);
         setEnableSetting(true);
-        console.log(enableSetting);
         break;
       default:
         return "foo";
@@ -133,9 +148,10 @@ function Ex_Production({ history }) {
                 <CircularProgress />
               </Box>
             ) : (
-              <TableItem
+              <ProductionTableItem
                 columns={columns}
                 rows={rows}
+                setRows={setRows}
                 page={page}
                 setPage={setPage}
                 tablePagin={true}
@@ -143,14 +159,13 @@ function Ex_Production({ history }) {
                 getData={fetchData}
                 handleAction={handleAction}
                 showActions={["settings"]}
+                enableSetting={enableSetting}
+                setEnableSetting={setEnableSetting}
+                editingRow={editingRow}
+                setEditingRow={setEditingRow}
               />
             )}
           </Grid>
-
-          <Ex_ItemUnitPrice
-            enableSetting={enableSetting}
-            setEnableSetting={setEnableSetting}
-          />
         </Grid>
       ) : (
         <Grid>{product}</Grid>

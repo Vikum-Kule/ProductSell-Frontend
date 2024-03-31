@@ -1,12 +1,7 @@
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  useHistory,
-} from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import "./App.css";
-import { createTheme } from "@mui/material/styles";
-import { ThemeProvider } from "@mui/private-theming";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+// import { ThemeProvider } from "@mui/private-theming";
 import Login from "./components/Login";
 import Template from "./components/Template";
 import Home from "./pages/Home";
@@ -27,7 +22,25 @@ import Ex_ProductEdit from "./pages/Exports/ExportItem/Ex_ItemEdit";
 import Ex_Production from "./pages/Exports/ExportItem/Ex_Production";
 import Im_BillEdit from "./pages/Imports/ImportBill/Im_BillEdit";
 
-const theme = createTheme({});
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#EF5D8E", // Red color
+    },
+  },
+  // components: {
+  //   MuiButton: {
+  //     styleOverrides: {
+  //       root: {
+  //         color: "#FFF", // Set text color of all buttons to white
+  //         "&.MuiButton-containedPrimary": {
+  //           color: "#FFF", // Set text color of primary contained buttons to white
+  //         },
+  //       },
+  //     },
+  //   },
+  // },
+});
 
 function App() {
   return (

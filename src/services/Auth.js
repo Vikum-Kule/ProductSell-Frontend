@@ -21,7 +21,7 @@ const userLogin =async(email, password)=>{
     })
     .catch(error =>{
         // return error.response.data.message.toString;
-         console.log(error.response.status );
+         console.log(error);
         if (error.response.status === 403 || error.response.status === 400) {
             return "Invalid credentials."
         } else {

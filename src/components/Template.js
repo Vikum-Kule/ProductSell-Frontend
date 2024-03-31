@@ -119,13 +119,18 @@ function Template({ children }) {
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <AppBar
-        style={{ backgroundColor: "#2f3c66" }}
+        style={{ backgroundColor: "#fff" }}
         position="fixed"
         sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
       >
         <Toolbar>
-          <Typography variant="h6" noWrap component="div">
-            Business
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{ color: "Red", fontFamily: "Serif", fontWeight: "bold" }}
+          >
+            NORTEL
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
@@ -133,6 +138,7 @@ function Template({ children }) {
               size="large"
               aria-label="show 4 new mails"
               color="inherit"
+              sx={{ color: "black" }}
             >
               <Badge badgeContent={4} color="error">
                 <MailIcon />
@@ -142,6 +148,7 @@ function Template({ children }) {
               size="large"
               aria-label="show 17 new notifications"
               color="inherit"
+              sx={{ color: "black" }}
             >
               <Badge badgeContent={17} color="error">
                 <NotificationsIcon />
@@ -155,11 +162,17 @@ function Template({ children }) {
               aria-haspopup="true"
               onClick={handleProfileMenuOpen}
               color="inherit"
+              sx={{ color: "black" }}
             >
               <AccountCircle />
             </IconButton>
           </Box>
-          <Typography variant="h9" noWrap component="div">
+          <Typography
+            variant="h9"
+            noWrap
+            component="div"
+            style={{ color: "#000" }}
+          >
             Logged in as {user}
           </Typography>
         </Toolbar>
@@ -173,7 +186,7 @@ function Template({ children }) {
           [`& .MuiDrawer-paper`]: {
             width: drawerWidth,
             boxSizing: "border-box",
-            backgroundColor: "#2f3c66",
+            backgroundColor: "#fff",
             color: "white",
           },
         }}
@@ -188,7 +201,8 @@ function Template({ children }) {
                 handleListItemClick(event, 0, "/template/home")
               }
               style={{
-                backgroundColor: selectedIndex == 0 ? "#15285c" : "#2f3c66",
+                backgroundColor: selectedIndex === 0 ? "#FDEBF1" : "#fff",
+                color: selectedIndex === 0 ? "#EF5D8E" : "#000",
               }}
             >
               <ListItemIcon>
@@ -218,8 +232,16 @@ function Template({ children }) {
                   selectedIndex == 3 ||
                   selectedIndex == 4 ||
                   selectedIndex == 5
-                    ? "#15285c"
-                    : "#2f3c66",
+                    ? "#FDEBF1"
+                    : "#fff",
+                color:
+                  selectedIndex == 1 ||
+                  selectedIndex == 2 ||
+                  selectedIndex == 3 ||
+                  selectedIndex == 4 ||
+                  selectedIndex == 5
+                    ? "#EF5D8E"
+                    : "#000",
               }}
             >
               <ListItemIcon>
@@ -244,6 +266,7 @@ function Template({ children }) {
                   <ListItemText
                     primaryTypographyProps={{ style: sub }}
                     primary="Items"
+                    style={{ color: "#000" }}
                   />
                 </ListItemButton>
                 <ListItemButton
@@ -257,6 +280,7 @@ function Template({ children }) {
                   <ListItemText
                     primaryTypographyProps={{ style: sub }}
                     primary="Categories"
+                    style={{ color: "#000" }}
                   />
                 </ListItemButton>
                 <ListItemButton
@@ -270,6 +294,7 @@ function Template({ children }) {
                   <ListItemText
                     primaryTypographyProps={{ style: sub }}
                     primary="Bills"
+                    style={{ color: "#000" }}
                   />
                 </ListItemButton>
                 <ListItemButton
@@ -283,6 +308,7 @@ function Template({ children }) {
                   <ListItemText
                     primaryTypographyProps={{ style: sub }}
                     primary="Stock Updates"
+                    style={{ color: "#000" }}
                   />
                 </ListItemButton>
               </List>
@@ -294,9 +320,13 @@ function Template({ children }) {
               }
               style={{
                 backgroundColor:
-                  selectedIndex == 6 || selectedIndex == 7
-                    ? "#15285c"
-                    : "#2f3c66",
+                  selectedIndex == 6 || selectedIndex == 7 || selectedIndex == 8
+                    ? "#FDEBF1"
+                    : "#fff",
+                color:
+                  selectedIndex == 6 || selectedIndex == 7 || selectedIndex == 8
+                    ? "#EF5D8E"
+                    : "#000",
               }}
             >
               <ListItemIcon>
@@ -305,12 +335,13 @@ function Template({ children }) {
               <ListItemText
                 primaryTypographyProps={{ style: text }}
                 primary="Export"
+                style={{ color: "#000" }}
               />
               {openExport ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
             <Collapse in={openExport} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
-              <ListItemButton
+                <ListItemButton
                   sx={{ pl: 4 }}
                   selected={selectedIndex == 7}
                   onClick={(event) =>
@@ -321,6 +352,7 @@ function Template({ children }) {
                   <ListItemText
                     className={classes.menuText}
                     primary="Products"
+                    style={{ color: "#000" }}
                   />
                 </ListItemButton>
                 <ListItemButton
@@ -334,6 +366,7 @@ function Template({ children }) {
                   <ListItemText
                     className={classes.menuText}
                     primary="Categories"
+                    style={{ color: "#000" }}
                   />
                 </ListItemButton>
                 <ListItemButton sx={{ pl: 4 }}>
@@ -341,6 +374,7 @@ function Template({ children }) {
                   <ListItemText
                     className={classes.menuText}
                     primary="Starred"
+                    style={{ color: "#000" }}
                   />
                 </ListItemButton>
               </List>

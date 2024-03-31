@@ -1,45 +1,59 @@
 import * as React from "react";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import {
   FormControl,
+  Grid,
   InputLabel,
   MenuItem,
   Paper,
   Select,
-  Slider,
+  Tooltip,
 } from "@mui/material";
 import InputField from "../../../FormComponents/InputField";
+import { useState, useEffect } from "react";
 
 const style = {
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 400,
+  width: "auto",
   bgcolor: "background.paper",
   boxShadow: 24,
   p: 4,
 };
 
-export default function Ex_ItemUnitPrice({ enableSetting, setEnableSetting }) {
-  const handleClose = () => setEnableSetting(false);
+function ValueLabelComponent(props) {
+  const { children, open, value } = props;
 
-  const [unitPriceDetails, setUnitPriceDetails] = React.useState({
-    _method: "",
-    _dateRange: 0,
-    _unitPrice: 0.0,
-  });
-  const handlePaymentChange = (event) => {
-    console.log(event);
-    setUnitPriceDetails({
-      ...unitPriceDetails,
-      _method: event.target.value,
-    });
-    console.log(unitPriceDetails._method);
+  return (
+    <Tooltip open={open} enterTouchDelay={0} placement="top" title={value}>
+      {children}
+    </Tooltip>
+  );
+}
+
+export default function Ex_ItemUnitPrice({
+  enableSetting,
+  setEnableSetting,
+  row,
+  handleMethodChange,
+  handleValueChange,
+  handleFromDateChange,
+  handleToDateChange,
+  duration,
+}) {
+  const handleClose = () => {
+    setEnableSetting(false);
+    setSelectedMethod(null);
+    setUnitPriceVal(0);
+    setFromDate(null);
+    setToDate(null);
   };
+  const [selectedMethod, setSelectedMethod] = useState();
+  const [unitPriceVal, setUnitPriceVal] = useState(0);
+  const [fromDate, setFromDate] = useState();
+  const [toDate, setToDate] = useState();
 
   return (
     <div>
@@ -56,29 +70,97 @@ export default function Ex_ItemUnitPrice({ enableSetting, setEnableSetting }) {
               labelId="demo-select-small"
               id="demo-select-small"
               name="_unitPriceMethod"
-              value={unitPriceDetails._method}
+              value={selectedMethod ? selectedMethod : row.unitPriceMethod}
               label="Payment Method"
-              onChange={handlePaymentChange}
+              onChange={(event) => {
+                setSelectedMethod(event.target.value);
+                handleMethodChange(event, row.importId, event.target.value);
+              }}
             >
+              <MenuItem value={null}></MenuItem>
               <MenuItem value={"define"}>Define</MenuItem>
               <MenuItem value={"topMost"}>Top Most</MenuItem>
               <MenuItem value={"average"}>Average</MenuItem>
             </Select>
           </FormControl>
-          <Slider
-            aria-label="Temperature"
-            defaultValue={30}
-            getAriaValueText={null}
-            valueLabelDisplay="auto"
-            shiftStep={30}
-            step={10}
-            marks
-            min={10}
-            max={110}
-          />
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-          </Typography>
+          {selectedMethod === "define" || row.unitPriceMethod === "define" ? (
+            <>
+              <Grid item xs={12} sm={3} sx={12}>
+                <InputField
+                  name="_total"
+                  value={unitPriceVal ? unitPriceVal : row.unitPrice}
+                  onChange={(event, newInputValue) => {
+                    setUnitPriceVal(newInputValue);
+                    handleValueChange(
+                      event,
+                      row.importId,
+                      parseInt(newInputValue)
+                    );
+                  }}
+                  type="text"
+                  label="Total"
+                />
+              </Grid>
+            </>
+          ) : null}
+          {duration.length !== 0 || row.fromDate || row.toDate ? (
+            <Grid item xs={12} sm={12} sx={12}>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6} sx={12}>
+                  <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
+                    <InputLabel id="demo-select-small">From Date</InputLabel>
+                    <Select
+                      labelId="demo-select-small"
+                      id="demo-select-small"
+                      name="_fromDate"
+                      value={fromDate ? fromDate : row.fromDate}
+                      label="From Date"
+                      onChange={(event) => {
+                        setFromDate(event.target.value);
+                        handleFromDateChange(
+                          event,
+                          row.importId,
+                          event.target.value
+                        );
+                      }}
+                    >
+                      {duration.map((index) => {
+                        return (
+                          <MenuItem value={index.value}>{index.label}</MenuItem>
+                        );
+                      })}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={6} sx={12}>
+                  <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
+                    <InputLabel id="demo-select-small">To Date</InputLabel>
+                    <Select
+                      labelId="demo-select-small"
+                      id="demo-select-small"
+                      name="_toDate"
+                      value={toDate ? toDate : row.toDate}
+                      label="To Date"
+                      onChange={(event) => {
+                        setToDate(event.target.value);
+                        handleToDateChange(
+                          event,
+                          row.importId,
+                          event.target.value
+                        );
+                      }}
+                    >
+                      {duration.map((index) => {
+                        return (
+                          <MenuItem value={index.value}>{index.label}</MenuItem>
+                        );
+                      })}
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </Grid>
+          ) : null}
         </Paper>
       </Modal>
     </div>
