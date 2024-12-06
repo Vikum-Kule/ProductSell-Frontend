@@ -8,7 +8,7 @@ import Home from "./pages/Home";
 import ImItems from "./pages/Imports/ImportItem/Im_Items";
 import Im_Categories from "./pages/Imports/ImportCategory/Im_Categories";
 import Im_Bill from "./pages/Imports/ImportBill/Im_Bill";
-import Ex_Products from "./pages/Ex_Products";
+import Ex_Products from "./pages/Exports/ExportItem/Ex_Products";
 import Im_Stockupdates from "./pages/Imports/ImportStockIntake/Im_stockupdates";
 import CategoryView from "./pages/Imports/ImportCategory/CategoryView";
 import ImportItemView from "./pages/Imports/ImportItem/Im_ItemView";
@@ -21,6 +21,7 @@ import Ex_Items from "./pages/Exports/ExportItem/Ex_Items";
 import Ex_ProductEdit from "./pages/Exports/ExportItem/Ex_ItemEdit";
 import Ex_Production from "./pages/Exports/ExportItem/Ex_Production";
 import Im_BillEdit from "./pages/Imports/ImportBill/Im_BillEdit";
+import Ex_ProductView from "./pages/Exports/ExportItem/Ex_ItemView";
 
 const theme = createTheme({
   palette: {
@@ -103,6 +104,9 @@ function App() {
                 </Route>
                 <Route path="/template/ex_product_production/:productId">
                   <Ex_Production />
+                </Route>
+                <Route path="/template/ex_product_view/:productId">
+                  <Ex_ProductView />
                 </Route>
               </Switch>
             </Template>

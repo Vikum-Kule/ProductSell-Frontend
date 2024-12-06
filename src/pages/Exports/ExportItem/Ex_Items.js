@@ -165,7 +165,7 @@ function Ex_Items() {
   const handleAction = async (event, id) => {
     switch (event) {
       case "view":
-        // history.push("/template/im_item_view/" + id);
+        history.push("/template/ex_product_view/" + id);
         break;
       case "edit":
         console.log("Id: " + id);
@@ -267,7 +267,7 @@ function Ex_Items() {
                   setOpenForm(true);
                 }}
               >
-                Add Peoduct
+                Add Product
               </Button>
             </Grid>
             <Grid item xs={12} sm={12} sx={12}>

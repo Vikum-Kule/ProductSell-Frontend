@@ -23,8 +23,9 @@ function ProductionTableItem({
   editingRow,
   setEditingRow,
 }) {
-
   const [duration, setDuration] = useState([]);
+  const [enableDuration, setEnableDuration] = useState(false);
+  const [enableDefine, setEnableDefine] = useState(false);
 
   const handleMethodChange = (event, rowId, unitPriceMethod) => {
     console.log(rowId);
@@ -57,6 +58,15 @@ function ProductionTableItem({
     console.log(rowId);
     let updatedRows = rows.map((row) =>
       row.importId === rowId ? { ...row, unitPrice } : row
+    );
+    console.log(updatedRows);
+    setRows(updatedRows);
+  };
+
+  const handleQtyChange = (event, rowId, itemQty) => {
+    console.log("handleQtyChange ",rowId);
+    let updatedRows = rows.map((row) =>
+      row.importId === rowId ? { ...row, itemQty } : row
     );
     console.log(updatedRows);
     setRows(updatedRows);
@@ -123,8 +133,21 @@ function ProductionTableItem({
                                     aria-label="SettingsIcon"
                                     size="small"
                                     onClick={() => {
-                                      fetchUpdatedDuration(row.importId)
+                                      fetchUpdatedDuration(row.importId);
                                       handleAction("settings", row);
+                                      if (row.unitPriceMethod === "define") {
+                                        setEnableDefine(true);
+                                        setEnableDuration(false);
+                                      } else if (
+                                        row.unitPriceMethod === "topMost" ||
+                                        row.unitPriceMethod === "average"
+                                      ) {
+                                        setEnableDefine(false);
+                                        setEnableDuration(true);
+                                      } else {
+                                        setEnableDefine(false);
+                                        setEnableDuration(false);
+                                      }
                                     }}
                                   >
                                     <SettingsIcon fontSize="inherit" />
@@ -150,10 +173,15 @@ function ProductionTableItem({
                         row={editingRow}
                         handleMethodChange={handleMethodChange}
                         handleValueChange={handleValueChange}
-                        handleToDateChange = {handletoDateChange}
+                        handleToDateChange={handletoDateChange}
                         handleFromDateChange={handlefromDateChange}
-                        duration = {duration}
-                        setDuration = {setDuration}
+                        duration={duration}
+                        setDuration={setDuration}
+                        enableDuration={enableDuration}
+                        setEnableDuration={setEnableDuration}
+                        setEnableDefine={setEnableDefine}
+                        enableDefine={enableDefine}
+                        handleQtyChange = {handleQtyChange}
                       />
                     </TableRow>
                   );

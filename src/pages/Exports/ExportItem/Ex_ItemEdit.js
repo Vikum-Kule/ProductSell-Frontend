@@ -1,4 +1,12 @@
-import { Button, Grid, IconButton, Tooltip, Typography } from "@mui/material";
+import {
+  Button,
+  Grid,
+  IconButton,
+  Paper,
+  Tooltip,
+  Typography,
+  Chip,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import React, { useEffect, useState } from "react";
 import { getImportItemById } from "../../../services/Import";
@@ -9,48 +17,57 @@ import FormAlert from "../../../components/FormAlert";
 import ItemSelectingPopup from "../../../components/ItemSelectingPopup";
 import { makeStyles } from "@mui/styles";
 import {
-  updateExportProduct,
-  getExportProductById,
+  addExportProduct,
+  checkBarcode,
   getExCategoryById,
+  getExportProductById,
+  updateExportProduct,
 } from "../../../services/Export";
 import { Validators } from "../../../Validation/FormValidation";
 import Ex_ItemFormValidation from "../../../Validation/Ex_ItemFormValidation";
 import Ex_CategorySelectingPopup from "../../../components/Ex_CategorySelectingPopup";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router-dom/cjs/react-router-dom.min";
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  // height: 400,
-  bgcolor: "background.paper",
-  // border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
+const useStyles = makeStyles({
+  categoryContainer: {
+    padding: "10px",
+  },
+  categoryTag: {
+    marginRight: "10px",
+  },
 
-function Ex_ItemEdit({ histroy }) {
+  itemContainer: {
+    padding: "10px",
+  },
+
+  container: {
+    padding: "5px",
+  },
+});
+
+function Ex_ItemEdit({ history }) {
+  const classes = useStyles();
   const { productId } = useParams();
-  // const classes = useStyles();
   //for input feild values
   const [values, setValues] = useState({
     _barcode: "",
     _productName: "",
     _ProductNote: "",
+    _categories: [],
   });
 
   //Reset values
   const resetValues = () => {
     setError({ _barcode: "", _productName: "" });
     setSelectedCatgory([]);
-    setExportCategory({});
+    setExportCategories([]);
     closeAlert();
     setSelectedItems([]);
     setValues({
       _barcode: "",
       _productName: "",
       _ProductNote: "",
+      _categories: [],
     });
   };
 
@@ -58,37 +75,62 @@ function Ex_ItemEdit({ histroy }) {
     await fetchData();
   }, []);
 
-  const fetchData = async () => {
-    let productData = await getExportProductById(productId);
-    console.log(productData);
-    let productCategory = productData.ex_category;
-    let importItems = productData.items;
-    const selectedArray = [];
-    const importidemIdArray = [];
-    for (let x = 0; x < importItems.length; x++) {
-      importidemIdArray.push(importItems[x].imports.importId);
-      selectedArray.push(
-        createDataForSelectedTable(
-          importItems[x].imports.itemName,
-          importItems[x].imports.brand,
-          importItems[x].imports.im_category.category,
-          importItems[x].usingQty,
-          importItems[x].itemId
-        )
-      );
-    }
-    setSelectedRows(selectedArray);
+  // set open category table
+  const [openCatgoryTable, setOpenCatgoryTable] = useState(false);
+  const [selectedCatgory, setSelectedCatgory] = useState([]);
+  const [exportCategories, setExportCategories] = useState([]);
+  const [catgoryRows, setCatgoryRows] = useState([]);
+  const [isLoading, setLoading] = useState(false);
 
-    // set values for the export products
-    setValues({
-      _barcode: productData.barcode,
-      _productName: productData.name,
-      _ProductNote: productData.note,
-    });
-    selectedCatgory[0] = productCategory.cat_id;
-    setExportCategory(productCategory);
-    setSelectedItems(importidemIdArray);
-    console.log(selectedItems);
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      // Fetch export product data by ID
+      const result = await getExportProductById(productId);
+      console.log(result);
+
+      if (result) {
+        const exportProduct = result;
+        // Extract relevant data from the response
+        const barcode = exportProduct.barcode || "";
+        const productName = exportProduct.name || "";
+        const categories = exportProduct.ex_categories.map((cat) => ({
+          cat_id: cat.cat_id,
+          category: cat.category,
+        }));
+        const items = exportProduct.items.map((item) => ({
+          item: item.itemName,
+          brand: item.brand,
+          importId: item.importId,
+        }));
+
+        // Set the state with fetched data
+        setValues((prevValues) => ({
+          ...prevValues,
+          _barcode: barcode,
+          _productName: productName,
+          _categories: categories.map((cat) => cat.cat_id), // Just the IDs for saving
+        }));
+
+        //set values for selected categories
+        setSelectedCatgory(categories.map((cat) => cat.cat_id));
+
+        setExportCategories(categories); // Displaying categories
+        setSelectedRows(items); // Displaying selected items
+        setSelectedItems(items.map((item) => item.importId)); // Item IDs for saving
+      } else {
+        throw new Error("Invalid response format");
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setAlertData({
+        type: "error",
+        message: "Failed to load product data. Please try again.",
+      });
+      setAlert(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Alerts ////////////////////////////////////
@@ -115,12 +157,6 @@ function Ex_ItemEdit({ histroy }) {
   // set open item table
   const [openTable, setOpenTable] = useState(false);
 
-  // set open category table
-  const [openCatgoryTable, setOpenCatgoryTable] = useState(false);
-  const [selectedCatgory, setSelectedCatgory] = useState([]);
-  const [exportCategory, setExportCategory] = useState();
-  const [catgoryRows, setCatgoryRows] = useState([]);
-
   // errors for inputfeild
   const [error, setError] = useState({
     _barcode: "",
@@ -143,20 +179,6 @@ function Ex_ItemEdit({ histroy }) {
   const selectedColumns = [
     { id: "item", label: "Item", minWidth: 100, editable: false },
     { id: "brand", label: "Brand", minWidth: 100, editable: false },
-    {
-      id: "category_m",
-      label: "Main category",
-      minWidth: 100,
-      editable: false,
-    },
-    {
-      id: "qty",
-      label: "Required Qty",
-      minWidth: 100,
-      editable: true,
-      type: "number",
-      isDecimal: false,
-    },
   ];
 
   const [selectedItems, setSelectedItems] = React.useState([]);
@@ -186,8 +208,6 @@ function Ex_ItemEdit({ histroy }) {
         createDataForSelectedTable(
           importItem.itemName,
           importItem.brand,
-          importItem.im_category.category,
-          0,
           importItem.importId
         )
       );
@@ -196,32 +216,23 @@ function Ex_ItemEdit({ histroy }) {
   };
 
   const handleCloseCatgoryTable = async () => {
-    let categoryData = await getExCategoryById(selectedCatgory[0]);
-    console.log(categoryData);
-    setExportCategory(categoryData);
+    const categoryList = [];
+    for (let x = 0; x < selectedCatgory.length; x++) {
+      let categoryData = await getExCategoryById(selectedCatgory[x]);
+      categoryList.push(categoryData);
+    }
+    setExportCategories(categoryList);
+    setValues({
+      ...values,
+      _categories: selectedCatgory,
+    });
     setOpenCatgoryTable(false);
   };
 
-  function createDataForSelectedTable(
-    item,
-    brand,
-    category_m,
-    qty,
-    unitType,
-    unitPrice,
-    discountPerItem,
-    price,
-    importId
-  ) {
+  function createDataForSelectedTable(item, brand, importId) {
     return {
       item,
       brand,
-      category_m,
-      qty,
-      unitType,
-      unitPrice,
-      discountPerItem,
-      price,
       importId,
     };
   }
@@ -230,18 +241,22 @@ function Ex_ItemEdit({ histroy }) {
     console.log(values);
     let errorMsg = Ex_ItemFormValidation(values);
     setError(errorMsg);
-    console.log(exportCategory);
+    // console.log(exportCategory);
     if (!errorMsg._barcode && !errorMsg._productName) {
       console.log(errorMsg);
+      let _barcode = await checkBarcode(values._barcode);
+      // if (_barcode) {
+      //   setError({
+      //     ...error,
+      //     _barcode: "Barcode Allready exist",
+      //   });
+      // }
+      // else if (!_barcode) {
       if (selectedRows) {
         //set product items according to the Product body
         const importItems = [];
         for (let x = 0; x < selectedRows?.length; x++) {
-          const item = {
-            useQty: parseInt(selectedRows[x].qty),
-            itemId: selectedRows[x].importId,
-          };
-          importItems.push(item);
+          importItems.push(selectedRows[x].importId);
         }
 
         ////create product body
@@ -251,7 +266,7 @@ function Ex_ItemEdit({ histroy }) {
         const productBody = {
           name: values._productName,
           barcode: values._barcode,
-          categoryId: exportCategory?.cat_id,
+          categories: values._categories,
           status: "ACTIVE",
           addedBy: user.username,
           note: values._ProductNote,
@@ -277,183 +292,164 @@ function Ex_ItemEdit({ histroy }) {
           setAlert(true);
         }
       }
+      // }
+      else {
+        //server error
+      }
     }
   };
 
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={12} sm={11} sx={12}>
-        <Typography mt={1} variant="h6">
-          {" "}
-          Edit Export Product{" "}
-        </Typography>
-      </Grid>
-      <Grid item xs={12} sm={4} sx={12}>
-        <InputField
-          name="_barcode"
-          errorMsg={error._barcode}
-          value={values._barcode}
-          onChange={(event, newInputValue) =>
-            handleChange(event, newInputValue)
-          }
-          type="text"
-          label="Barcode"
-          validators={[{ check: Validators.required }]}
-        />
-      </Grid>
-      <Grid item xs={12} sm={9} sx={12}>
-        <InputField
-          name="_productName"
-          errorMsg={error._productName}
-          value={values._productName}
-          onChange={(event, newInputValue) =>
-            handleChange(event, newInputValue)
-          }
-          type="text"
-          label="Product Name"
-          validators={[{ check: Validators.required }]}
-        />
-      </Grid>
-      <Grid item xs={12} sm={9} sx={12}>
-        <Button onClick={handleOpenCategoryTable} variant="outlined">
-          Select Category
-        </Button>
-      </Grid>
-      {selectedCatgory.length !== 0 ? (
-        <>
-          <Grid item xs={12} sm={9} sx={12}>
-            <InputField
-              name="_category"
-              value={exportCategory?.category}
-              type="text"
-              label="Category"
-              isdisabled={true}
-            />
-          </Grid>
-          <Grid item xs={12} sm={9} sx={12}>
-            <InputField
-              name="_subCat_1"
-              value={exportCategory?.subCat_1}
-              type="text"
-              label="Subcategory 1"
-              isdisabled={true}
-            />
-          </Grid>
-          <Grid item xs={12} sm={9} sx={12}>
-            <InputField
-              name="_subCat_2"
-              value={exportCategory?.subCat_2}
-              type="text"
-              label="Subcategory 2"
-              isdisabled={true}
-            />
-          </Grid>
-          <Grid item xs={12} sm={9} sx={12}>
-            <InputField
-              name="_subCat_3"
-              value={exportCategory?.subCat_3}
-              type="text"
-              label="Subcategory 3"
-              isdisabled={true}
-            />
-          </Grid>
-          <Grid item xs={12} sm={9} sx={12}>
-            <InputField
-              name="_subCat_4"
-              value={exportCategory?.subCat_4}
-              type="text"
-              label="Subcategory 4"
-              isdisabled={true}
-            />
-          </Grid>
-          <Grid item xs={12} sm={9} sx={12}>
-            <InputField
-              name="_subCat_5"
-              value={exportCategory?.subCat_5}
-              type="text"
-              label="Subcategory 5"
-              isdisabled={true}
-            />
-          </Grid>
-        </>
-      ) : null}
-      <Grid item xs={12} sm={9} sx={12}>
-        <Button onClick={handleOpenTable} variant="outlined">
-          Select Import Items
-        </Button>
-      </Grid>
-      <Grid item xs={12} sm={12} sx={12}>
-        {/* selected table */}
-        {selectedItems.length !== 0 ? (
-          <ExportProductItemWritableTable
-            columns={selectedColumns}
-            rows={selectedRows}
-            setRows={setRows}
-            page={writeable_page}
-            setPage={set_writeable_Page}
-            rowsPerPage={writeable_rowsPerPage}
-            tablePagin={false}
-            setRowsPerPage={set_writeable_RowsPerPage}
-            setTotalCount={setTotalCount}
+    <Paper className={classes.container} elevation={8}>
+      <Grid container className={classes.container} spacing={2}>
+        <Grid item xs={12} sm={11} sx={12}>
+          <Typography mt={1} variant="h6">
+            {" "}
+            Edit Export Product{" "}
+          </Typography>
+        </Grid>
+        <Grid item xs={12} sm={1} sx={12}>
+          <Tooltip title="Close">
+            <IconButton onClick={() => {}} aria-label="close" size="small">
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Grid>
+        <Grid item xs={12} sm={4} sx={12}>
+          <InputField
+            name="_barcode"
+            errorMsg={error._barcode}
+            value={values._barcode}
+            onChange={(event, newInputValue) =>
+              handleChange(event, newInputValue)
+            }
+            type="text"
+            label="Barcode"
+            validators={[{ check: Validators.required }]}
           />
-        ) : null}
-      </Grid>
-      <Grid item xs={12} sm={9} sx={12}>
-        <InputField
-          name="_ProductNote"
-          value={values._ProductNote}
-          // onChange={(event, newInputValue) => handleChange(event, newInputValue)}
-          type="text"
-          label="Note"
-          multiline={true}
-        />
-      </Grid>
-      <Grid item xs={12} sm={12} sx={12}>
-        {displayAlert ? (
-          <FormAlert type={alertData.type} message={alertData.message} />
-        ) : null}
-      </Grid>
-      <Grid item xs={12} sm={12} sx={12}>
-        <Grid container justifyContent="space-between">
-          <Grid item xs={12} sm={4} sx={12}>
-            <Button fullWidth variant="contained" onClick={submitValue}>
-              Submit
+        </Grid>
+        <Grid item xs={12} sm={9} sx={12}>
+          <InputField
+            name="_productName"
+            errorMsg={error._productName}
+            value={values._productName}
+            onChange={(event, newInputValue) =>
+              handleChange(event, newInputValue)
+            }
+            type="text"
+            label="Product Name"
+            validators={[{ check: Validators.required }]}
+          />
+        </Grid>
+        {exportCategories.length !== 0 ? (
+          <Grid item xs={12} sm={12} sx={12}>
+            <Paper
+              className={classes.categoryContainer}
+              onClick={handleOpenCategoryTable}
+            >
+              <Typography>Category</Typography>
+              <Grid container spacing={1}>
+                {exportCategories.map((category) => {
+                  return (
+                    <Grid item sx={2}>
+                      <Chip label={category.category} variant="outlined" pt />
+                    </Grid>
+                  );
+                })}
+              </Grid>
+            </Paper>
+          </Grid>
+        ) : (
+          <Grid item xs={12} sm={9} sx={12}>
+            <Button onClick={handleOpenCategoryTable} variant="outlined">
+              Select Category
             </Button>
           </Grid>
-          <Grid item xs={12} sm={1} sx={12}>
-            <Button onClick={resetValues} variant="outlined">
-              Reset
+        )}
+        {selectedItems.length !== 0 ? (
+          <Grid item xs={12} sm={12} sx={12}>
+            <Paper className={classes.itemContainer} onClick={handleOpenTable}>
+              <Typography>Selected Items</Typography>
+              <Grid container spacing={1}>
+                {selectedRows.map((item) => {
+                  console.log("Selected item", selectedRows);
+                  return (
+                    <Grid item sx={2}>
+                      <Chip
+                        label={item.item + " | " + item.brand}
+                        variant="outlined"
+                        pt
+                      />
+                    </Grid>
+                  );
+                })}
+              </Grid>
+            </Paper>
+          </Grid>
+        ) : (
+          <Grid item xs={12} sm={9} sx={12}>
+            <Button onClick={handleOpenTable} variant="outlined">
+              Select Import Items
             </Button>
+          </Grid>
+        )}
+        <Grid item xs={12} sm={9} sx={12}>
+          <InputField
+            name="_ProductNote"
+            value={values._ProductNote}
+            // onChange={(event, newInputValue) => handleChange(event, newInputValue)}
+            type="text"
+            label="Note"
+            multiline={true}
+          />
+        </Grid>
+        <Grid item xs={12} sm={12} sx={12}>
+          {displayAlert ? (
+            <FormAlert type={alertData.type} message={alertData.message} />
+          ) : null}
+        </Grid>
+        <Grid item xs={12} sm={12} sx={12}>
+          <Grid container justifyContent="space-between">
+            <Grid item xs={12} sm={4} sx={12}>
+              <Button fullWidth variant="contained" onClick={submitValue}>
+                Submit
+              </Button>
+            </Grid>
+            <Grid item xs={12} sm={1} sx={12}>
+              <Button onClick={resetValues} variant="outlined">
+                Reset
+              </Button>
+            </Grid>
           </Grid>
         </Grid>
+        <Grid>
+          {openCatgoryTable ? (
+            <Ex_CategorySelectingPopup
+              setOpenCatgoryTable={setOpenCatgoryTable}
+              openCatgoryTable={openCatgoryTable}
+              handleCloseCatgoryTable={handleCloseCatgoryTable}
+              setSelectedCatgory={setSelectedCatgory}
+              selectedCatgory={selectedCatgory}
+              setCatgoryRows={setCatgoryRows}
+              catgoryRows={catgoryRows}
+            />
+          ) : null}
+        </Grid>
+        <Grid>
+          {openTable ? (
+            <ItemSelectingPopup
+              setOpenTable={setOpenTable}
+              openTable={openTable}
+              handleCloseTable={handleCloseTable}
+              setSelectedItems={setSelectedItems}
+              selectedItems={selectedItems}
+              setRows={setRows}
+              rows={rows}
+            />
+          ) : null}
+        </Grid>
       </Grid>
-      <Grid>
-        {openCatgoryTable ? (
-          <Ex_CategorySelectingPopup
-            setOpenCatgoryTable={setOpenCatgoryTable}
-            openCatgoryTable={openCatgoryTable}
-            handleCloseCatgoryTable={handleCloseCatgoryTable}
-            setSelectedCatgory={setSelectedCatgory}
-            selectedCatgory={selectedCatgory}
-            setCatgoryRows={setCatgoryRows}
-            catgoryRows={catgoryRows}
-          />
-        ) : null}
-      </Grid>
-      <Grid>
-        {openTable ? (
-          <ItemSelectingPopup
-            setOpenTable={setOpenTable}
-            openTable={openTable}
-            handleCloseTable={handleCloseTable}
-            setSelectedItems={setSelectedItems}
-            selectedItems={selectedItems}
-            setRows={setRows}
-            rows={rows}
-          />
-        ) : null}
-      </Grid>
-    </Grid>
+    </Paper>
   );
 }
 

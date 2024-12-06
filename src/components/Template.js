@@ -124,14 +124,17 @@ function Template({ children }) {
         sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
       >
         <Toolbar>
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ color: "Red", fontFamily: "Serif", fontWeight: "bold" }}
-          >
-            NORTEL
-          </Typography>
+          <Box
+            component="img"
+            sx={{
+              height: 25,
+              margin: 0,
+              maxHeight: { xs: 233, md: 167 },
+              maxWidth: { xs: 350, md: 250 },
+            }}
+            alt="logo"
+            src="../images/logo.png"
+          />
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
             <IconButton

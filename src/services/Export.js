@@ -2,6 +2,102 @@ import axios from "axios";
 import { getToken, getUser } from "../Utils/Common";
 import token_valid from "./TokenValid";
 
+///////////// production /////////////////////////////////
+//add production
+const addProduction = async (values) => {
+  //check access tocken expiry function
+  let token_valid_result = await token_valid();
+  if (token_valid_result) {
+    let token = getToken();
+
+    //get user name
+    let user = getUser();
+    console.log("User" + user.username);
+
+    return axios
+      .post("/api/export/production", {
+        productId:values._productId,
+        productionQty:values._productionQty,
+        electricityCost:values._electricityCost,
+        labourCost:values._labourCost,
+        transportCost:values._transportCost,
+        otherCost:values._otherCost,
+        addedBy:user.username,
+        items:values._productionItems,
+        note:""
+      }, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      })
+      .then(async (response) => {
+        console.log(response);
+        // setUserSession(response.data.token, response.data.user)
+        return true;
+      })
+      .catch((error) => {
+        // return "Something went wrong...";
+        console.log("get imports " + error);
+        return false;
+      });
+  }
+};
+
+//get recent production record according to the product Id
+const getLatestProductionByProductId = async (productId) => {
+  //check access tocken expiry function
+  let token_valid_result = await token_valid();
+  if (token_valid_result) {
+    let token = getToken();
+    return axios
+      .get("/api/export/production/" + productId, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        console.log("Response all--", response.data);
+        return response.data;
+      })
+      .catch((error) => {
+        // return "Something went wrong...";
+        console.log("get production " + error);
+        return "Something went wrong...";
+      });
+  }
+};
+
+//get recent production record according to the product Id
+const getProductionsByProductId = async (productId) => {
+  //check access tocken expiry function
+  let token_valid_result = await token_valid();
+  if (token_valid_result) {
+    let token = getToken();
+    return axios
+      .get("/api/export/production/findlastfive/" + productId, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        console.log("Response all--", response.data);
+        return response.data;
+      })
+      .catch((error) => {
+        // return "Something went wrong...";
+        console.log("get production " + error);
+        return "Something went wrong...";
+      });
+  }
+};
+
+//////////////////////////////////////////////////////////
+
 const getExportProducts = async (offset, pageSize, filter) => {
   let token = getToken();
   return axios
@@ -386,6 +482,7 @@ const getExCategoryDataByFilter = async (offset, pageSize, filter) => {
 ///////////////////////////////////////////////////////////
 
 export {
+  addProduction,
   addExportProduct,
   checkBarcode,
   getExportCategoryData,
@@ -398,4 +495,6 @@ export {
   getExCategoryById,
   getExCategoryDataByFilter,
   updateExportProduct,
+  getProductionsByProductId,
+  getLatestProductionByProductId
 };

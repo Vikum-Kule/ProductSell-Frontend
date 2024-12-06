@@ -5,7 +5,7 @@ import {
   Paper,
   Tooltip,
   Typography,
-  Chip
+  Chip,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import React, { useEffect, useState } from "react";
@@ -31,6 +31,10 @@ const useStyles = makeStyles({
   },
   categoryTag: {
     marginRight: "10px",
+  },
+
+  itemContainer: {
+    padding: "10px",
   },
 });
 
@@ -110,14 +114,6 @@ function Ex_ItemForm({ setOpenForm }) {
   const selectedColumns = [
     { id: "item", label: "Item", minWidth: 100, editable: false },
     { id: "brand", label: "Brand", minWidth: 100, editable: false },
-    {
-      id: "qty",
-      label: "Required Qty",
-      minWidth: 100,
-      editable: true,
-      type: "number",
-      isDecimal: false,
-    },
   ];
 
   const [selectedItems, setSelectedItems] = React.useState([]);
@@ -147,7 +143,6 @@ function Ex_ItemForm({ setOpenForm }) {
         createDataForSelectedTable(
           importItem.itemName,
           importItem.brand,
-          0,
           importItem.importId
         )
       );
@@ -169,11 +164,10 @@ function Ex_ItemForm({ setOpenForm }) {
     setOpenCatgoryTable(false);
   };
 
-  function createDataForSelectedTable(item, brand, qty, importId) {
+  function createDataForSelectedTable(item, brand, importId) {
     return {
       item,
       brand,
-      qty,
       importId,
     };
   }
@@ -196,11 +190,7 @@ function Ex_ItemForm({ setOpenForm }) {
           //set product items according to the Product body
           const importItems = [];
           for (let x = 0; x < selectedRows?.length; x++) {
-            const item = {
-              useQty: parseInt(selectedRows[x].qty),
-              itemId: selectedRows[x].importId,
-            };
-            importItems.push(item);
+            importItems.push(selectedRows[x].importId);
           }
 
           ////create product body
@@ -314,27 +304,33 @@ function Ex_ItemForm({ setOpenForm }) {
           </Button>
         </Grid>
       )}
-      <Grid item xs={12} sm={9} sx={12}>
-        <Button onClick={handleOpenTable} variant="outlined">
-          Select Import Items
-        </Button>
-      </Grid>
-      <Grid item xs={12} sm={12} sx={12}>
-        {/* selected table */}
-        {selectedItems.length !== 0 ? (
-          <ExportProductItemWritableTable
-            columns={selectedColumns}
-            rows={selectedRows}
-            setRows={setRows}
-            page={writeable_page}
-            setPage={set_writeable_Page}
-            rowsPerPage={writeable_rowsPerPage}
-            tablePagin={false}
-            setRowsPerPage={set_writeable_RowsPerPage}
-            setTotalCount={setTotalCount}
-          />
-        ) : null}
-      </Grid>
+      {selectedItems.length !== 0 ? (
+        <Grid item xs={12} sm={12} sx={12}>
+          <Paper className={classes.itemContainer} onClick={handleOpenTable}>
+            <Typography>Selected Items</Typography>
+            <Grid container spacing={1}>
+              {selectedRows.map((item) => {
+                console.log("Selected item", selectedRows);
+                return (
+                  <Grid item sx={2}>
+                    <Chip
+                      label={item.item + " | " + item.brand}
+                      variant="outlined"
+                      pt
+                    />
+                  </Grid>
+                );
+              })}
+            </Grid>
+          </Paper>
+        </Grid>
+      ) : (
+        <Grid item xs={12} sm={9} sx={12}>
+          <Button onClick={handleOpenTable} variant="outlined">
+            Select Import Items
+          </Button>
+        </Grid>
+      )}
       <Grid item xs={12} sm={9} sx={12}>
         <InputField
           name="_ProductNote"

@@ -74,12 +74,12 @@ function Im_ItemEdit({history}) {
             _importName:importData.itemName,
             _importBrand:importData.brand,
             _productCode:importData.product_code,
-            _importMCategory:importData.im_category.category,
-            _subCat_1:importData.im_category.subCat_1,
-            _subCat_2:importData.im_category.subCat_2,
-            _subCat_3:importData.im_category.subCat_3,
-            _subCat_4:importData.im_category.subCat_4,
-            _subCat_5:importData.im_category.subCat_5,
+            _importMCategory:importData.im_categories.category,
+            _subCat_1:importData.im_categories.subCat_1,
+            _subCat_2:importData.im_categories.subCat_2,
+            _subCat_3:importData.im_categories.subCat_3,
+            _subCat_4:importData.im_categories.subCat_4,
+            _subCat_5:importData.im_categories.subCat_5,
             _importQty:importData.qty,
             _importUnitType:importData.unitType,
             _minRate:importData.refillRate,
@@ -128,7 +128,7 @@ function Im_ItemEdit({history}) {
         
             let data = {...value};
             for(let x=1; x<6; x++){
-                if(value["_subCat_"+x]==''){
+                if(value["_subCat_"+x]===''){
                     data["_subCat_"+x] = '-';  
                 }else{
                     data["_subCat_"+x] = value["_subCat_"+x];  
@@ -199,7 +199,7 @@ function Im_ItemEdit({history}) {
     const [counter, setCounter] = useState(5);
 
     const handleClickSubCategory = () => {
-        if(counter!= 5){
+        if(counter!== 5){
             setCounter(counter + 1);
         }
         console.log(value._subCat_2);
