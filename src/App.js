@@ -22,6 +22,7 @@ import Ex_ProductEdit from "./pages/Exports/ExportItem/Ex_ItemEdit";
 import Ex_Production from "./pages/Exports/ExportItem/Ex_Production";
 import Im_BillEdit from "./pages/Imports/ImportBill/Im_BillEdit";
 import Ex_ProductView from "./pages/Exports/ExportItem/Ex_ItemView";
+import Sale_Product from "./pages/Sales/SaleProducts";
 
 const theme = createTheme({
   palette: {
@@ -107,6 +108,9 @@ function App() {
                 </Route>
                 <Route path="/template/ex_product_view/:productId">
                   <Ex_ProductView />
+                </Route>
+                <Route path="/template/sale_products">
+                  <Sale_Product />
                 </Route>
               </Switch>
             </Template>

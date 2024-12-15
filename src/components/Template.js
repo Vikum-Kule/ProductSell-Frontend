@@ -21,6 +21,7 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import { makeStyles } from "@mui/styles";
 import { useHistory } from "react-router";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import Badge from "@mui/material/Badge";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
@@ -43,6 +44,7 @@ function Template({ children }) {
   const menuId = "primary-search-account-menu";
   const [openExport, setOpenExport] = React.useState(false);
   const [openImport, setOpenImport] = React.useState(false);
+  const [openSales, setOpenSales] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [user, setUser] = React.useState("");
 
@@ -90,6 +92,8 @@ function Template({ children }) {
       handleClickImport();
     } else if (index === 6) {
       handleClickExport();
+    }else if (index === 9) {
+      handleClickSales();
     }
   };
 
@@ -105,6 +109,14 @@ function Template({ children }) {
       setOpenExport(false);
     }
     setOpenImport(!openImport);
+  };
+
+  const handleClickSales = () => {
+    if (openSales) {
+      setOpenExport(false);
+      setOpenImport(false);
+    }
+    setOpenSales(!openSales);
   };
 
   const text = {
@@ -372,11 +384,47 @@ function Template({ children }) {
                     style={{ color: "#000" }}
                   />
                 </ListItemButton>
-                <ListItemButton sx={{ pl: 4 }}>
+              </List>
+            </Collapse>
+            <ListItemButton
+              selected={selectedIndex == 9 || selectedIndex == 10}
+              onClick={(event) =>
+                handleListItemClick(event, 9, "/template/sale_products")
+              }
+              style={{
+                backgroundColor:
+                  selectedIndex == 9 || selectedIndex == 10
+                    ? "#FDEBF1"
+                    : "#fff",
+                color:
+                  selectedIndex == 9 || selectedIndex == 10
+                    ? "#EF5D8E"
+                    : "#000",
+              }}
+            >
+              <ListItemIcon>
+                <AttachMoneyIcon color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primaryTypographyProps={{ style: text }}
+                primary="Sales"
+                style={{ color: "#000" }}
+              />
+              {openSales ? <ExpandLess /> : <ExpandMore />}
+            </ListItemButton>
+            <Collapse in={openSales} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                <ListItemButton
+                  sx={{ pl: 4 }}
+                  selected={selectedIndex == 9}
+                  onClick={(event) =>
+                    handleListItemClick(event, 9, "/template/sale_products")
+                  }
+                >
                   <ListItemIcon>{/* <StarBorder /> */}</ListItemIcon>
                   <ListItemText
                     className={classes.menuText}
-                    primary="Starred"
+                    primary="Sale Products"
                     style={{ color: "#000" }}
                   />
                 </ListItemButton>
