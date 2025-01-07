@@ -3,6 +3,41 @@ import { getToken, getUser } from "../Utils/Common";
 import token_valid from "./TokenValid";
 
 ///////////// production /////////////////////////////////
+
+//get production data by paging
+const getExportProductionDataByPaging = async (offset, pageSize, filter) => {
+  //check access tocken expiry function
+  let token_valid_result = await token_valid();
+  if (token_valid_result) {
+    let token = getToken();
+
+    return axios
+      .post(
+        "/api/export/production/all/" + offset + "/" + pageSize,
+        {
+          barcode: filter._barcode ? filter._barcode.trim() : null,
+          productName: filter._productName ? filter._productName.trim() : null,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+        }
+      )
+      .then((response) => {
+        console.log(response);
+        console.log("Response --", response.data.content);
+        return response.data;
+      })
+      .catch(async (error) => {
+        // return "Something went wrong...";
+        console.log("Get export production " + error);
+        return "Something went wrong...";
+      });
+  }
+};
+
 //add production
 const addProduction = async (values) => {
   //check access tocken expiry function
@@ -15,22 +50,26 @@ const addProduction = async (values) => {
     console.log("User" + user.username);
 
     return axios
-      .post("/api/export/production", {
-        productId:values._productId,
-        productionQty:values._productionQty,
-        electricityCost:values._electricityCost,
-        labourCost:values._labourCost,
-        transportCost:values._transportCost,
-        otherCost:values._otherCost,
-        addedBy:user.username,
-        items:values._productionItems,
-        note:""
-      }, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + token,
+      .post(
+        "/api/export/production",
+        {
+          productId: values._productId,
+          productionQty: values._productionQty,
+          electricityCost: values._electricityCost,
+          labourCost: values._labourCost,
+          transportCost: values._transportCost,
+          otherCost: values._otherCost,
+          addedBy: user.username,
+          items: values._productionItems,
+          note: "",
         },
-      })
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+        }
+      )
       .then(async (response) => {
         console.log(response);
         // setUserSession(response.data.token, response.data.user)
@@ -51,7 +90,59 @@ const getLatestProductionByProductId = async (productId) => {
   if (token_valid_result) {
     let token = getToken();
     return axios
-      .get("/api/export/production/" + productId, {
+      .get("/api/export/production/get_last_production/" + productId, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        console.log("Response all--", response.data);
+        return response.data;
+      })
+      .catch((error) => {
+        // return "Something went wrong...";
+        console.log("get production " + error);
+        return "Something went wrong...";
+      });
+  }
+};
+
+//get recent production record according to the product Id
+const getProductionsForSales = async (productId, requiredQty) => {
+  //check access tocken expiry function
+  let token_valid_result = await token_valid();
+  if (token_valid_result) {
+    let token = getToken();
+    return axios
+      .get("/api/export/production/sale/" + productId + "/" + requiredQty, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        console.log("Response all--", response.data);
+        return response.data;
+      })
+      .catch((error) => {
+        // return "Something went wrong...";
+        console.log("get production for sale" + error);
+        return "Something went wrong...";
+      });
+  }
+};
+
+//get recent production record according to the product Id
+const getProductionById = async (productionId) => {
+  //check access tocken expiry function
+  let token_valid_result = await token_valid();
+  if (token_valid_result) {
+    let token = getToken();
+    return axios
+      .get("/api/export/production/" + productionId, {
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + token,
@@ -99,39 +190,37 @@ const getProductionsByProductId = async (productId) => {
 //////////////////////////////////////////////////////////
 
 const getExportProducts = async (offset, pageSize, filter) => {
-  let token = getToken();
-  return axios
-    .post(
-      "/api/export/product/all/" + offset + "/" + pageSize,
-      {
-        barcode: filter._barcode ? filter._barcode.trim() : null,
-        productName: filter._product ? filter._product.trim() : null,
-        addedBy: filter._addedBy ? filter._addedBy.trim() : null,
-        categories: filter._categories.length !== 0 ? filter._categories : null,
-        items: filter._items.length !== 0 ? filter._items : null,
-        status: filter._status ? filter._status.trim() : null,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + token,
+  let token_valid_result = await token_valid();
+  if (token_valid_result) {
+    let token = getToken();
+    return axios
+      .post(
+        "/api/export/product/all/" + offset + "/" + pageSize,
+        {
+          barcode: filter._barcode ? filter._barcode.trim() : null,
+          productName: filter._product ? filter._product.trim() : null,
+          addedBy: filter._addedBy ? filter._addedBy.trim() : null,
+          categories:
+            filter._categories.length !== 0 ? filter._categories : null,
+          items: filter._items.length !== 0 ? filter._items : null,
+          status: filter._status ? filter._status.trim() : null,
         },
-      }
-    )
-    .then((response) => {
-      console.log(response);
-      console.log("Response --", response.data.content);
-      return response.data;
-    })
-    .catch((error) => {
-      return "Something went wrong...";
-      //  console.log(error);
-      // if (error.response.statuscode == 403) {
-      //     console.log(error);
-      // } else {
-      //   console.log("something else");
-      // }
-    });
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+        }
+      )
+      .then((response) => {
+        console.log(response);
+        console.log("Response --", response.data.content);
+        return response.data;
+      })
+      .catch((error) => {
+        return "Something went wrong...";
+      });
+  }
 };
 
 //////////////////export products /////////////////////////
@@ -496,5 +585,8 @@ export {
   getExCategoryDataByFilter,
   updateExportProduct,
   getProductionsByProductId,
-  getLatestProductionByProductId
+  getLatestProductionByProductId,
+  getExportProductionDataByPaging,
+  getProductionById,
+  getProductionsForSales,
 };

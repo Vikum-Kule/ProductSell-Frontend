@@ -1,9 +1,6 @@
 const Ex_ProductionValidation = (values, rows) => {
   let errors = {};
 
-  // if(!values.fullname){
-  //     errors.fullname = "Name is required."
-  // }
   if (values._productionItems.length === 0) {
     errors._productionItems = "Please Select atleast one item";
   }

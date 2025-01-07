@@ -1,4 +1,13 @@
-import { Button, Grid, Modal, Pagination, Paper, Stack } from "@mui/material";
+import {
+  Button,
+  Grid,
+  Modal,
+  Pagination,
+  Paper,
+  Stack,
+  Chip,
+  Typography,
+} from "@mui/material";
 import React, { useState, useEffect } from "react";
 import InputField from "../FormComponents/InputField";
 import SelectingTable from "../FormComponents/SelectingTable";
@@ -9,9 +18,7 @@ const style = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  // height: 400,
   bgcolor: "background.paper",
-  // border: '2px solid #000',
   boxShadow: 24,
   p: 4,
 };
@@ -24,14 +31,11 @@ export default function ItemSelectingPopup({
   selectedItems,
   rows,
   setRows,
+  isOneChoise,
 }) {
   const [page, setPage] = React.useState(0);
   const [totalPages, setTotalPages] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-
-  /// filter area /////////////////////////////////
-
-  // filter values
   const [filter, setFilter] = useState({
     _productCode: "",
     _itemName: "",
@@ -40,7 +44,9 @@ export default function ItemSelectingPopup({
     _unitType: "",
   });
 
-  //to handle changing filters
+  const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+
   const handleFilterChange = (name, val) => {
     setFilter({
       ...filter,
@@ -48,7 +54,6 @@ export default function ItemSelectingPopup({
     });
   };
 
-  //reset filters
   const resetFilters = () => {
     setFilter({
       _productCode: "",
@@ -59,50 +64,51 @@ export default function ItemSelectingPopup({
     });
   };
 
-  /////////////////////////////////////////////////
-
   const handleChangepage = async (event, value) => {
     setPage(value - 1);
   };
 
-  useEffect(async () => {
-    await fetchData();
+  useEffect(() => {
+    fetchData();
   }, [page, filter]);
 
   const fetchData = async () => {
     setOpenTable(true);
-    //get import items data when page loading...
     let result = await getImportData(page, 10, filter);
-
     let importSet = result.content;
-
-    //set total rows and pages
     setTotalPages(result.totalPages);
 
-    const newSet = [];
-
-    for (let x = 0; x < importSet?.length; x++) {
-      //set data in new set list to display in the table
-      newSet.push(
-        createData(
-          importSet[x].itemName,
-          importSet[x].brand,
-          importSet[x].qty,
-          importSet[x].importId
-        )
-      );
-    }
-    // console.log("ImportSet",newSet);
-    // set rows to table
+    const newSet = importSet.map((item) =>
+      createData(
+        item.product_code,
+        item.itemName,
+        item.im_categories, // Pass the array of categories directly
+        item.brand,
+        item.qty,
+        item.importId
+      )
+    );
     setRows(newSet);
   };
 
   const columns = [
     {
+      id: "itemCode",
+      numeric: false,
+      disablePadding: true,
+      label: "Item Code",
+    },
+    {
       id: "item",
       numeric: false,
       disablePadding: true,
       label: "Item",
+    },
+    {
+      id: "categorySummary",
+      numeric: false,
+      disablePadding: true,
+      label: "Category",
     },
     {
       id: "brand",
@@ -118,9 +124,32 @@ export default function ItemSelectingPopup({
     },
   ];
 
-  function createData(item, brand, qty, im_id) {
-    return { item, brand, qty, im_id };
-  }
+  const createData = (itemCode, item, categories, brand, qty, im_id) => {
+    const categorySummary = (
+      <Grid container spacing={1}>
+        {categories.map((cat, index) => (
+          <Grid item key={index}>
+            <Chip
+              size="small" // Reduces the chip size
+              style={{ padding: "2px 4px", height: "20px" }} // Custom chip size
+              label={
+                <Typography>
+                  <span style={{ fontSize: "0.8rem", fontWeight: "500" }}>
+                    {Object.entries(cat)
+                      .filter(([key]) => key !== "cat_id") // Exclude `cat_id`
+                      .map(([, value]) => value) // Extract only the values
+                      .filter(Boolean) // Remove null or undefined values
+                      .join(" : ")}{" "}
+                  </span>
+                </Typography>
+              }
+            />
+          </Grid>
+        ))}
+      </Grid>
+    );
+    return { itemCode, item, categorySummary, categories, brand, qty, im_id };
+  };
 
   return (
     <Grid item xs={12} sm={9} sx={12} sx={{ mt: 2 }}>
@@ -214,6 +243,7 @@ export default function ItemSelectingPopup({
             </Grid>
             <Grid item xs={12} sm={12} sx={12}>
               <SelectingTable
+                isOneChoise={isOneChoise}
                 page={page}
                 setPage={setPage}
                 rowsPerPage={rowsPerPage}

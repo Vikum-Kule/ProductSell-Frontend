@@ -227,6 +227,7 @@ export default function Ex_ProductSelectingPopup({
             </Grid>
             <Grid item xs={12} sm={12} sx={12}>
               <SelectingTable
+                isOneChoise={true}
                 page={page}
                 setPage={setPage}
                 rowsPerPage={rowsPerPage}

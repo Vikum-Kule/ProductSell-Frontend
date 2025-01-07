@@ -70,8 +70,8 @@ function Ex_ItemView({ history }) {
   //columns for table
   const columns = [
     { id: "date", label: "Date", minWidth: 80 },
-    { id: "productionQty", label: "Item", minWidth: 100 },
-    { id: "totalCost", label: "Brand", minWidth: 100 },
+    { id: "productionQty", label: "Production Qty", minWidth: 100 },
+    { id: "totalCost", label: "Total Cost", minWidth: 100 },
     {
       id: "totalItemCost",
       label: "Material Cost",

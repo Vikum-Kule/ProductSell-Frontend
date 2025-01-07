@@ -7,15 +7,16 @@ import {
   Typography,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import TableItem from "../../components/TableItem";
+import TableItem from "../../../components/TableItem";
 import React, { useEffect, useState } from "react";
-import { getImportData, DiactivateItemById } from "../../services/Import";
+import { getImportData, DiactivateItemById } from "../../../services/Import";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useHistory } from "react-router";
 import Box from "@mui/material/Box";
-import InputField from "../../FormComponents/InputField";
-import Alart from "../../components/Alart";
-import { getSaleProductData } from "../../services/Sales";
+import InputField from "../../../FormComponents/InputField";
+import Alart from "../../../components/Alart";
+import { getSaleProductData } from "../../../services/Sales";
+import SaleProductForm from "./SaleProductForm";
 
 const useStyles = makeStyles({
   container: {
@@ -148,7 +149,9 @@ function SaleProducts() {
             saleProductList[x].product.name,
             saleProductList[x].billNumber,
             saleProductList[x].sellingQty,
-            saleProductList[x].paidStatus
+            saleProductList[x].paidStatus,
+            saleProductList[x].saleId,
+            saleProductList[x].product.product_id
           )
         );
       }
@@ -162,10 +165,11 @@ function SaleProducts() {
   const handleAction = async (event, id) => {
     switch (event) {
       case "view":
-        history.push("/template/im_item_view/" + id);
+        console.log("View Id:", id)
+        history.push("/template/sale_product_view/" + id);
         break;
       case "edit":
-        history.push("/template/im_item_edit/" + id);
+        history.push("/template/sale_product_edit/" + id);
         break;
       case "disable":
         disableProduct(id);
@@ -214,13 +218,14 @@ function SaleProducts() {
       />
       <Paper className={classes.container} elevation={8}>
         {/* import list or import from */}
-        {openForm ? // <ImportFrom setOpenForm={setOpenForm} />
-        null : (
+        {openForm ? (
+          <SaleProductForm setOpenForm={setOpenForm} />
+        ) : (
           <Grid container spacing={5}>
             <Grid item xs={12} sm={10} sx={12}>
               <Typography mt={1} variant="h6">
                 {" "}
-                Import Inventory{" "}
+                Sale Items{" "}
               </Typography>
             </Grid>
             <Grid item xs={12} sm={2} sx={12}>
@@ -230,7 +235,7 @@ function SaleProducts() {
                   setOpenForm(true);
                 }}
               >
-                Add Import
+                Add Sale
               </Button>
             </Grid>
             <Grid item xs={12} sm={12} sx={12}>

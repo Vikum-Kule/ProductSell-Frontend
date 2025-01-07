@@ -1,0 +1,538 @@
+import {
+  Button,
+  Grid,
+  IconButton,
+  Tooltip,
+  Typography,
+  Paper,
+  Chip,
+} from "@mui/material";
+import React, { useState, useEffect } from "react";
+import CloseIcon from "@mui/icons-material/Close";
+import Validation from "../../../Validation/SaleProductValidation";
+import { makeStyles } from "@mui/styles";
+import Ex_ProductSelectingPopup from "../../../components/Ex_ProductSelectingPopup";
+import {
+  getExportProductById,
+  getProductionsForSales,
+} from "../../../services/Export";
+import InputField from "../../../FormComponents/InputField";
+import { addSaleProduct } from "../../../services/Sales";
+import ProductionWritableTable from "../../../components/ProductionWritableTable";
+
+const useStyles = makeStyles({
+  categoryContainer: {
+    padding: "10px",
+  },
+  categoryTag: {
+    marginRight: "10px",
+  },
+});
+
+function SaleProductForm({ setOpenForm }) {
+  const classes = useStyles();
+
+  const [value, setValue] = useState({
+    _product: null,
+    _customer: "",
+    _paidStatus: "",
+    _sellingQty: 0.0,
+    _sellingPricePerUnit: 0.0,
+    _costPerProduct: 0.0,
+    _billNumber: "",
+    _note: "",
+  });
+
+  const resetValues = () => {
+    setValue({
+      _product: null,
+      _customer: "",
+      _paidStatus: "",
+      _sellingQty: 0.0,
+      _sellingPricePerUnit: 0.0,
+      _costPerProduct: 0.0,
+      _billNumber: "",
+      _note: "",
+    });
+    setSelectedProduct([]);
+    setSelectedProductData(null);
+  };
+
+  const [openProductTable, setOpenProductTable] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState([]);
+  const [selectedProductData, setSelectedProductData] = useState(null);
+  const [rows, setRows] = React.useState([]);
+
+  //just hard coded...
+  const [writeable_page, set_writeable_Page] = React.useState(0);
+  const [writeable_rowsPerPage, set_writeable_RowsPerPage] =
+    React.useState(100);
+
+  useEffect(async () => {
+    setError({
+      ...error,
+      _product: "",
+    })
+    await loadProductionData();
+  }, [selectedProduct, value._sellingQty]);
+
+  const handleOpenProductTable = async () => {
+    setOpenProductTable(true);
+  };
+
+  const handleCloseProductTable = async () => {
+    if (selectedProduct.length !== 0) {
+      const productDataResponse = await getExportProductById(
+        selectedProduct[0]
+      );
+      setSelectedProductData(productDataResponse);
+      setOpenProductTable(false);
+      handleChange("_product", productDataResponse);
+    } else {
+      setOpenProductTable(false);
+    }
+  };
+
+  const loadProductionData = async () => {
+    if (selectedProduct.length > 0 && value._sellingQty > 0) {
+      let productionSet = await getProductionsForSales(
+        selectedProduct[0],
+        value._sellingQty
+      );
+      const selectedArray = [];
+      console.log("production set", productionSet);
+      if (productionSet.length === 0) {
+        setRows([]);
+        setError({
+          ...error,
+          _product: "No sufficient productions found for this product",
+        })
+        return;
+        
+      }
+      let requiredQty = value._sellingQty;
+      for (let x = 0; x < productionSet.length; x++) {
+        let availableQty =
+          parseInt(productionSet[x].productionQty) -
+          parseInt(productionSet[x].soldQuantity);
+        
+        let sellingQty = 0
+        if (requiredQty > availableQty) {
+          sellingQty = availableQty;
+          requiredQty -= availableQty; 
+        } else {
+          sellingQty = requiredQty;
+        }
+            
+        selectedArray.push(
+          createDataForProductionTable(
+            productionSet[x].productionDate,
+            productionSet[x].productionId.toString(),
+            availableQty,
+            productionSet[x].totalItemCost,
+            productionSet[x].labourCost,
+            productionSet[x].electricityCost,
+            productionSet[x].transportCost,
+            productionSet[x].otherCost,
+            productionSet[x].totalCost,
+            sellingQty,
+            productionSet[x].productionId
+          )
+        );
+      }
+
+      setRows(selectedArray);
+    }else{
+      setRows([]);
+    }
+  };
+
+  const [error, setError] = useState({
+    _product: "",
+    _customer: "",
+    _paidStatus: "",
+    _sellingQty: "",
+  });
+
+  const [displayAlert, setAlert] = useState(false);
+
+  const [alertData, setAlertData] = useState({
+    type: "",
+    message: "",
+  });
+
+  const closeAlert = () => {
+    setAlert(false);
+    setAlertData({
+      type: "",
+      message: "",
+    });
+  };
+
+  const resetErrors = () => {
+    setError({});
+  };
+
+  const submitValue = async () => {
+    setError(Validation(value));
+    console.log("Selected Data: ", rows);
+    if (
+      !error._product &&
+      !error._customer &&
+      !error._paidStatus &&
+      !error._sellingQty
+    ) {
+
+      let productionList = rows.map((row) => ({
+        usingQty: row.saleQty,
+        productionId: row.productionId, // Assuming the rows array contains productionQty property
+      }));
+
+      let data = { ...value };
+      let submitSaleProduct = await addSaleProduct(data, productionList);
+      if (submitSaleProduct) {
+        resetValues();
+        setAlertData({
+          type: "success",
+          message: "Item submitted..",
+        });
+        setAlert(true);
+      } else {
+        setAlertData({
+          type: "error",
+          message: "Something went wrong...",
+        });
+        setAlert(true);
+      }
+    }
+  };
+
+  const handleChange = (name, val) => {
+    setValue({
+      ...value,
+      [name]: val,
+    });
+    // if (name === "_sellingQty" && val > 0) {
+    //   loadProductionData();
+    // }
+  };
+
+  //columns for selected table
+  const productionColumns = [
+    { id: "date", label: "Production Date", minWidth: 100, editable: false },
+    {
+      id: "batchNumber",
+      label: "ProductionBatch",
+      minWidth: 100,
+      editable: false,
+    },
+    {
+      id: "availableQty",
+      label: "Available Qty",
+      minWidth: 100,
+      editable: false,
+      type: "number",
+      isDecimal: false,
+    },
+    {
+      id: "itemCost",
+      label: "Item Cost",
+      minWidth: 100,
+      editable: false,
+      type: "number",
+      isDecimal: false,
+    },
+    {
+      id: "labourCost",
+      label: "Labour Cost",
+      minWidth: 100,
+      editable: false,
+      type: "number",
+      isDecimal: false,
+    },
+    {
+      id: "electricityCost",
+      label: "Electricity Cost",
+      minWidth: 100,
+      editable: false,
+      type: "number",
+      isDecimal: false,
+    },
+    {
+      id: "transportCost",
+      label: "Transport Cost",
+      minWidth: 100,
+      editable: false,
+      type: "number",
+      isDecimal: false,
+    },
+    {
+      id: "otherCost",
+      label: "Other Cost",
+      minWidth: 100,
+      editable: false,
+      type: "number",
+      isDecimal: false,
+    },
+    {
+      id: "totalCost",
+      label: "Total Cost",
+      minWidth: 100,
+      editable: false,
+      type: "number",
+      isDecimal: false,
+    },
+    {
+      id: "saleQty",
+      label: "Selling Qty",
+      minWidth: 100,
+      editable: true,
+      type: "number",
+      isDecimal: true,
+    },
+  ];
+
+  function createDataForProductionTable(
+    date,
+    batchNumber,
+    availableQty,
+    itemCost,
+    labourCost,
+    electricityCost,
+    transportCost,
+    otherCost,
+    totalCost,
+    saleQty,
+    productionId
+  ) {
+    return {
+      date,
+      batchNumber,
+      availableQty,
+      itemCost,
+      labourCost,
+      electricityCost,
+      transportCost,
+      otherCost,
+      totalCost,
+      saleQty,
+      productionId,
+    };
+  }
+
+  return (
+    <Grid container spacing={2}>
+      <Grid item xs={12} sm={11} sx={12}>
+        <Typography mt={1} variant="h6">
+          Add Sale Item
+        </Typography>
+      </Grid>
+      <Grid item xs={12} sm={1} sx={12}>
+        <Tooltip title="Close">
+          <IconButton
+            onClick={() => {
+              setOpenForm(false);
+            }}
+            aria-label="close"
+            size="small"
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      </Grid>
+      {selectedProductData ? (
+        <>
+          <Grid item xs={12} sm={3} sx={12}>
+            <InputField
+              isdisabled={true}
+              name="_productName"
+              value={selectedProductData.name}
+              type="text"
+              label="Product"
+            />
+          </Grid>
+          <Grid item xs={12} sm={3} sx={12}>
+            <InputField
+              isdisabled={true}
+              name="_barcode"
+              value={selectedProductData.barcode}
+              type="text"
+              label="Barcode"
+            />
+          </Grid>
+          <Grid item xs={12} sm={3} sx={12}>
+            <InputField
+              isdisabled={true}
+              name="_existingQty"
+              value={selectedProductData.existingQty}
+              type="text"
+              label="Quantity Exist"
+            />
+          </Grid>
+          <Grid item xs={12} sm={3} sx={12}>
+            <InputField
+              isdisabled={true}
+              name="_currentPrice"
+              value={selectedProductData.currentPrice}
+              type="text"
+              label="Current Price"
+            />
+          </Grid>
+          <Grid item xs={12} sm={12} sx={12}>
+            <Paper className={classes.categoryContainer}>
+              <Typography>Category</Typography>
+              <Grid container spacing={1}>
+                {selectedProductData.ex_categories.map((category) => (
+                  <Grid item sx={2} key={category.id}>
+                    <Chip label={category.category} variant="outlined" pt />
+                  </Grid>
+                ))}
+              </Grid>
+            </Paper>
+          </Grid>
+        </>
+      ) : error._product !== "" ? (
+        <Grid container>
+          <Typography
+            align="left"
+            variant="caption"
+            style={{
+              color: "red",
+              fontSize: 16,
+              fontWeight: "bold",
+              paddingLeft: 40,
+            }}
+          >
+            {error._product}
+          </Typography>
+        </Grid>
+      ) : null}
+
+      <Grid item xs={12} sm={12} sx={12}>
+        {/* selected table */}
+        {rows.length != 0 ? (
+          <ProductionWritableTable
+            columns={productionColumns}
+            rows={rows}
+            setRows={setRows}
+            page={writeable_page}
+            setPage={set_writeable_Page}
+            rowsPerPage={writeable_rowsPerPage}
+            tablePagin={false}
+            setRowsPerPage={set_writeable_RowsPerPage}
+          />
+        ) : error._product ===
+          "No sufficient productions found for this product" ? (
+          <Grid container>
+            <Typography
+              align="left"
+              variant="caption"
+              style={{
+                color: "red",
+                fontSize: 16,
+                fontWeight: "bold",
+                paddingLeft: 40,
+              }}
+            >
+              {error._product}
+            </Typography>
+          </Grid>
+        ) : null}
+      </Grid>
+      <Grid item xs={12} sm={4} sx={12}>
+        <Grid container direction="column" spacing={2}>
+          <Grid item xs={12} sm={4} sx={12}>
+            <Button onClick={handleOpenProductTable} variant="outlined">
+              Select Product
+            </Button>
+          </Grid>
+          <Grid item>
+            <InputField
+              name="_sellingQty"
+              errorMsg={error._sellingQty}
+              value={value._sellingQty}
+              onChange={(event, newInputValue) =>
+                handleChange(event, newInputValue)
+              }
+              type="number"
+              label="Selling Qty"
+            />
+          </Grid>
+          <Grid item>
+            <InputField
+              name="_sellingPricePerUnit"
+              value={value._sellingPricePerUnit}
+              onChange={(event, newInputValue) =>
+                handleChange(event, newInputValue)
+              }
+              type="number"
+              label="Unit Price"
+            />
+          </Grid>
+          <Grid item>
+            <InputField
+              name="_customer"
+              errorMsg={error._customer}
+              value={value._customer}
+              onChange={(event, newInputValue) =>
+                handleChange(event, newInputValue)
+              }
+              type="text"
+              label="Customer"
+            />
+          </Grid>
+          <Grid item>
+            <InputField
+              name="_paidStatus"
+              errorMsg={error._paidStatus}
+              value={value._paidStatus}
+              onChange={(event, newInputValue) =>
+                handleChange(event, newInputValue)
+              }
+              type="text"
+              label="Paid Status"
+            />
+          </Grid>
+          <Grid item>
+            <InputField
+              name="_billNumber"
+              value={value._billNumber}
+              onChange={(event, newInputValue) =>
+                handleChange(event, newInputValue)
+              }
+              type="text"
+              label="Bill Number"
+            />
+          </Grid>
+        </Grid>
+      </Grid>
+      <Grid item xs={12} sm={12} sx={12}>
+        <Grid container justifyContent="space-between">
+          <Grid item xs={12} sm={4} sx={12}>
+            <Button fullWidth variant="contained" onClick={submitValue}>
+              Submit
+            </Button>
+          </Grid>
+          <Grid item xs={12} sm={1} sx={12}>
+            <Button onClick={resetValues} variant="outlined">
+              Reset
+            </Button>
+          </Grid>
+        </Grid>
+      </Grid>
+      <Grid>
+        {openProductTable ? (
+          <Ex_ProductSelectingPopup
+            setOpenProductTable={setOpenProductTable}
+            openProductTable={openProductTable}
+            handleCloseProductTable={handleCloseProductTable}
+            setSelectedProduct={setSelectedProduct}
+            selectedProduct={selectedProduct}
+          />
+        ) : null}
+      </Grid>
+    </Grid>
+  );
+}
+
+export default SaleProductForm;

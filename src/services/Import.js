@@ -516,7 +516,7 @@ const addImportBill = async (billBody) => {
 
 ///////////////////////////////////////////////// stock update
 
-//get import data with pagination
+//get stock update data with pagination
 const getStockUpdateData = async (offset, pageSize, filter) => {
   //check access tocken expiry function
   let token_valid_result = await token_valid();
@@ -527,7 +527,7 @@ const getStockUpdateData = async (offset, pageSize, filter) => {
       .post(
         "/api/stockintake/all/" + offset + "/" + pageSize,
         {
-          ProductCode: filter._productCode ? filter._productCode.trim() : null,
+          productCode: filter._productCode ? filter._productCode.trim() : null,
           itemName: filter._itemName ? filter._itemName.trim() : null,
           brand: filter._brand ? filter._brand.trim() : null,
           addedBy: filter._addedBy ? filter._addedBy.trim() : null,
@@ -631,6 +631,51 @@ const getImportUpdateDurationByImportId = async (importId) => {
   }
 };
 
+//add export product
+const addStockIntakeItem = async (values) => {
+  //check access tocken expiry function
+  let token_valid_result = await token_valid();
+  if (token_valid_result) {
+    let token = getToken();
+
+    //get user name
+    let user = getUser();
+    console.log("User" + user.username);
+
+    return axios
+      .post(
+        "/api/stockintake/add/" + values._importitem.importId,
+        {
+          importId: values._importitem
+            ? values._importitem.importId
+            : null,
+          intake_qty: values._importQty,
+          discountPerItem: values._discount ? values._discount : 0.0,
+          pricePerItem: values._pricePerItem,
+          totalPrice: values._totalPrice,
+          addedBy: user.username,
+          note: values._note ? values._note.trim() : null,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+        }
+      )
+      .then(async (response) => {
+        console.log(response);
+        // setUserSession(response.data.token, response.data.user)
+        return true;
+      })
+      .catch((error) => {
+        // return "Something went wrong...";
+        console.log("update stock intake " + error);
+        return false;
+      });
+  }
+};
+
 // /////////////////////////////////////////////////////
 
 export {
@@ -653,5 +698,6 @@ export {
   getImportStockUpdateByImportId,
   getStockUpdateData,
   searchImportItem,
-  getImportUpdateDurationByImportId
+  getImportUpdateDurationByImportId,
+  addStockIntakeItem,
 };

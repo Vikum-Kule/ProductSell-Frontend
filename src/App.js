@@ -19,10 +19,14 @@ import Ex_Category from "./pages/Exports/ExportCategory/Ex_Categories";
 import Ex_CategoryView from "./pages/Exports/ExportCategory/Ex_CategoyView";
 import Ex_Items from "./pages/Exports/ExportItem/Ex_Items";
 import Ex_ProductEdit from "./pages/Exports/ExportItem/Ex_ItemEdit";
-import Ex_Production from "./pages/Exports/ExportItem/Ex_Production";
+import Ex_ProductionForm from "./pages/Exports/ExportItem/Ex_ProductionForm";
 import Im_BillEdit from "./pages/Imports/ImportBill/Im_BillEdit";
 import Ex_ProductView from "./pages/Exports/ExportItem/Ex_ItemView";
-import Sale_Product from "./pages/Sales/SaleProducts";
+import Sale_Product from "./pages/Sales/ProductSale/SaleProducts";
+import Sale_ProductView from "./pages/Sales/ProductSale/SaleProductView";
+import Sale_ProductEdit from "./pages/Sales/ProductSale/SaleProductEdit";
+import Ex_Production from "./pages/Exports/ExportItem/Ex_Production";
+import Ex_ProductionView from "./pages/Exports/ExportItem/Ex_ProductionView";
 
 const theme = createTheme({
   palette: {
@@ -104,13 +108,25 @@ function App() {
                   <Ex_ProductEdit />
                 </Route>
                 <Route path="/template/ex_product_production/:productId">
-                  <Ex_Production />
+                  <Ex_ProductionForm />
                 </Route>
                 <Route path="/template/ex_product_view/:productId">
                   <Ex_ProductView />
                 </Route>
                 <Route path="/template/sale_products">
                   <Sale_Product />
+                </Route>
+                <Route path="/template/sale_product_view/:saleId">
+                  <Sale_ProductView />
+                </Route>
+                <Route path="/template/sale_product_edit/:saleId">
+                  <Sale_ProductEdit />
+                </Route>
+                <Route path="/template/ex_production">
+                  <Ex_Production />
+                </Route>
+                <Route path="/template/ex_production_view/:productionId">
+                  <Ex_ProductionView />
                 </Route>
               </Switch>
             </Template>

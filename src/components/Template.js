@@ -21,7 +21,7 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import { makeStyles } from "@mui/styles";
 import { useHistory } from "react-router";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import Badge from "@mui/material/Badge";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
@@ -92,7 +92,7 @@ function Template({ children }) {
       handleClickImport();
     } else if (index === 6) {
       handleClickExport();
-    }else if (index === 9) {
+    } else if (index === 10) {
       handleClickSales();
     }
   };
@@ -384,20 +384,34 @@ function Template({ children }) {
                     style={{ color: "#000" }}
                   />
                 </ListItemButton>
+                <ListItemButton
+                  sx={{ pl: 4 }}
+                  selected={selectedIndex == 9}
+                  onClick={(event) =>
+                    handleListItemClick(event, 9, "/template/ex_production")
+                  }
+                >
+                  <ListItemIcon>{/* <StarBorder /> */}</ListItemIcon>
+                  <ListItemText
+                    className={classes.menuText}
+                    primary="Production"
+                    style={{ color: "#000" }}
+                  />
+                </ListItemButton>
               </List>
             </Collapse>
             <ListItemButton
-              selected={selectedIndex == 9 || selectedIndex == 10}
+              selected={selectedIndex == 10 || selectedIndex == 11}
               onClick={(event) =>
-                handleListItemClick(event, 9, "/template/sale_products")
+                handleListItemClick(event, 10, "/template/sale_products")
               }
               style={{
                 backgroundColor:
-                  selectedIndex == 9 || selectedIndex == 10
+                  selectedIndex == 10 || selectedIndex == 11
                     ? "#FDEBF1"
                     : "#fff",
                 color:
-                  selectedIndex == 9 || selectedIndex == 10
+                  selectedIndex == 10 || selectedIndex == 11
                     ? "#EF5D8E"
                     : "#000",
               }}
@@ -416,9 +430,9 @@ function Template({ children }) {
               <List component="div" disablePadding>
                 <ListItemButton
                   sx={{ pl: 4 }}
-                  selected={selectedIndex == 9}
+                  selected={selectedIndex == 11}
                   onClick={(event) =>
-                    handleListItemClick(event, 9, "/template/sale_products")
+                    handleListItemClick(event, 11, "/template/sale_products")
                   }
                 >
                   <ListItemIcon>{/* <StarBorder /> */}</ListItemIcon>
