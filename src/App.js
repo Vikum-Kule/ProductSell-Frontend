@@ -27,6 +27,10 @@ import Sale_ProductView from "./pages/Sales/ProductSale/SaleProductView";
 import Sale_ProductEdit from "./pages/Sales/ProductSale/SaleProductEdit";
 import Ex_Production from "./pages/Exports/ExportItem/Ex_Production";
 import Ex_ProductionView from "./pages/Exports/ExportItem/Ex_ProductionView";
+import Sale_Bills from "./pages/Sales/SaleBill/SaleBills";
+import Sale_BillView from "./pages/Sales/SaleBill/SaleBillView";
+import Sale_BillItemView from "./pages/Sales/SaleBill/SaleBillItemView"
+import Signup from "./components/Signup";
 
 const theme = createTheme({
   palette: {
@@ -55,6 +59,9 @@ function App() {
         <Switch>
           <Route exact path="/">
             <Login />
+          </Route>
+          <Route exact path="/register">
+            <Signup />
           </Route>
           <Route path="/template">
             <Template>
@@ -127,6 +134,15 @@ function App() {
                 </Route>
                 <Route path="/template/ex_production_view/:productionId">
                   <Ex_ProductionView />
+                </Route>
+                <Route path="/template/sale_bills">
+                  <Sale_Bills />
+                </Route>
+                <Route path="/template/sale_bill_view/:billId">
+                  <Sale_BillView />
+                </Route>
+                <Route path="/template/sale_bill_item_view/:productId/:billNumber">
+                  <Sale_BillItemView />
                 </Route>
               </Switch>
             </Template>

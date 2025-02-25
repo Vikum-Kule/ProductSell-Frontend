@@ -17,7 +17,6 @@ function InputField({
   onChange,
   isdisabled,
 }) {
-
   const handleChange = (event) => {
     const { value } = event.target;
     onChange(name, value);

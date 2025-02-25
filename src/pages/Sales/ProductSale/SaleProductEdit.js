@@ -302,8 +302,8 @@ function SaleProductEdit({ history }) {
           type="text"
           label="Bill Number"
         />
-          </Grid>
-          <Grid item xs={12} sm={12} sx={12}>
+      </Grid>
+      <Grid item xs={12} sm={12} sx={12}>
         {displayAlert ? (
           <FormAlert type={alertData.type} message={alertData.message} />
         ) : null}
@@ -330,6 +330,7 @@ function SaleProductEdit({ history }) {
             handleCloseProductTable={handleCloseProductTable}
             setSelectedProduct={setSelectedProduct}
             selectedProduct={selectedProduct}
+            isOneChoise={true}
           />
         ) : null}
       </Grid>

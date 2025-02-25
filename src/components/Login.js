@@ -70,100 +70,112 @@ function Login(props) {
 
     const classes = useStyles()
     return (
-        <Grid>
-            <Paper elevation={10} className={classes.paper}>
-            <Grid align="center" className={classes.header} container spacing={{ xs: 0, sm: 1, md: 1 }} >
-                <Grid item xs={12}>
-                <h2>NORTEL (PVT)LTD </h2> 
+      <Grid>
+        <Paper elevation={10} className={classes.paper}>
+          <Grid
+            align="center"
+            className={classes.header}
+            container
+            spacing={{ xs: 0, sm: 1, md: 1 }}
+          >
+            <Grid item xs={12}>
+              <h2>NORTEL (PVT)LTD </h2>
+            </Grid>
+            <Grid item xs={12}>
+              <Avatar sx={{ bgcolor: pink[500] }}>
+                <LockIcon />
+              </Avatar>
+            </Grid>
+            <Grid item xs={12}>
+              <h3 className={classes.headerTxt}>Sign in</h3>
+            </Grid>
+            <Grid item>
+              {showError ? (
+                <Grid container>
+                  <Typography
+                    align="left"
+                    variant="caption"
+                    style={{
+                      color: "red",
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      paddingLeft: 40,
+                    }}
+                  >
+                    {showError}
+                  </Typography>
                 </Grid>
-                <Grid item xs={12}>   
-                <Avatar sx={{ bgcolor: pink[500] }}>
-                    <LockIcon />
-                </Avatar>
-                </Grid>
-                <Grid item xs={12}>
-                <h3 className={classes.headerTxt}>Sign in</h3>
-                </Grid>
-                <Grid item>
-                {showError ? (
-                    <Grid container>
-                    <Typography
-                        align="left"
-                        variant="caption"
-                        style={{
-                        color: "red",
-                        fontSize: 16,
-                        fontWeight: "bold",
-                        paddingLeft: 40,
-                        }}
-                    >
-                        {showError}
-                    </Typography>
-                    </Grid>
-                ) : null}
-                </Grid>
-                <Grid item xs={12}>
-                <Stack direction={"column"} spacing={{ xs: 1, sm: 2, md: 3 }}>
-                <Grid container direction={"column"} columnSpacing={{ xs: 1, sm: 1, md: 3 }}>
-                    <Grid item>
-                        <TextField 
-                            error={errors.email}
-                            id="email"
-                            type="email" 
-                            label="Email" 
-                            variant="standard"
-                            fullWidth
-                            required
-                            name="email" 
-                            value={values.email}
-                            onChange={handleChange}
-                            className={classes.inputContainer}
-                            helperText={errors.email}
-                            onClick={resetError}
-                        />
-                    </Grid>
-                    <Grid item>    
-                        <TextField
-                            error={errors.password}
-                            id="filled-password-input"
-                            label="Password"
-                            type="password"
-                            autoComplete="current-password"
-                            variant="standard"
-                            fullWidth
-                            required
-                            name="password" 
-                            value={values.password}
-                            onChange={handleChange}
-                            className={classes.inputContainer}
-                            helperText={errors.password}
-                            onClick={resetError}
-                        />
-                    </Grid>
-                </Grid>
-                <Button 
-                className={classes.btnSignin}
-                variant="contained"
-                fullWidth
-                onClick={hanldeFormSubmit}
+              ) : null}
+            </Grid>
+            <Grid item xs={12}>
+              <Stack direction={"column"} spacing={{ xs: 1, sm: 2, md: 3 }}>
+                <Grid
+                  container
+                  direction={"column"}
+                  columnSpacing={{ xs: 1, sm: 1, md: -1 }}
                 >
-                    Sign in
+                  <Grid item>
+                    <TextField
+                      error={errors.email}
+                      id="email"
+                      type="email"
+                      label="Email"
+                      variant="standard"
+                      fullWidth
+                      required
+                      name="email"
+                      value={values.email}
+                      onChange={handleChange}
+                      className={classes.inputContainer}
+                      helperText={errors.email}
+                      onClick={resetError}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <TextField
+                      error={errors.password}
+                      id="filled-password-input"
+                      label="Password"
+                      type="password"
+                      autoComplete="current-password"
+                      variant="standard"
+                      fullWidth
+                      required
+                      name="password"
+                      value={values.password}
+                      onChange={handleChange}
+                      className={classes.inputContainer}
+                      helperText={errors.password}
+                      onClick={resetError}
+                    />
+                  </Grid>
+                </Grid>
+                <Button
+                  className={classes.btnSignin}
+                  variant="contained"
+                  fullWidth
+                  onClick={hanldeFormSubmit}
+                >
+                  Sign in
                 </Button>
-                
-            </Stack>
-            <Typography align="center" sx={{ m: 2 }} className={classes.forgotpss}>
-                <Link 
-                href="#"
-                underline="hover"
-                >
-                Forgot password?
+              </Stack>
+              <Typography
+                align="center"
+                sx={{ m: 2 }}
+                className={classes.forgotpss}
+              >
+                <Link href="#" underline="hover">
+                  Forgot password?
                 </Link>
-            </Typography>
+              </Typography>
+              <Typography align="center" sx={{ m: 2 }}>
+                Sign up? <a href="/register">Sign up</a>
+              </Typography>
             </Grid>
-            </Grid>
-            </Paper>
-        </Grid>
-    )
+          </Grid>
+        </Paper>
+      </Grid>
+    );
 }
 
 Login.propTypes = {

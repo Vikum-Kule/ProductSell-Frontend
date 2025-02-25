@@ -1,4 +1,4 @@
-import { Button, Grid, Modal, Pagination, Paper, Stack } from "@mui/material";
+import { Button, Chip, Grid, Modal, Pagination, Paper, Stack, Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import InputField from "../FormComponents/InputField";
 import SelectingTable from "../FormComponents/SelectingTable";
@@ -25,6 +25,7 @@ export default function Ex_ProductSelectingPopup({
   handleCloseProductTable,
   setSelectedProduct,
   selectedProduct,
+  isOneChoise,
 }) {
   const [page, setPage] = React.useState(0);
   const [totalPages, setTotalPages] = React.useState(0);
@@ -93,6 +94,7 @@ export default function Ex_ProductSelectingPopup({
           productList[x].product_id,
           productList[x].name,
           productList[x].barcode,
+          productList[x].ex_categories,
           productList[x].addedBy,
           productList[x].existingQty
         )
@@ -114,7 +116,13 @@ export default function Ex_ProductSelectingPopup({
       id: "_barcode",
       numeric: false,
       disablePadding: true,
-      label: "Subcategory 1",
+      label: "Barcode",
+    },
+    {
+      id: "categorySummary",
+      numeric: false,
+      disablePadding: true,
+      label: "Category",
     },
     {
       id: "_addedBy",
@@ -134,13 +142,38 @@ export default function Ex_ProductSelectingPopup({
     _productId,
     _productName,
     _barcode,
+    categories,
     _addedBy,
     _existingQty
   ) {
+    const categorySummary = (
+      <Grid container spacing={1}>
+        {categories.map((cat, index) => (
+          <Grid item key={index}>
+            <Chip
+              size="small" // Reduces the chip size
+              style={{ padding: "2px 4px", height: "20px" }} // Custom chip size
+              label={
+                <Typography>
+                  <span style={{ fontSize: "0.8rem", fontWeight: "500" }}>
+                    {Object.entries(cat)
+                      .filter(([key]) => key !== "cat_id") // Exclude `cat_id`
+                      .map(([, value]) => value) // Extract only the values
+                      .filter(Boolean) // Remove null or undefined values
+                      .join(" : ")}{" "}
+                  </span>
+                </Typography>
+              }
+            />
+          </Grid>
+        ))}
+      </Grid>
+    );
     return {
       _productId,
       _productName,
       _barcode,
+      categorySummary,
       _addedBy,
       _existingQty,
     };
@@ -227,7 +260,7 @@ export default function Ex_ProductSelectingPopup({
             </Grid>
             <Grid item xs={12} sm={12} sx={12}>
               <SelectingTable
-                isOneChoise={true}
+                isOneChoise={isOneChoise}
                 page={page}
                 setPage={setPage}
                 rowsPerPage={rowsPerPage}

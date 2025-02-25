@@ -13,6 +13,7 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import CloseIcon from "@mui/icons-material/Close";
 import SettingsIcon from "@mui/icons-material/Settings";
+import ForwardIcon from "@mui/icons-material/Forward";
 import { Grid } from "@mui/material";
 
 function TableItem({ dropDown, columns, rows, handleAction, showActions }) {
@@ -49,6 +50,8 @@ function TableItem({ dropDown, columns, rows, handleAction, showActions }) {
                       {columns.map((column) => {
                         if (column.id === "action") {
                           const value = row[column.id];
+                          console.log("row value", row);
+                          console.log("value", value);
                           return (
                             <Grid container spacing={1} sx={{ pt: 1.5 }}>
                               {showActions.includes("view") ? (
@@ -126,6 +129,19 @@ function TableItem({ dropDown, columns, rows, handleAction, showActions }) {
                                     }}
                                   >
                                     <SettingsIcon fontSize="inherit" />
+                                  </IconButton>
+                                </Grid>
+                              ) : null}
+                              {showActions.includes("saleProduct") ? (
+                                <Grid item>
+                                  <IconButton
+                                    aria-label="ForwardIcon"
+                                    size="small"
+                                    onClick={() => {
+                                      handleAction("saleProduct", row);
+                                    }}
+                                  >
+                                    <ForwardIcon fontSize="inherit" />
                                   </IconButton>
                                 </Grid>
                               ) : null}

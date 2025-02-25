@@ -1,28 +1,34 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { useParams } from "react-router-dom";
-import { Chip, Grid, Paper, Typography } from "@mui/material";
+import { Chip, Grid, IconButton, Paper, Tooltip, Typography } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import { getSaleProductById } from "../../../services/Sales";
+import {
+  getSaleProductbyBillId,
+  getSaleProductById,
+} from "../../../services/Sales";
 import TableItem from "../../../components/TableItem";
 import ProfitCard from "../../../components/ProfitCard";
+import { useHistory } from "react-router";
+import CloseIcon from "@mui/icons-material/Close";
 
 const useStyles = makeStyles({
   container: {
     padding: "10px",
   },
 });
-function SaleProductView({ history }) {
+function SaleBillItemView({ }) {
   const classes = useStyles();
-  const { saleId } = useParams();
+  const history = useHistory();
+  const { billNumber, productId } = useParams();
   const [sale, setSale] = React.useState([]);
   const [totalPages, setTotalPages] = React.useState(0);
   const [rows, setRows] = React.useState([]);
   const [page, setPage] = React.useState(0);
 
   const fetchData = async () => {
-    let result = await getSaleProductById(saleId);
-    // console.log(result);
+    let result = await getSaleProductbyBillId(billNumber, productId);
+    console.log(result);
     const batches = [];
     if (result) {
       console.log(result);
@@ -121,6 +127,18 @@ function SaleProductView({ history }) {
     <Paper className={classes.container} elevation={8}>
       {sale.saleId ? (
         <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <Tooltip title="Close">
+              <IconButton
+                onClick={() => {
+                  history.goBack();
+                }}
+                aria-label="close"
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Grid>
           <Grid item xs={12}>
             <Typography variant="h6">Sale Product View</Typography>
           </Grid>
@@ -243,8 +261,9 @@ function SaleProductView({ history }) {
   );
 }
 
-SaleProductView.propTypes = {
-  saleId: PropTypes.any,
+SaleBillItemView.propTypes = {
+  billNumber: PropTypes.any,
+  productId: PropTypes.any,
 };
 
-export default SaleProductView;
+export default SaleBillItemView;

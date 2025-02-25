@@ -401,17 +401,25 @@ function Template({ children }) {
               </List>
             </Collapse>
             <ListItemButton
-              selected={selectedIndex == 10 || selectedIndex == 11}
+              selected={
+                selectedIndex == 10 ||
+                selectedIndex == 11 ||
+                selectedIndex == 12
+              }
               onClick={(event) =>
                 handleListItemClick(event, 10, "/template/sale_products")
               }
               style={{
                 backgroundColor:
-                  selectedIndex == 10 || selectedIndex == 11
+                  selectedIndex == 10 ||
+                  selectedIndex == 11 ||
+                  selectedIndex == 12
                     ? "#FDEBF1"
                     : "#fff",
                 color:
-                  selectedIndex == 10 || selectedIndex == 11
+                  selectedIndex == 10 ||
+                  selectedIndex == 11 ||
+                  selectedIndex == 12
                     ? "#EF5D8E"
                     : "#000",
               }}
@@ -439,6 +447,20 @@ function Template({ children }) {
                   <ListItemText
                     className={classes.menuText}
                     primary="Sale Products"
+                    style={{ color: "#000" }}
+                  />
+                </ListItemButton>
+                <ListItemButton
+                  sx={{ pl: 4 }}
+                  selected={selectedIndex == 12}
+                  onClick={(event) =>
+                    handleListItemClick(event, 12, "/template/sale_bills")
+                  }
+                >
+                  <ListItemIcon>{/* <StarBorder /> */}</ListItemIcon>
+                  <ListItemText
+                    className={classes.menuText}
+                    primary="Sale Bills"
                     style={{ color: "#000" }}
                   />
                 </ListItemButton>

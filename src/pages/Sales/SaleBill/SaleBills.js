@@ -15,8 +15,14 @@ import { useHistory } from "react-router";
 import Box from "@mui/material/Box";
 import InputField from "../../../FormComponents/InputField";
 import Alart from "../../../components/Alart";
-import { getSaleProductData } from "../../../services/Sales";
-import SaleProductForm from "./SaleProductForm";
+import {
+  deleteSaleBillById,
+  getSaleBillData,
+  getSaleProductData,
+} from "../../../services/Sales";
+import SaleAddBill from "./SaleAddBill";
+import ConfirmationPopup from "../../../components/ConfirmationPopup";
+import FormAlert from "../../../components/FormAlert";
 
 const useStyles = makeStyles({
   container: {
@@ -28,7 +34,7 @@ const useStyles = makeStyles({
 });
 
 // Sale products all functionalties..
-function SaleProducts() {
+function SaleBills() {
   const classes = useStyles();
   const history = useHistory();
 
@@ -84,46 +90,96 @@ function SaleProducts() {
   //columns for table
   const columns = [
     { id: "date", label: "Date", minWidth: 80 },
-    { id: "barcode", label: "Barcode", minWidth: 80 },
-    { id: "product", label: "Product", minWidth: 100 },
     { id: "billNumber", label: "Bill Number", minWidth: 100 },
+    { id: "customer", label: "Customer", minWidth: 80 },
+    { id: "paidStatus", label: "Paid Status", minWidth: 100 },
     {
-      id: "sllingQty",
-      label: "Selling Qty",
+      id: "totalProfit",
+      label: "Total Profit",
       minWidth: 100,
       format: (value) => value.toLocaleString("en-US"),
     },
-    { id: "paidStatus", label: "Paid Status", minWidth: 100 },
+    {
+      id: "totalAmount",
+      label: "Total Amount",
+      minWidth: 100,
+      format: (value) => value.toLocaleString("en-US"),
+    },
     { id: "action", label: "Actions", minWidth: 100 },
   ];
 
   function createData(
     date,
-    barcode,
-    product,
     billNumber,
-    sllingQty,
+    customer,
     paidStatus,
+    totalProfit,
+    totalAmount,
     action,
-    sellingId,
-    productId
+    billId
   ) {
     return {
       date,
-      barcode,
-      product,
       billNumber,
-      sllingQty,
+      customer,
       paidStatus,
+      totalProfit,
+      totalAmount,
       action,
-      sellingId,
-      productId,
+      billId,
     };
   }
 
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [openForm, setOpenForm] = React.useState(false);
+  const [openPopup, setOpenPopup] = React.useState(false);
+  const [isMatched, setIsMatched] = React.useState(false);
+  const [matchingText, setMachingText] = React.useState("");
+  const [confirmationText, setConfirmationText] = React.useState("");
+  const [deletingRow, setDeletingRow] = React.useState("");
+
+  const [displayAlert, setAlert] = useState(false);
+  const [alertData, setAlertData] = useState({
+    type: "",
+    message: "",
+  });
+
+  const closeAlert = () => {
+    setAlert(false);
+    setAlertData({
+      type: "",
+      message: "",
+    });
+  };
+
+  useEffect(async () => {
+    console.log("Updated isMatched value:", isMatched);
+    console.log("Popup Status :", openPopup);
+    console.log("Row Data for delete: ", deletingRow);
+    if (isMatched && !openPopup && deletingRow != null) {
+      setLoading(true);
+      let deleteResponse = await deleteSaleBillById(deletingRow.action);
+      if (deleteResponse) {
+        fetchData();
+        setLoading(false);
+      } else {
+        setAlertData({
+          type: "error",
+          message:
+            "Faild to delete  " +
+            deletingRow.billNumber +
+            " Bill. Something went wrong",
+        });
+        setAlert(true);
+        setLoading(false);
+      }
+    }
+  }, [isMatched, openPopup]);
+
+  const handleOpenPopup = () => {
+    setOpenPopup(!openPopup);
+  };
 
   const handleChange = async (event, value) => {
     setPage(value - 1);
@@ -135,27 +191,27 @@ function SaleProducts() {
     setLoading(true);
     //get import items data when page loading...
     console.log(page);
-    let result = await getSaleProductData(pageNo, rowsPerPage, productFilter);
-    let saleProductList = result.content;
+    let result = await getSaleBillData(pageNo, rowsPerPage, productFilter);
+    let saleBillList = result.content;
 
     //set total rows and pages
     setTotalPages(result.totalPages);
     setTotalRows(result.totalElements);
 
     const newSet = [];
-    if (saleProductList) {
-      for (let x = 0; x < saleProductList.length; x++) {
+    if (saleBillList) {
+      for (let x = 0; x < saleBillList.length; x++) {
         //set data in new set list to display in the table
+        console.log("Customer :", saleBillList[x].customer);
         newSet.push(
           createData(
-            saleProductList[x].saleDate,
-            saleProductList[x].product.barcode,
-            saleProductList[x].product.name,
-            saleProductList[x].billNumber,
-            saleProductList[x].sellingQty,
-            saleProductList[x].paidStatus,
-            saleProductList[x].saleId,
-            saleProductList[x].product.product_id
+            saleBillList[x].sellingDate,
+            saleBillList[x].billNumber,
+            saleBillList[x].customer,
+            saleBillList[x].paidStatus,
+            saleBillList[x].totalProfit,
+            saleBillList[x].totalPrice,
+            saleBillList[x].billId
           )
         );
       }
@@ -169,14 +225,28 @@ function SaleProducts() {
   const handleAction = async (event, id) => {
     switch (event) {
       case "view":
-        console.log("View Id:", id)
-        history.push("/template/sale_product_view/" + id);
+        console.log("View Id:", id);
+        history.push("/template/sale_bill_view/" + id);
         break;
       case "edit":
         history.push("/template/sale_product_edit/" + id);
         break;
       case "disable":
-        disableProduct(id);
+        setIsMatched(false);
+        console.log("Delete val: ", id);
+        let filterData = rows.find((row) => row.action === id);
+        console.log("Filtered Row: ", filterData);
+        setDeletingRow(filterData);
+        let topicText =
+          "Please Confirm Bill Number To Delete " + filterData.billNumber;
+        setConfirmationText(topicText);
+        setMachingText(filterData.billNumber);
+        handleOpenPopup();
+        console.log("Test Is match: " + isMatched);
+        // if (isMatched) {
+        //   deleteSaleBillById(id)
+        // }
+        // disableProduct(id);
         break;
       default:
         return "foo";
@@ -185,9 +255,9 @@ function SaleProducts() {
 
   // filter values
   const [filter, setFilter] = useState({
-    _barcode: "",
-    _productName: "",
     _billNumber: "",
+    _productName: "",
+    _barcode: "",
     _addedBy: "",
     _customer: "",
     _paidStatus: "",
@@ -196,9 +266,9 @@ function SaleProducts() {
   //reset filters
   const resetFilters = () => {
     setFilter({
-      _barcode: "",
-      _productName: "",
       _billNumber: "",
+      _productName: "",
+      _barcode: "",
       _addedBy: "",
       _customer: "",
       _paidStatus: "",
@@ -215,21 +285,16 @@ function SaleProducts() {
 
   return (
     <>
-      <Alart
-        open={openDisableWarning}
-        message={msgDisableWarning}
-        actions={<DisableWarningActionButtons />}
-      />
       <Paper className={classes.container} elevation={8}>
         {/* import list or import from */}
         {openForm ? (
-          <SaleProductForm setOpenForm={setOpenForm} />
+          <SaleAddBill setOpenForm={setOpenForm} />
         ) : (
           <Grid container spacing={5}>
             <Grid item xs={12} sm={10} sx={12}>
               <Typography mt={1} variant="h6">
                 {" "}
-                Sale Items{" "}
+                Sale Bills{" "}
               </Typography>
             </Grid>
             <Grid item xs={12} sm={2} sx={12}>
@@ -239,20 +304,20 @@ function SaleProducts() {
                   setOpenForm(true);
                 }}
               >
-                Add Sale
+                Add Bill
               </Button>
             </Grid>
             <Grid item xs={12} sm={12} sx={12}>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={2} sx={12}>
                   <InputField
-                    name="_barcode"
+                    name="_billNumber"
                     value={filter._barcode}
                     onChange={(event, newInputValue) =>
                       handleFilterChange(event, newInputValue)
                     }
                     type="text"
-                    label="Barcode"
+                    label="Bill Number"
                   />
                 </Grid>
                 <Grid item xs={12} sm={3} sx={12}>
@@ -268,13 +333,13 @@ function SaleProducts() {
                 </Grid>
                 <Grid item xs={12} sm={3} sx={12}>
                   <InputField
-                    name="_billNumber"
+                    name="_barcode"
                     value={filter._billNumber}
                     onChange={(event, newInputValue) =>
                       handleFilterChange(event, newInputValue)
                     }
                     type="text"
-                    label="Bill Number"
+                    label="Barcode"
                   />
                 </Grid>
                 <Grid item xs={12} sm={3} sx={12}>
@@ -316,6 +381,7 @@ function SaleProducts() {
                       variant="contained"
                       onClick={() => {
                         resetFilters();
+                        closeAlert();
                       }}
                     >
                       Reset
@@ -324,6 +390,7 @@ function SaleProducts() {
                       variant="contained"
                       onClick={() => {
                         fetchData(filter, page);
+                        closeAlert();
                       }}
                     >
                       Filter
@@ -331,6 +398,11 @@ function SaleProducts() {
                   </Stack>
                 </Grid>
               </Grid>
+            </Grid>
+            <Grid item xs={12} sm={12} sx={12}>
+              {displayAlert ? (
+                <FormAlert type={alertData.type} message={alertData.message} />
+              ) : null}
             </Grid>
             <Grid item xs={12} sm={12} sx={12}>
               {isLoading ? (
@@ -361,6 +433,19 @@ function SaleProducts() {
                 />
               </Stack>
             </Grid>
+            <Grid>
+              {openPopup ? (
+                <ConfirmationPopup
+                  setOpenPopup={setOpenPopup}
+                  openPopup={openPopup}
+                  handleOpenPopup={handleOpenPopup}
+                  matchingText={matchingText}
+                  message={confirmationText}
+                  isMatched={isMatched}
+                  setIsMatched={setIsMatched}
+                />
+              ) : null}
+            </Grid>
           </Grid>
         )}
       </Paper>
@@ -368,4 +453,4 @@ function SaleProducts() {
   );
 }
 
-export default SaleProducts;
+export default SaleBills;
