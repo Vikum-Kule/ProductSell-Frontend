@@ -1,7 +1,7 @@
 name: Deploy Front End to AWS S3
 on:
   push:
-    branch: 
+    branches: 
       -main
 jobs:
   deploy:
