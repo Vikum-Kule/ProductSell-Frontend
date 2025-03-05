@@ -7,17 +7,15 @@ import {
   Typography,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import TableItem from "../../../components/TableItem";
+import TableItem from "../../components/TableItem";
 import React, { useEffect, useState } from "react";
-import { getImportData, DiactivateItemById } from "../../../services/Import";
-import ImportFrom from "./ImportFrom";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useHistory } from "react-router";
 import Box from "@mui/material/Box";
-import InputField from "../../../FormComponents/InputField";
-import Alart from "../../../components/Alart";
-import Im_CategorySelectingPopup from "../../../components/Im_CategorySelectingPopup";
+import InputField from "../../FormComponents/InputField";
+import Alart from "../../components/Alart";
 import { getCustomers } from "../../services/Customer";
+// import AddCustomer from "./AddCustomer";
 
 const useStyles = makeStyles({
   container: {
@@ -50,7 +48,7 @@ function Customers() {
       <>
         <Button
           onClick={async () => {
-            await DiactivateItemById(disableItemId);
+            // await DiactivateItemById(disableItemId);
             setOpenDisableWarning(false);
             await fetchData(filter, page);
           }}
@@ -188,7 +186,8 @@ function Customers() {
       <Paper className={classes.container} elevation={8}>
         {/* import list or import from */}
         {openForm ? (
-          <ImportFrom setOpenForm={setOpenForm} />
+          <></>
+          // <AddCustomer setOpenForm={setOpenForm} />
         ) : (
           <Grid container spacing={5}>
             <Grid item xs={12} sm={10} sx={12}>

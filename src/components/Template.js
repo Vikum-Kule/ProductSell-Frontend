@@ -45,6 +45,8 @@ function Template({ children }) {
   const [openExport, setOpenExport] = React.useState(false);
   const [openImport, setOpenImport] = React.useState(false);
   const [openSales, setOpenSales] = React.useState(false);
+  const [openCustomers, setOpenCustomers] = React.useState(false);
+  const [openRatails, setOpenRetails] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [user, setUser] = React.useState("");
 
@@ -94,6 +96,10 @@ function Template({ children }) {
       handleClickExport();
     } else if (index === 10) {
       handleClickSales();
+    } else if (index === 13) {
+      handleClickCustomers();
+    } else if (index === 15){
+      handleClickRetails();
     }
   };
 
@@ -117,6 +123,22 @@ function Template({ children }) {
       setOpenImport(false);
     }
     setOpenSales(!openSales);
+  };
+
+  const handleClickCustomers = () => {
+    if (openCustomers) {
+      setOpenExport(false);
+      setOpenImport(false);
+    }
+    setOpenCustomers(!openCustomers);
+  };
+
+  const handleClickRetails = () => {
+    if (openRatails) {
+      setOpenExport(false);
+      setOpenImport(false);
+    }
+    setOpenRetails(!openRatails);
   };
 
   const text = {
@@ -468,25 +490,17 @@ function Template({ children }) {
             </Collapse>
             {/*  */}
             <ListItemButton
-              selected={
-                selectedIndex == 10 ||
-                selectedIndex == 11 ||
-                selectedIndex == 12
-              }
+              selected={selectedIndex == 13 || selectedIndex == 14}
               onClick={(event) =>
-                handleListItemClick(event, 10, "/template/sale_products")
+                handleListItemClick(event, 13, "/template/customers")
               }
               style={{
                 backgroundColor:
-                  selectedIndex == 10 ||
-                  selectedIndex == 11 ||
-                  selectedIndex == 12
+                  selectedIndex == 13 || selectedIndex == 14
                     ? "#FDEBF1"
                     : "#fff",
                 color:
-                  selectedIndex == 10 ||
-                  selectedIndex == 11 ||
-                  selectedIndex == 12
+                  selectedIndex == 13 || selectedIndex == 14
                     ? "#EF5D8E"
                     : "#000",
               }}
@@ -496,38 +510,92 @@ function Template({ children }) {
               </ListItemIcon>
               <ListItemText
                 primaryTypographyProps={{ style: text }}
-                primary="Sales"
+                primary="Customers"
                 style={{ color: "#000" }}
               />
-              {openSales ? <ExpandLess /> : <ExpandMore />}
+              {openCustomers ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
-            <Collapse in={openSales} timeout="auto" unmountOnExit>
+            <Collapse in={openCustomers} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 <ListItemButton
                   sx={{ pl: 4 }}
-                  selected={selectedIndex == 11}
+                  selected={selectedIndex == 14}
                   onClick={(event) =>
-                    handleListItemClick(event, 11, "/template/sale_products")
+                    handleListItemClick(event, 14, "/template/customers")
                   }
                 >
                   <ListItemIcon>{/* <StarBorder /> */}</ListItemIcon>
                   <ListItemText
                     className={classes.menuText}
-                    primary="Sale Products"
+                    primary="Customers"
+                    style={{ color: "#000" }}
+                  />
+                </ListItemButton>
+              </List>
+            </Collapse>
+
+            {/* */}
+            <ListItemButton
+              selected={
+                selectedIndex == 15 ||
+                selectedIndex == 16 ||
+                selectedIndex == 17
+              }
+              onClick={(event) =>
+                handleListItemClick(event, 15, "/template/sale_products")
+              }
+              style={{
+                backgroundColor:
+                  selectedIndex == 15 ||
+                  selectedIndex == 16 ||
+                  selectedIndex == 17
+                    ? "#FDEBF1"
+                    : "#fff",
+                color:
+                  selectedIndex == 15 ||
+                  selectedIndex == 16 ||
+                  selectedIndex == 17
+                    ? "#EF5D8E"
+                    : "#000",
+              }}
+            >
+              <ListItemIcon>
+                <AttachMoneyIcon color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primaryTypographyProps={{ style: text }}
+                primary="Retail"
+                style={{ color: "#000" }}
+              />
+              {openCustomers ? <ExpandLess /> : <ExpandMore />}
+            </ListItemButton>
+            <Collapse in={openCustomers} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                <ListItemButton
+                  sx={{ pl: 4 }}
+                  selected={selectedIndex == 16}
+                  onClick={(event) =>
+                    handleListItemClick(event, 16, "/template/sale_products")
+                  }
+                >
+                  <ListItemIcon>{/* <StarBorder /> */}</ListItemIcon>
+                  <ListItemText
+                    className={classes.menuText}
+                    primary="Sales Person"
                     style={{ color: "#000" }}
                   />
                 </ListItemButton>
                 <ListItemButton
                   sx={{ pl: 4 }}
-                  selected={selectedIndex == 12}
+                  selected={selectedIndex == 17}
                   onClick={(event) =>
-                    handleListItemClick(event, 12, "/template/sale_bills")
+                    handleListItemClick(event, 17, "/template/sale_products")
                   }
                 >
                   <ListItemIcon>{/* <StarBorder /> */}</ListItemIcon>
                   <ListItemText
                     className={classes.menuText}
-                    primary="Sale Bills"
+                    primary="Retail Bill"
                     style={{ color: "#000" }}
                   />
                 </ListItemButton>

@@ -8,7 +8,7 @@ const getCustomers = async (offset, pageSize, filter) => {
     let token = getToken();
     return axios
       .post(
-        "/api/export/product/all/" + offset + "/" + pageSize,
+        "/api/customer/all/" + offset + "/" + pageSize,
         {
           name: filter._name ? filter._name.trim() : null,
           email: filter._email ? filter._product.trim() : null,
