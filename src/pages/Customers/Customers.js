@@ -17,6 +17,7 @@ import Box from "@mui/material/Box";
 import InputField from "../../../FormComponents/InputField";
 import Alart from "../../../components/Alart";
 import Im_CategorySelectingPopup from "../../../components/Im_CategorySelectingPopup";
+import { getCustomers } from "../../services/Customer";
 
 const useStyles = makeStyles({
   container: {
@@ -97,10 +98,6 @@ function Customers() {
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [openForm, setOpenForm] = React.useState(false);
 
-  // set open category table
-  const [openCatgoryTable, setOpenCatgoryTable] = useState(false);
-  const [selectedCatgory, setSelectedCatgory] = useState([]);
-  const [catgoryRows, setCatgoryRows] = useState([]);
 
   const handleChange = async (event, value) => {
     setPage(value - 1);
@@ -108,11 +105,11 @@ function Customers() {
   };
 
   //fetch data for pagination actions
-  const fetchData = async (itemFilter, pageNo) => {
+  const fetchData = async (customerFilter, pageNo) => {
     setLoading(true);
     //get import items data when page loading...
     console.log(page);
-    let result = await getImportData(pageNo, rowsPerPage, itemFilter);
+    let result = await getCustomers(pageNo, rowsPerPage, customerFilter);
     let importSet = result.content;
 
     //set total rows and pages
@@ -173,19 +170,6 @@ function Customers() {
     });
   };
 
-  // handle categories
-  const handleOpenCategoryTable = async () => {
-    setOpenCatgoryTable(true);
-  };
-
-  const handleCloseCatgoryTable = async () => {
-    setOpenCatgoryTable(false);
-    setFilter({
-      ...filter,
-      _category: selectedCatgory,
-    });
-  };
-
   //to handle changing filters
   const handleFilterChange = (name, val) => {
     setFilter({
@@ -210,7 +194,7 @@ function Customers() {
             <Grid item xs={12} sm={10} sx={12}>
               <Typography mt={1} variant="h6">
                 {" "}
-                Import Inventory{" "}
+                Customers{" "}
               </Typography>
             </Grid>
             <Grid item xs={12} sm={2} sx={12}>
@@ -220,64 +204,31 @@ function Customers() {
                   setOpenForm(true);
                 }}
               >
-                Add Import
+                Add Customer
               </Button>
             </Grid>
             <Grid item xs={12} sm={12} sx={12}>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={2} sx={12}>
                   <InputField
-                    name="_productCode"
+                    name="_name"
                     value={filter._productCode}
                     onChange={(event, newInputValue) =>
                       handleFilterChange(event, newInputValue)
                     }
                     type="text"
-                    label="Product Code"
+                    label="Customer Name"
                   />
                 </Grid>
                 <Grid item xs={12} sm={3} sx={12}>
                   <InputField
-                    name="_itemName"
+                    name="_email"
                     value={filter._itemName}
                     onChange={(event, newInputValue) =>
                       handleFilterChange(event, newInputValue)
                     }
                     type="text"
-                    label="Item Name"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={3} sx={12}>
-                  <InputField
-                    name="_brand"
-                    value={filter._brand}
-                    onChange={(event, newInputValue) =>
-                      handleFilterChange(event, newInputValue)
-                    }
-                    type="text"
-                    label="Brand"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={3} sx={12}>
-                  <InputField
-                    name="_unitType"
-                    value={filter._unitType}
-                    onChange={(event, newInputValue) =>
-                      handleFilterChange(event, newInputValue)
-                    }
-                    type="text"
-                    label="Unit Type"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={4} sx={12}>
-                  <InputField
-                    name="_addedBy"
-                    value={filter._addedBy}
-                    onChange={(event, newInputValue) =>
-                      handleFilterChange(event, newInputValue)
-                    }
-                    type="text"
-                    label="Added By"
+                    label="Email"
                   />
                 </Grid>
                 <Grid item xs={12} sm={2} sx={12}>
@@ -290,11 +241,6 @@ function Customers() {
                     type="text"
                     label="Status"
                   />
-                </Grid>
-                <Grid item xs={12} sm={4} sx={12}>
-                  <Button onClick={handleOpenCategoryTable} variant="outlined">
-                    Select Category
-                  </Button>
                 </Grid>
                 <Grid item xs={12} sm={4} sx={12}>
                   <Stack direction="row" spacing={2}>
@@ -346,19 +292,6 @@ function Customers() {
                   onChange={handleChange}
                 />
               </Stack>
-            </Grid>
-            <Grid>
-              {openCatgoryTable ? (
-                <Im_CategorySelectingPopup
-                  setOpenCatgoryTable={setOpenCatgoryTable}
-                  openCatgoryTable={openCatgoryTable}
-                  handleCloseCatgoryTable={handleCloseCatgoryTable}
-                  setSelectedCatgory={setSelectedCatgory}
-                  selectedCatgory={selectedCatgory}
-                  setCatgoryRows={setCatgoryRows}
-                  catgoryRows={catgoryRows}
-                />
-              ) : null}
             </Grid>
           </Grid>
         )}
