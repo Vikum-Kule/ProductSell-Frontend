@@ -1,19 +1,9 @@
-import Validation from "../../../Validation/Validation";
-import React, { Fragment, useState } from "react";
-import InputField from "../../../FormComponents/InputField";
-import {
-  getAllCategories,
-  checkCategory,
-  addNewCategory,
-} from "../../../services/Export";
-import { Validators } from "../../../Validation/FormValidation";
-import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
-import Divider from "@mui/material/Divider";
-import RemoveCircleOutlineOutlinedIcon from "@mui/icons-material/RemoveCircleOutlineOutlined";
+import Validation from "../../Validation/CustomerFormValidation";
+import React, { Fragment, useEffect, useState } from "react";
+import InputField from "../../FormComponents/InputField";
 import CloseIcon from "@mui/icons-material/Close";
 import { Button, Grid, IconButton, Tooltip, Typography } from "@mui/material";
-import AutoCompleteFeild from "../../../FormComponents/AutoCompleteFeild";
-import FormAlert from "../../../components/FormAlert";
+import FormAlert from "../../components/FormAlert";
 
 function AddCustomer({ setOpenForm }) {
   //for input feild values
@@ -54,7 +44,10 @@ function AddCustomer({ setOpenForm }) {
 
   // errors for inputfeild
   const [error, setError] = useState({
-    _exportMCategory: "",
+    _name: "",
+    _address: "",
+    _email: "",
+    _phone: "",
   });
 
   //reset errors...
@@ -62,46 +55,22 @@ function AddCustomer({ setOpenForm }) {
     setError({});
   };
 
-  //set error
+
   const submitValue = async () => {
-    setError(Validation(values));
-    if (!error._exportMCategory) {
+    const validationErrors = Validation(values); // Get validation errors first
+    setError(validationErrors); // Set the state
+
+    console.log("Validation Errors:", validationErrors); // Debugging
+
+    if (
+      !validationErrors._name &&
+      !validationErrors._phone &&
+      !validationErrors._email
+    ) {
       console.log("Submit");
 
       let data = { ...values };
-
-      // check the category already exist or not
-      let status = await checkCategory(data);
-      console.log("status", status);
-      if (!status.ifExist) {
-        let submitData = await addNewCategory(data);
-        if (submitData) {
-          resetValues();
-          setAlertData({
-            type: "success",
-            message: "Category submitted..",
-          });
-          setAlert(true);
-        } else {
-          setAlertData({
-            type: "error",
-            message: "Something went wrong...",
-          });
-          setAlert(true);
-        }
-      } else if (status) {
-        setAlertData({
-          type: "warning",
-          message: "Category already exist..",
-        });
-        setAlert(true);
-      } else {
-        setAlertData({
-          type: "error",
-          message: "Something went wrong...",
-        });
-        setAlert(true);
-      }
+      console.log("Data to submit:", data);
     }
   };
 
@@ -113,7 +82,6 @@ function AddCustomer({ setOpenForm }) {
       [name]: val,
     });
   };
-
 
   return (
     <Grid container spacing={2}>

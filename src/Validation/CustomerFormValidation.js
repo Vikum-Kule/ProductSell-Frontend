@@ -3,7 +3,8 @@ const regex = {
 };
 
 const CustomerFormValidation = (values) => {
-    let errors = {};
+  let errors = {};
+  console.log("calling....");
   
     if (values._name == "") {
       errors._product = "Please Enter Customer Name ";

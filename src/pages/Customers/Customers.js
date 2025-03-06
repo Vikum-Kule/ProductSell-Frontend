@@ -15,7 +15,7 @@ import Box from "@mui/material/Box";
 import InputField from "../../FormComponents/InputField";
 import Alart from "../../components/Alart";
 import { getCustomers } from "../../services/Customer";
-// import AddCustomer from "./AddCustomer";
+import AddCustomer from "./AddCustomer";
 
 const useStyles = makeStyles({
   container: {
@@ -85,11 +85,12 @@ function Customers() {
     { id: "name", label: "Name", minWidth: 80 },
     { id: "phone", label: "Phone", minWidth: 100 },
     { id: "email", label: "Email", minWidth: 100 },
+    { id: "status", label: "Status", minWidth: 100 },
     { id: "action", label: "Actions", minWidth: 100 },
   ];
 
-  function createData(name, phone, email, action, customer_id) {
-    return { name, phone, email, action, customer_id };
+  function createData(name, phone, email, status, action, customer_id) {
+    return { name, phone, email, status, action, customer_id };
   }
 
   const [page, setPage] = React.useState(0);
@@ -108,24 +109,23 @@ function Customers() {
     //get import items data when page loading...
     console.log(page);
     let result = await getCustomers(pageNo, rowsPerPage, customerFilter);
-    let importSet = result.content;
+    let customerSet = result.content;
 
     //set total rows and pages
     setTotalPages(result.totalPages);
     setTotalRows(result.totalElements);
 
     const newSet = [];
-    if (importSet) {
-      for (let x = 0; x < importSet.length; x++) {
+    if (customerSet) {
+      for (let x = 0; x < customerSet.length; x++) {
         //set data in new set list to display in the table
         newSet.push(
           createData(
-            importSet[x].product_code,
-            importSet[x].itemName,
-            importSet[x].brand,
-            importSet[x].qty,
-            importSet[x].status,
-            importSet[x].importId
+            customerSet[x].customerName,
+            customerSet[x].phone,
+            customerSet[x].email,
+            customerSet[x].status,
+            customerSet[x].customerId
           )
         );
       }
@@ -186,8 +186,7 @@ function Customers() {
       <Paper className={classes.container} elevation={8}>
         {/* import list or import from */}
         {openForm ? (
-          <></>
-          // <AddCustomer setOpenForm={setOpenForm} />
+          <AddCustomer setOpenForm={setOpenForm} />
         ) : (
           <Grid container spacing={5}>
             <Grid item xs={12} sm={10} sx={12}>
