@@ -39,7 +39,7 @@ function SaleProductForm({ setOpenForm }) {
 
   const [value, setValue] = useState({
     _product: null,
-    _customer: "",
+    _customer: null,
     _paidStatus: "",
     _sellingQty: 0.0,
     _sellingPricePerUnit: 0.0,
@@ -51,7 +51,7 @@ function SaleProductForm({ setOpenForm }) {
   const resetValues = () => {
     setValue({
       _product: null,
-      _customer: "",
+      _customer: null,
       _paidStatus: "",
       _sellingQty: 0.0,
       _sellingPricePerUnit: 0.0,
@@ -61,6 +61,13 @@ function SaleProductForm({ setOpenForm }) {
     });
     setSelectedProduct([]);
     setSelectedProductData(null);
+    setSelectedCustomer([]);
+    setSelectedCustomerData(null);
+    setProfitMargin(0.0);
+    setProfit(0.0);
+    setproductionCost(0.0);
+    setRows([]);
+    resetErrors();
   };
 
   const [openProductTable, setOpenProductTable] = useState(false);
@@ -116,9 +123,22 @@ function SaleProductForm({ setOpenForm }) {
     if (selectedCustomer.length !== 0) {
       console.log(selectedCustomer[0]);
       const customerResponse = await getCustomerById(selectedCustomer[0]);
-      console.log("Customer Data: " + customerResponse);
-      setSelectedCustomerData(customerResponse);
-      setOpenCustomerTable(false);
+      if (customerResponse == "Something went wrong...") {
+        setError({
+          ...error,
+          _customer: "Something went wrong...",
+        });
+        return;
+      } else {
+        console.log("Customer Data: " + customerResponse);
+        setSelectedCustomerData(customerResponse);
+        setOpenCustomerTable(false);
+        setValue({
+          ...value,
+          _customer: selectedCustomer[0],
+        });
+      }
+      
     } else {
       setOpenCustomerTable(false);
     }
@@ -563,7 +583,9 @@ function SaleProductForm({ setOpenForm }) {
             />
           </Grid>
           {selectedCustomerData ? (
-            <CustomerDataComponent customer={selectedCustomer} />
+            <Grid item xs={12} sm={4} sx={12}>
+              <CustomerDataComponent customer={selectedCustomerData} />
+            </Grid>
           ) : (
             <Grid item xs={12} sm={4} sx={12}>
               <Button onClick={handleOpenCustomerTable} variant="outlined">
@@ -571,19 +593,6 @@ function SaleProductForm({ setOpenForm }) {
               </Button>
             </Grid>
           )}
-
-          {/* <Grid item>
-            <InputField
-              name="_customer"
-              errorMsg={error._customer}
-              value={value._customer}
-              onChange={(event, newInputValue) =>
-                handleChange(event, newInputValue)
-              }
-              type="text"
-              label="Customer"
-            />
-          </Grid> */}
           <Grid item>
             <InputField
               name="_paidStatus"

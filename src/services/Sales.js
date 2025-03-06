@@ -56,7 +56,7 @@ const addSaleProduct = async (values, productionList) => {
       .post(
         "/api/saleproduct/add",
         {
-          customer: values._customer,
+          customerId: values._customer,
           paidStatus: values._paidStatus,
           sellingQty: values._sellingQty,
           sellingPricePerUnit: values._sellingPricePerUnit,
@@ -254,7 +254,7 @@ const addSaleBill = async (values, productList) => {
       .post(
         "/api/salebill/add",
         {
-          customer: values._customer,
+          customerId: values._customer,
           paidStatus: values._paidStatus,
           totalPrice: values._totalPrice,
           discount_percentage: values._discount_percentage,

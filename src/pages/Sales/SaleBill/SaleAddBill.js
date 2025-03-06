@@ -20,6 +20,9 @@ import ProfitCard from "../../../components/ProfitCard";
 import TableItem from "../../../components/TableItem";
 import SaleBillItemForm from "./SaleBillItemForm";
 import FormAlert from "../../../components/FormAlert";
+import { getCustomerById } from "../../../services/Customer";
+import CustomerDataComponent from "../../../components/CustomerDataComponent";
+import CustomerSelectingPopup from "../../../components/CustomerSelectingPopup";
 
 const useStyles = makeStyles({
   categoryContainer: {
@@ -36,7 +39,7 @@ function SaleAddBill({ setOpenForm }) {
 
   const [value, setValue] = useState({
     _billNumber: "",
-    _customer: "",
+    _customer: null,
     _paidStatus: "",
     _totalPrice: 0.0,
     _totalCost: 0.0,
@@ -49,7 +52,7 @@ function SaleAddBill({ setOpenForm }) {
   const resetValues = () => {
     setValue({
       _billNumber: "",
-      _customer: "",
+      _customer: null,
       _paidStatus: "",
       _totalPrice: 0.0,
       _totalCost: 0.0,
@@ -64,6 +67,9 @@ function SaleAddBill({ setOpenForm }) {
     setDiscountVal(0.0);
     setSelectedProductRow(null);
     setRows([]);
+    setSelectedCustomer([]);
+    setSelectedCustomerData(null);
+    setError({});
   };
 
   const [openProductTable, setOpenProductTable] = useState(false);
@@ -76,6 +82,9 @@ function SaleAddBill({ setOpenForm }) {
   const [selectedProductRow, setSelectedProductRow] = useState(null);
   const [discountType, setDiscountType] = useState("Percentage");
   const [discountVal, setDiscountVal] = useState(0.0);
+  const [openCustomerTable, setOpenCustomerTable] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState([]);
+  const [selectedCustomerData, setSelectedCustomerData] = useState(null);
 
   const discountTypes = [
     {
@@ -107,6 +116,10 @@ function SaleAddBill({ setOpenForm }) {
 
   const handleOpenProductTable = async () => {
     setOpenProductTable(true);
+  };
+
+  const handleOpenCustomerTable = async () => {
+    setOpenCustomerTable(true);
   };
 
   const handleTotalAmounts = () => {
@@ -187,6 +200,30 @@ function SaleAddBill({ setOpenForm }) {
     }
   };
 
+  const handleCloseCustomerTable = async () => {
+    if (selectedCustomer.length !== 0) {
+      console.log(selectedCustomer[0]);
+      const customerResponse = await getCustomerById(selectedCustomer[0]);
+      if (customerResponse == "Something went wrong...") {
+        setError({
+          ...error,
+          _customer: "Something went wrong...",
+        });
+        return;
+      } else {
+        console.log("Customer Data: " + customerResponse);
+        setSelectedCustomerData(customerResponse);
+        setOpenCustomerTable(false);
+        setValue({
+          ...value,
+          _customer: selectedCustomer[0],
+        });
+      }
+    } else {
+      setOpenCustomerTable(false);
+    }
+  };
+
   const handleAction = async (event, id) => {
     switch (event) {
       case "saleProduct":
@@ -236,7 +273,7 @@ function SaleAddBill({ setOpenForm }) {
       !error._customer &&
       !error._paidStatus &&
       !error._totalPrice &&
-      !error._billNumber    
+      !error._billNumber
     ) {
       console.log("Bill data: ", value);
       console.log("Bill item data: ", rows);
@@ -441,18 +478,17 @@ function SaleAddBill({ setOpenForm }) {
               label="Bill Number"
             />
           </Grid>
-          <Grid item>
-            <InputField
-              name="_customer"
-              errorMsg={error._customer}
-              value={value._customer}
-              onChange={(event, newInputValue) =>
-                handleChange(event, newInputValue)
-              }
-              type="text"
-              label="Customer"
-            />
-          </Grid>
+          {selectedCustomerData ? (
+            <Grid item xs={12} sm={4} sx={12}>
+              <CustomerDataComponent customer={selectedCustomerData} />
+            </Grid>
+          ) : (
+            <Grid item xs={12} sm={4} sx={12}>
+              <Button onClick={handleOpenCustomerTable} variant="outlined">
+                Select Customer
+              </Button>
+            </Grid>
+          )}
           <Grid item>
             <InputField
               name="_paidStatus"
@@ -589,6 +625,16 @@ function SaleAddBill({ setOpenForm }) {
             setSelectedProduct={setSelectedProduct}
             selectedProduct={selectedProduct}
             isOneChoise={false}
+          />
+        ) : null}
+        {openCustomerTable ? (
+          <CustomerSelectingPopup
+            setOpenCustomerTable={setOpenCustomerTable}
+            openCustomerTable={openCustomerTable}
+            handleCloseCustomerTable={handleCloseCustomerTable}
+            setSelectedCustomer={setSelectedCustomer}
+            selectedCustomer={selectedCustomer}
+            isOneChoise={true}
           />
         ) : null}
       </Grid>

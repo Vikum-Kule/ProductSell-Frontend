@@ -16,6 +16,7 @@ import { makeStyles } from "@mui/styles";
 import { getSaleBillById } from "../../../services/Sales";
 import CloseIcon from "@mui/icons-material/Close";
 import { useHistory } from "react-router";
+import CustomerDataComponent from "../../../components/CustomerDataComponent";
 
 const useStyles = makeStyles({
   container: {
@@ -41,8 +42,8 @@ const useStyles = makeStyles({
 });
 
 function SaleBillView() {
-    const classes = useStyles();
-    const history = useHistory();
+  const classes = useStyles();
+  const history = useHistory();
   const { billId } = useParams();
   const [saleBill, setSaleBill] = React.useState(null);
   const [rows, setRows] = React.useState([]);
@@ -197,9 +198,13 @@ function SaleBillView() {
             </Grid>
             <Grid item xs={6}>
               <Typography className={classes.label}>Customer:</Typography>
-              <Typography className={classes.value}>
-                {saleBill.customer}
-              </Typography>
+              {saleBill.customer ? (
+                <Grid item xs={12} sm={12} sx={12}>
+                  <CustomerDataComponent customer={saleBill.customer} />
+                </Grid>
+              ) : (
+                <Typography></Typography>
+              )}
             </Grid>
             <Grid item xs={6}>
               <Typography className={classes.label}>Discount:</Typography>
