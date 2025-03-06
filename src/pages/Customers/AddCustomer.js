@@ -4,6 +4,7 @@ import InputField from "../../FormComponents/InputField";
 import CloseIcon from "@mui/icons-material/Close";
 import { Button, Grid, IconButton, Tooltip, Typography } from "@mui/material";
 import FormAlert from "../../components/FormAlert";
+import { addCustomer } from "../../services/Customer";
 
 function AddCustomer({ setOpenForm }) {
   //for input feild values
@@ -43,39 +44,42 @@ function AddCustomer({ setOpenForm }) {
   };
 
   // errors for inputfeild
-  const [error, setError] = useState({
-    _name: "",
-    _address: "",
-    _email: "",
-    _phone: "",
-  });
+  const [error, setError] = useState({});
 
   //reset errors...
   const resetErrors = () => {
     setError({});
   };
 
-
   const submitValue = async () => {
-    const validationErrors = Validation(values); // Get validation errors first
-    setError(validationErrors); // Set the state
-
-    console.log("Validation Errors:", validationErrors); // Debugging
-
-    if (
-      !validationErrors._name &&
-      !validationErrors._phone &&
-      !validationErrors._email
-    ) {
-      console.log("Submit");
-
-      let data = { ...values };
-      console.log("Data to submit:", data);
+    const validationErrors = Validation(values);
+    console.log("Validation function output:", validationErrors);
+    setError(Validation(values));
+    console.log("Selected Data: ", values);
+    if (Object.keys(validationErrors).length === 0) {
+      console.log("Customer data: ", values);
+      let cutomerResponse = await addCustomer(values)
+      
+      if (cutomerResponse) {
+        resetValues();
+        setAlertData({
+          type: "success",
+          message: "Customer Added..",
+        });
+        setAlert(true);
+      } else {
+        setAlertData({
+          type: "error",
+          message: "Something went wrong...",
+        });
+        setAlert(true);
+      }
     }
   };
 
   //to handle changing value
   const handleChange = (name, val) => {
+    resetErrors();
     console.log(name, val);
     setValues({
       ...values,
@@ -138,6 +142,18 @@ function AddCustomer({ setOpenForm }) {
           }
           type="text"
           label="Phone Number"
+        />
+      </Grid>
+      <Grid item xs={12} sm={9} sx={12}>
+        <InputField
+          name="_address"
+          errorMsg={error._address}
+          value={values._address}
+          onChange={(event, newInputValue) =>
+            handleChange(event, newInputValue)
+          }
+          type="text"
+          label="Address"
         />
       </Grid>
       <Grid item xs={12} sm={12} sx={12}>

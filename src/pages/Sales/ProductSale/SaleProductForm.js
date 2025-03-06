@@ -12,6 +12,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import Validation from "../../../Validation/SaleProductValidation";
 import { makeStyles } from "@mui/styles";
 import Ex_ProductSelectingPopup from "../../../components/Ex_ProductSelectingPopup";
+import CustomerSelectingPopup from "../../../components/CustomerSelectingPopup";
 import {
   getExportProductById,
   getProductionsForSales,
@@ -21,6 +22,8 @@ import { addSaleProduct } from "../../../services/Sales";
 import ProductionWritableTable from "../../../components/ProductionWritableTable";
 import { Padding } from "@mui/icons-material";
 import ProfitCard from "../../../components/ProfitCard";
+import { getCustomerById } from "../../../services/Customer";
+import CustomerDataComponent from "../../../components/CustomerDataComponent";
 
 const useStyles = makeStyles({
   categoryContainer: {
@@ -63,6 +66,9 @@ function SaleProductForm({ setOpenForm }) {
   const [openProductTable, setOpenProductTable] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState([]);
   const [selectedProductData, setSelectedProductData] = useState(null);
+  const [openCustomerTable, setOpenCustomerTable] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState([]);
+  const [selectedCustomerData, setSelectedCustomerData] = useState(null);
   const [rows, setRows] = React.useState([]);
   const [profit, setProfit] = useState(0.0);
   const [profitMargin, setProfitMargin] = useState(0.0);
@@ -89,6 +95,10 @@ function SaleProductForm({ setOpenForm }) {
     setOpenProductTable(true);
   };
 
+  const handleOpenCustomerTable = async () => {
+    setOpenCustomerTable(true);
+  };
+
   const handleCloseProductTable = async () => {
     if (selectedProduct.length !== 0) {
       const productDataResponse = await getExportProductById(
@@ -99,6 +109,18 @@ function SaleProductForm({ setOpenForm }) {
       handleChange("_product", productDataResponse);
     } else {
       setOpenProductTable(false);
+    }
+  };
+
+  const handleCloseCustomerTable = async () => {
+    if (selectedCustomer.length !== 0) {
+      console.log(selectedCustomer[0]);
+      const customerResponse = await getCustomerById(selectedCustomer[0]);
+      console.log("Customer Data: " + customerResponse);
+      setSelectedCustomerData(customerResponse);
+      setOpenCustomerTable(false);
+    } else {
+      setOpenCustomerTable(false);
     }
   };
 
@@ -540,7 +562,17 @@ function SaleProductForm({ setOpenForm }) {
               label="Profit Margin"
             />
           </Grid>
-          <Grid item>
+          {selectedCustomerData ? (
+            <CustomerDataComponent customer={selectedCustomer} />
+          ) : (
+            <Grid item xs={12} sm={4} sx={12}>
+              <Button onClick={handleOpenCustomerTable} variant="outlined">
+                Select Customer
+              </Button>
+            </Grid>
+          )}
+
+          {/* <Grid item>
             <InputField
               name="_customer"
               errorMsg={error._customer}
@@ -551,7 +583,7 @@ function SaleProductForm({ setOpenForm }) {
               type="text"
               label="Customer"
             />
-          </Grid>
+          </Grid> */}
           <Grid item>
             <InputField
               name="_paidStatus"
@@ -613,6 +645,16 @@ function SaleProductForm({ setOpenForm }) {
             handleCloseProductTable={handleCloseProductTable}
             setSelectedProduct={setSelectedProduct}
             selectedProduct={selectedProduct}
+            isOneChoise={true}
+          />
+        ) : null}
+        {openCustomerTable ? (
+          <CustomerSelectingPopup
+            setOpenCustomerTable={setOpenCustomerTable}
+            openCustomerTable={openCustomerTable}
+            handleCloseCustomerTable={handleCloseCustomerTable}
+            setSelectedCustomer={setSelectedCustomer}
+            selectedCustomer={selectedCustomer}
             isOneChoise={true}
           />
         ) : null}

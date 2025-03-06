@@ -157,6 +157,7 @@ function Customers() {
     _name: "",
     _email: "",
     _status: "",
+    _address: ""
   });
 
   //reset filters
@@ -165,6 +166,7 @@ function Customers() {
       _name: "",
       _email: "",
       _status: "",
+      _address: "",
     });
   };
 

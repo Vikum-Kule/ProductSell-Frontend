@@ -236,7 +236,7 @@ function SaleAddBill({ setOpenForm }) {
       !error._customer &&
       !error._paidStatus &&
       !error._totalPrice &&
-      !error._billNumber
+      !error._billNumber    
     ) {
       console.log("Bill data: ", value);
       console.log("Bill item data: ", rows);

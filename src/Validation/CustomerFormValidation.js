@@ -7,10 +7,10 @@ const CustomerFormValidation = (values) => {
   console.log("calling....");
   
     if (values._name == "") {
-      errors._product = "Please Enter Customer Name ";
+      errors._name = "Please Enter Customer Name ";
     }
     if (values._phone == "") {
-      errors._customer = "Enter Phone Number";
+      errors._phone = "Enter Phone Number";
     }else{
       const length = values._phone ? values._phone.toString().length : 0;
 
@@ -23,10 +23,13 @@ const CustomerFormValidation = (values) => {
         errors._phone = "Phone number should only contains atleast 10 numbers"
       }
     }
+    if (values._email == "") {
+      errors._email = "Please add customer cutomer email";
+  }
     if (values._address == "") {
         errors._address = "Please add customer address";
     }
-  
+    console.log(errors)
     return errors;
   };
   
