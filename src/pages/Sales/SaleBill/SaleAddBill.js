@@ -23,6 +23,7 @@ import FormAlert from "../../../components/FormAlert";
 import { getCustomerById } from "../../../services/Customer";
 import CustomerDataComponent from "../../../components/CustomerDataComponent";
 import CustomerSelectingPopup from "../../../components/CustomerSelectingPopup";
+import PaymentOptions from "../../../components/PaymentOptions";
 
 const useStyles = makeStyles({
   categoryContainer: {
@@ -85,6 +86,7 @@ function SaleAddBill({ setOpenForm }) {
   const [openCustomerTable, setOpenCustomerTable] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState([]);
   const [selectedCustomerData, setSelectedCustomerData] = useState(null);
+  const [paymentMethods, setPaymentMethods] = useState([]); 
 
   const discountTypes = [
     {
@@ -99,7 +101,6 @@ function SaleAddBill({ setOpenForm }) {
 
   //just hard coded...
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(100);
   const [totalPages, setTotalPages] = React.useState(0);
 
   useEffect(() => {
@@ -489,7 +490,7 @@ function SaleAddBill({ setOpenForm }) {
               </Button>
             </Grid>
           )}
-          <Grid item>
+          {/* <Grid item>
             <InputField
               name="_paidStatus"
               errorMsg={error._paidStatus}
@@ -499,6 +500,12 @@ function SaleAddBill({ setOpenForm }) {
               }
               type="text"
               label="Paid Status"
+            />
+          </Grid> */}
+          <Grid item>
+            <PaymentOptions
+              paymentMethods={paymentMethods}
+              setPaymentMethods={setPaymentMethods}
             />
           </Grid>
         </Grid>
