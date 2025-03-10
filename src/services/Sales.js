@@ -193,7 +193,7 @@ const getSaleProductbyBillId = async (billNumber, productId) => {
         return response.data;
       })
       .catch((error) => {
-        console.log("Error: ", error)
+        console.log("Error: ", error);
         return "Something went wrong...";
       });
   }
@@ -336,7 +336,32 @@ const deleteSaleBillById = async (billId) => {
   }
 };
 
-
+///////sale bill payments
+//get sale bill payment by bill Id
+const getSaleBillPaymentsById = async (billId) => {
+  //check access tocken expiry function
+  let token_valid_result = await token_valid();
+  if (token_valid_result) {
+    let token = getToken();
+    return axios
+      .get("/api/billpayment/" + billId, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        console.log("Response all--", response.data);
+        return response.data;
+      })
+      .catch((error) => {
+        // return "Something went wrong...";
+        console.log("get Sale Bill Payment " + error);
+        return "Something went wrong...";
+      });
+  }
+};
 
 export {
   getSaleProductData,
@@ -348,4 +373,5 @@ export {
   getSaleBillById,
   getSaleProductbyBillId,
   deleteSaleBillById,
+  getSaleBillPaymentsById,
 };
