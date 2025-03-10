@@ -71,6 +71,7 @@ function SaleAddBill({ setOpenForm }) {
     setSelectedCustomer([]);
     setSelectedCustomerData(null);
     setError({});
+    setPaymentMethods([]);
   };
 
   const [openProductTable, setOpenProductTable] = useState(false);
@@ -86,7 +87,7 @@ function SaleAddBill({ setOpenForm }) {
   const [openCustomerTable, setOpenCustomerTable] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState([]);
   const [selectedCustomerData, setSelectedCustomerData] = useState(null);
-  const [paymentMethods, setPaymentMethods] = useState([]); 
+  const [paymentMethods, setPaymentMethods] = useState([]);
 
   const discountTypes = [
     {
@@ -269,6 +270,7 @@ function SaleAddBill({ setOpenForm }) {
   const submitValue = async () => {
     setError(Validation(value, rows));
     console.log("Selected Data: ", rows);
+    console.log("Payment Data: ", paymentMethods);
     if (
       !error._products &&
       !error._customer &&
@@ -278,6 +280,10 @@ function SaleAddBill({ setOpenForm }) {
     ) {
       console.log("Bill data: ", value);
       console.log("Bill item data: ", rows);
+      let saleBillData = {
+        ...value,
+        _payments: paymentMethods,
+      };
 
       let billItemList = rows.map((row) => ({
         productId: row.productId,
@@ -296,7 +302,7 @@ function SaleAddBill({ setOpenForm }) {
       }));
 
       console.log("bill List: ", billItemList);
-      let submitBill = await addSaleBill(value, billItemList);
+      let submitBill = await addSaleBill(saleBillData, billItemList);
 
       if (submitBill) {
         resetValues();
@@ -502,13 +508,13 @@ function SaleAddBill({ setOpenForm }) {
               label="Paid Status"
             />
           </Grid> */}
-          <Grid item>
-            <PaymentOptions
-              paymentMethods={paymentMethods}
-              setPaymentMethods={setPaymentMethods}
-            />
-          </Grid>
         </Grid>
+      </Grid>
+      <Grid item xs={12} sm={12} sx={12}>
+        <PaymentOptions
+          paymentMethods={paymentMethods}
+          setPaymentMethods={setPaymentMethods}
+        />
       </Grid>
       <Grid item xs={12} sm={12} sx={12}>
         {selectedProductData.length != 0 ? (

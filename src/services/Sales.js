@@ -255,7 +255,7 @@ const addSaleBill = async (values, productList) => {
         "/api/salebill/add",
         {
           customerId: values._customer,
-          paidStatus: values._paidStatus,
+          payments: values._payments,
           totalPrice: values._totalPrice,
           discount_percentage: values._discount_percentage,
           discount_amount: values._discount_value,

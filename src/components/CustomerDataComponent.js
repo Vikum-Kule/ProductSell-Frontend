@@ -20,11 +20,6 @@ export default function CustomerDataComponent({ customer }) {
             {first}
           </Avatar>
         }
-        // action={
-        //   <IconButton aria-label="settings">
-        //     <MoreVertIcon />
-        //   </IconButton>
-        // }
         title={customer.customerName}
         subheader={customer.email}
       />
