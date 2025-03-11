@@ -7,10 +7,12 @@ import {
   Avatar,
   ListItemText,
   List,
+  TextField,
 } from "@mui/material";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import RequestQuoteIcon from "@mui/icons-material/RequestQuote";
 import DescriptionIcon from "@mui/icons-material/Description";
+import InputField from "../FormComponents/InputField";
 
 function PaymentList({ payments }) {
   // Function to format date
@@ -24,7 +26,7 @@ function PaymentList({ payments }) {
   const formatAmount = (amount) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "USD",
+      currency: "LKR",
       minimumFractionDigits: 2,
     }).format(amount);
   };
@@ -44,7 +46,17 @@ function PaymentList({ payments }) {
                     <AttachMoneyIcon />
                   </Avatar>
                 </ListItemAvatar>
-                <ListItemText primary="Cash" secondary={formatDate(payment.paymentDate)} />
+                <ListItemText
+                  primary="Cash"
+                  secondary={`Payment Date: ${formatDate(payment.paymentDate)}`}
+                />
+                <InputField
+                  name="_amount"
+                  value={formatAmount(payment.amount)}
+                  type="text"
+                  label="Amount"
+                  isdisabled={true}
+                />
               </ListItem>
             );
           } else if (payment.paymentType === "CHEQUE") {
@@ -55,7 +67,19 @@ function PaymentList({ payments }) {
                     <RequestQuoteIcon />
                   </Avatar>
                 </ListItemAvatar>
-                <ListItemText primary="Cheque" secondary={formatDate(payment.paymentDate)} />
+                <ListItemText
+                  primary="Cheque"
+                  secondary={`Payment Date: ${formatDate(
+                    payment.paymentDate
+                  )}   Return Date: ${formatDate(payment.returnDate)}`}
+                />
+                <InputField
+                  name="_amount"
+                  value={formatAmount(payment.amount)}
+                  type="text"
+                  label="Amount"
+                  isdisabled={true}
+                />
               </ListItem>
             );
           } else {
@@ -66,7 +90,17 @@ function PaymentList({ payments }) {
                     <DescriptionIcon />
                   </Avatar>
                 </ListItemAvatar>
-                <ListItemText primary="Return Bill" secondary={formatDate(payment.paymentDate)} />
+                <ListItemText
+                  primary="Return Bill"
+                  secondary={`Payment Date: ${formatDate(payment.paymentDate)}`}
+                />
+                <InputField
+                  name="_amount"
+                  value={formatAmount(payment.amount)}
+                  type="text"
+                  label="Amount"
+                  isdisabled={true}
+                />
               </ListItem>
             );
           }

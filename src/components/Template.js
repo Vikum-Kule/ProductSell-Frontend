@@ -100,7 +100,7 @@ function Template({ children }) {
       handleClickSales();
     } else if (index === 13) {
       handleClickCustomers();
-    } else if (index === 15){
+    } else if (index === 15) {
       handleClickRetails();
     }
   };
@@ -569,9 +569,9 @@ function Template({ children }) {
                 primary="Retail"
                 style={{ color: "#000" }}
               />
-              {openCustomers ? <ExpandLess /> : <ExpandMore />}
+              {openRatails ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
-            <Collapse in={openCustomers} timeout="auto" unmountOnExit>
+            <Collapse in={openRatails} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 <ListItemButton
                   sx={{ pl: 4 }}
