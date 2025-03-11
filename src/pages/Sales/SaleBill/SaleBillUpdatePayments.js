@@ -45,7 +45,7 @@ const useStyles = makeStyles({
   },
 });
 
-function SaleBillView() {
+function SaleBillUpdatePayments() {
   const classes = useStyles();
   const history = useHistory();
   const { billId } = useParams();
@@ -85,6 +85,15 @@ function SaleBillView() {
     }
 
     if (billPaymentResult !== "Something went wrong...") {
+        const billPayments = billPaymentResult.map((p) => ({
+            type:p.paymentType,
+            amount:p.amount,
+            bank:p.bank,
+            chequeNumber:p.chequeNumber,
+            returnDate: p.returnDate
+            returnDateInput: {p.returnDate != null ? }
+            returnBillNumber:
+        }));
       setPayments(billPaymentResult);
     } else {
       setErrors({
@@ -277,7 +286,7 @@ function SaleBillView() {
           </Grid>
           {payments ? (
             <Grid container spacing={3} className={classes.fieldContainer}>
-              <Grid item xs={10}>
+              <Grid item xs={7}>
                 <PaymentList payments={payments} />
               </Grid>
             </Grid>
@@ -292,8 +301,8 @@ function SaleBillView() {
   );
 }
 
-SaleBillView.propTypes = {
+SaleBillUpdatePayments.propTypes = {
   billId: PropTypes.any,
 };
 
-export default SaleBillView;
+export default SaleBillUpdatePayments;

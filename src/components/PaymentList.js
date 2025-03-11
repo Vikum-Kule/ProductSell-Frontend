@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Grid,
   Typography,
@@ -7,14 +7,21 @@ import {
   Avatar,
   ListItemText,
   List,
-  TextField,
+  Paper,
 } from "@mui/material";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import RequestQuoteIcon from "@mui/icons-material/RequestQuote";
 import DescriptionIcon from "@mui/icons-material/Description";
 import InputField from "../FormComponents/InputField";
 
-function PaymentList({ payments }) {
+
+const chequeStatus = [
+    { value: "PENDING", label: "Pending" },
+    { value: "CLEARED", label: "Cleared" },
+    { value: "RETURNED", label: "Returned" },
+  ];
+
+function PaymentList({ payments}) {
   // Function to format date
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -32,76 +39,106 @@ function PaymentList({ payments }) {
   };
 
   return (
-    <Grid>
+    <Grid container>
       <Grid item xs={12} style={{ paddingTop: "10px" }}>
         <Typography variant="h7">Payments</Typography>
       </Grid>
-      <List sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>
+      <List sx={{ width: "100%", bgcolor: "background.paper" }}>
         {payments.map((payment, index) => {
           if (payment.paymentType === "CASH") {
             return (
-              <ListItem>
-                <ListItemAvatar>
-                  <Avatar>
-                    <AttachMoneyIcon />
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText
-                  primary="Cash"
-                  secondary={`Payment Date: ${formatDate(payment.paymentDate)}`}
-                />
-                <InputField
-                  name="_amount"
-                  value={formatAmount(payment.amount)}
-                  type="text"
-                  label="Amount"
-                  isdisabled={true}
-                />
-              </ListItem>
+              <Paper>
+                <ListItem key={index} sx={{ width: "100%" }}>
+                  <ListItemAvatar>
+                    <Avatar>
+                      <AttachMoneyIcon />
+                    </Avatar>
+                  </ListItemAvatar>
+                  <Grid container direction="row" spacing={2}>
+                    <Grid item>
+                      <ListItemText
+                        primary="Cash"
+                        secondary={`Payment Date: ${formatDate(
+                          payment.paymentDate
+                        )}`}
+                      />
+                    </Grid>
+                    <Grid item>
+                      <InputField
+                        name="_amount"
+                        value={formatAmount(payment.amount)}
+                        type="text"
+                        label="Amount"
+                        isdisabled={true}
+                      />
+                    </Grid>
+                  </Grid>
+                </ListItem>
+              </Paper>
             );
           } else if (payment.paymentType === "CHEQUE") {
             return (
-              <ListItem>
-                <ListItemAvatar>
-                  <Avatar>
-                    <RequestQuoteIcon />
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText
-                  primary="Cheque"
-                  secondary={`Payment Date: ${formatDate(
-                    payment.paymentDate
-                  )}   Return Date: ${formatDate(payment.returnDate)}`}
-                />
-                <InputField
-                  name="_amount"
-                  value={formatAmount(payment.amount)}
-                  type="text"
-                  label="Amount"
-                  isdisabled={true}
-                />
-              </ListItem>
+              <Paper>
+                <ListItem key={index} sx={{ width: "100%" }}>
+                  <ListItemAvatar>
+                    <Avatar>
+                      <RequestQuoteIcon />
+                    </Avatar>
+                  </ListItemAvatar>
+                  <ListItemText
+                    style={{ width: "100%" }}
+                    primary="Cheque"
+                    secondary={`Payment Date: ${formatDate(
+                      payment.paymentDate
+                    )}   Return Date: ${formatDate(payment.returnDate)}`}
+                  />
+                  <Grid container spacing={1}>
+                    <Grid item xs={6}>
+                      <InputField
+                        name="_amount"
+                        value={formatAmount(payment.amount)}
+                        type="text"
+                        label="Amount"
+                        isdisabled={true}
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <InputField
+                        name="_status"
+                        value={payment.status}
+                        type="text"
+                        label="Status"
+                        isdisabled={true}
+                      />
+                    </Grid>
+                  </Grid>
+                </ListItem>
+              </Paper>
             );
           } else {
             return (
-              <ListItem>
-                <ListItemAvatar>
-                  <Avatar>
-                    <DescriptionIcon />
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText
-                  primary="Return Bill"
-                  secondary={`Payment Date: ${formatDate(payment.paymentDate)}`}
-                />
-                <InputField
-                  name="_amount"
-                  value={formatAmount(payment.amount)}
-                  type="text"
-                  label="Amount"
-                  isdisabled={true}
-                />
-              </ListItem>
+              <Paper style={{ marginBottom: "5px" }}>
+                <ListItem key={index} sx={{ width: "100%" }}>
+                  <ListItemAvatar>
+                    <Avatar>
+                      <DescriptionIcon />
+                    </Avatar>
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary="Return Bill"
+                    secondary={`Payment Date: ${formatDate(
+                      payment.paymentDate
+                    )}`}
+                  />
+                  <InputField
+                    name="_amount"
+                    value={formatAmount(payment.amount)}
+                    type="text"
+                    label="Amount"
+                    isdisabled={true}
+                  />
+                </ListItem>
+              </Paper>
             );
           }
         })}

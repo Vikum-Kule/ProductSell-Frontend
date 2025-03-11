@@ -78,8 +78,6 @@ function SaleAddBill({ setOpenForm }) {
   const [selectedProduct, setSelectedProduct] = useState([]);
   const [selectedProductData, setSelectedProductData] = useState([]);
   const [rows, setRows] = React.useState([]);
-  const [profit, setProfit] = useState(0.0);
-  const [profitMargin, setProfitMargin] = useState(0.0);
   const [openProductProcess, setOpenProductProcess] = useState(false);
   const [selectedProductRow, setSelectedProductRow] = useState(null);
   const [discountType, setDiscountType] = useState("Percentage");
