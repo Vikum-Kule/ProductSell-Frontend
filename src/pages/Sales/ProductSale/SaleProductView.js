@@ -6,6 +6,7 @@ import { makeStyles } from "@mui/styles";
 import { getSaleProductById } from "../../../services/Sales";
 import TableItem from "../../../components/TableItem";
 import ProfitCard from "../../../components/ProfitCard";
+import CustomerDataComponent from "../../../components/CustomerDataComponent";
 
 const useStyles = makeStyles({
   container: {
@@ -176,7 +177,13 @@ function SaleProductView({ history }) {
             <Typography variant="h7" fontWeight="700">
               Customer
             </Typography>
-            <Typography>{sale.customer}</Typography>
+            {sale.customer ? (
+              <Grid item xs={12} sm={12} sx={12}>
+                <CustomerDataComponent customer={sale.customer} />
+              </Grid>
+            ) : (
+              <Typography></Typography>
+            )}
           </Grid>
           <Grid item xs={4}>
             <Typography variant="h7" fontWeight="700">

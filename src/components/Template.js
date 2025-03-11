@@ -12,6 +12,8 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
+import GroupIcon from '@mui/icons-material/Group';
+import AddBusinessIcon from '@mui/icons-material/AddBusiness';
 import { Collapse, IconButton, ListItemButton } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import ArrowCircleDownIcon from "@mui/icons-material/ArrowCircleDown";
@@ -45,6 +47,8 @@ function Template({ children }) {
   const [openExport, setOpenExport] = React.useState(false);
   const [openImport, setOpenImport] = React.useState(false);
   const [openSales, setOpenSales] = React.useState(false);
+  const [openCustomers, setOpenCustomers] = React.useState(false);
+  const [openRatails, setOpenRetails] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [user, setUser] = React.useState("");
 
@@ -94,6 +98,10 @@ function Template({ children }) {
       handleClickExport();
     } else if (index === 10) {
       handleClickSales();
+    } else if (index === 13) {
+      handleClickCustomers();
+    } else if (index === 15) {
+      handleClickRetails();
     }
   };
 
@@ -117,6 +125,22 @@ function Template({ children }) {
       setOpenImport(false);
     }
     setOpenSales(!openSales);
+  };
+
+  const handleClickCustomers = () => {
+    if (openCustomers) {
+      setOpenExport(false);
+      setOpenImport(false);
+    }
+    setOpenCustomers(!openCustomers);
+  };
+
+  const handleClickRetails = () => {
+    if (openRatails) {
+      setOpenExport(false);
+      setOpenImport(false);
+    }
+    setOpenRetails(!openRatails);
   };
 
   const text = {
@@ -461,6 +485,119 @@ function Template({ children }) {
                   <ListItemText
                     className={classes.menuText}
                     primary="Sale Bills"
+                    style={{ color: "#000" }}
+                  />
+                </ListItemButton>
+              </List>
+            </Collapse>
+            {/*  */}
+            <ListItemButton
+              selected={selectedIndex == 13 || selectedIndex == 14}
+              onClick={(event) =>
+                handleListItemClick(event, 13, "/template/customers")
+              }
+              style={{
+                backgroundColor:
+                  selectedIndex == 13 || selectedIndex == 14
+                    ? "#FDEBF1"
+                    : "#fff",
+                color:
+                  selectedIndex == 13 || selectedIndex == 14
+                    ? "#EF5D8E"
+                    : "#000",
+              }}
+            >
+              <ListItemIcon>
+                <GroupIcon color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primaryTypographyProps={{ style: text }}
+                primary="Customers"
+                style={{ color: "#000" }}
+              />
+              {openCustomers ? <ExpandLess /> : <ExpandMore />}
+            </ListItemButton>
+            <Collapse in={openCustomers} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                <ListItemButton
+                  sx={{ pl: 4 }}
+                  selected={selectedIndex == 14}
+                  onClick={(event) =>
+                    handleListItemClick(event, 14, "/template/customers")
+                  }
+                >
+                  <ListItemIcon>{/* <StarBorder /> */}</ListItemIcon>
+                  <ListItemText
+                    className={classes.menuText}
+                    primary="Customers"
+                    style={{ color: "#000" }}
+                  />
+                </ListItemButton>
+              </List>
+            </Collapse>
+
+            {/* */}
+            <ListItemButton
+              selected={
+                selectedIndex == 15 ||
+                selectedIndex == 16 ||
+                selectedIndex == 17
+              }
+              onClick={(event) =>
+                handleListItemClick(event, 15, "/template/sale_products")
+              }
+              style={{
+                backgroundColor:
+                  selectedIndex == 15 ||
+                  selectedIndex == 16 ||
+                  selectedIndex == 17
+                    ? "#FDEBF1"
+                    : "#fff",
+                color:
+                  selectedIndex == 15 ||
+                  selectedIndex == 16 ||
+                  selectedIndex == 17
+                    ? "#EF5D8E"
+                    : "#000",
+              }}
+            >
+              <ListItemIcon>
+                <AddBusinessIcon color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primaryTypographyProps={{ style: text }}
+                primary="Retail"
+                style={{ color: "#000" }}
+              />
+              {openRatails ? <ExpandLess /> : <ExpandMore />}
+            </ListItemButton>
+            <Collapse in={openRatails} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                <ListItemButton
+                  sx={{ pl: 4 }}
+                  selected={selectedIndex == 16}
+                  onClick={(event) =>
+                    handleListItemClick(event, 16, "/template/sale_products")
+                  }
+                >
+                  <ListItemIcon>{/* <StarBorder /> */}</ListItemIcon>
+                  <ListItemText
+                    className={classes.menuText}
+                    primary="Sales Person"
+                    style={{ color: "#000" }}
+                  />
+                </ListItemButton>
+                <ListItemButton
+                  sx={{ pl: 4 }}
+                  selected={selectedIndex == 17}
+                  onClick={(event) =>
+                    handleListItemClick(event, 17, "/template/sale_products")
+                  }
+                >
+                  <ListItemIcon>{/* <StarBorder /> */}</ListItemIcon>
+                  <ListItemText
+                    className={classes.menuText}
+                    primary="Retail Bill"
                     style={{ color: "#000" }}
                   />
                 </ListItemButton>

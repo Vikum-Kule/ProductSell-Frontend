@@ -29,8 +29,9 @@ import Ex_Production from "./pages/Exports/ExportItem/Ex_Production";
 import Ex_ProductionView from "./pages/Exports/ExportItem/Ex_ProductionView";
 import Sale_Bills from "./pages/Sales/SaleBill/SaleBills";
 import Sale_BillView from "./pages/Sales/SaleBill/SaleBillView";
-import Sale_BillItemView from "./pages/Sales/SaleBill/SaleBillItemView"
+import Sale_BillItemView from "./pages/Sales/SaleBill/SaleBillItemView";
 import Signup from "./components/Signup";
+import Customers from "./pages/Customers/Customers";
 
 const theme = createTheme({
   palette: {
@@ -143,6 +144,9 @@ function App() {
                 </Route>
                 <Route path="/template/sale_bill_item_view/:productId/:billNumber">
                   <Sale_BillItemView />
+                </Route>
+                <Route path="/template/customers">
+                  <Customers />
                 </Route>
               </Switch>
             </Template>

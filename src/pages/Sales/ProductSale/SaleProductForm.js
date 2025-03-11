@@ -12,6 +12,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import Validation from "../../../Validation/SaleProductValidation";
 import { makeStyles } from "@mui/styles";
 import Ex_ProductSelectingPopup from "../../../components/Ex_ProductSelectingPopup";
+import CustomerSelectingPopup from "../../../components/CustomerSelectingPopup";
 import {
   getExportProductById,
   getProductionsForSales,
@@ -21,6 +22,8 @@ import { addSaleProduct } from "../../../services/Sales";
 import ProductionWritableTable from "../../../components/ProductionWritableTable";
 import { Padding } from "@mui/icons-material";
 import ProfitCard from "../../../components/ProfitCard";
+import { getCustomerById } from "../../../services/Customer";
+import CustomerDataComponent from "../../../components/CustomerDataComponent";
 
 const useStyles = makeStyles({
   categoryContainer: {
@@ -36,7 +39,7 @@ function SaleProductForm({ setOpenForm }) {
 
   const [value, setValue] = useState({
     _product: null,
-    _customer: "",
+    _customer: null,
     _paidStatus: "",
     _sellingQty: 0.0,
     _sellingPricePerUnit: 0.0,
@@ -48,7 +51,7 @@ function SaleProductForm({ setOpenForm }) {
   const resetValues = () => {
     setValue({
       _product: null,
-      _customer: "",
+      _customer: null,
       _paidStatus: "",
       _sellingQty: 0.0,
       _sellingPricePerUnit: 0.0,
@@ -58,11 +61,21 @@ function SaleProductForm({ setOpenForm }) {
     });
     setSelectedProduct([]);
     setSelectedProductData(null);
+    setSelectedCustomer([]);
+    setSelectedCustomerData(null);
+    setProfitMargin(0.0);
+    setProfit(0.0);
+    setproductionCost(0.0);
+    setRows([]);
+    resetErrors();
   };
 
   const [openProductTable, setOpenProductTable] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState([]);
   const [selectedProductData, setSelectedProductData] = useState(null);
+  const [openCustomerTable, setOpenCustomerTable] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState([]);
+  const [selectedCustomerData, setSelectedCustomerData] = useState(null);
   const [rows, setRows] = React.useState([]);
   const [profit, setProfit] = useState(0.0);
   const [profitMargin, setProfitMargin] = useState(0.0);
@@ -89,6 +102,10 @@ function SaleProductForm({ setOpenForm }) {
     setOpenProductTable(true);
   };
 
+  const handleOpenCustomerTable = async () => {
+    setOpenCustomerTable(true);
+  };
+
   const handleCloseProductTable = async () => {
     if (selectedProduct.length !== 0) {
       const productDataResponse = await getExportProductById(
@@ -99,6 +116,31 @@ function SaleProductForm({ setOpenForm }) {
       handleChange("_product", productDataResponse);
     } else {
       setOpenProductTable(false);
+    }
+  };
+
+  const handleCloseCustomerTable = async () => {
+    if (selectedCustomer.length !== 0) {
+      console.log(selectedCustomer[0]);
+      const customerResponse = await getCustomerById(selectedCustomer[0]);
+      if (customerResponse == "Something went wrong...") {
+        setError({
+          ...error,
+          _customer: "Something went wrong...",
+        });
+        return;
+      } else {
+        console.log("Customer Data: " + customerResponse);
+        setSelectedCustomerData(customerResponse);
+        setOpenCustomerTable(false);
+        setValue({
+          ...value,
+          _customer: selectedCustomer[0],
+        });
+      }
+      
+    } else {
+      setOpenCustomerTable(false);
     }
   };
 
@@ -540,18 +582,17 @@ function SaleProductForm({ setOpenForm }) {
               label="Profit Margin"
             />
           </Grid>
-          <Grid item>
-            <InputField
-              name="_customer"
-              errorMsg={error._customer}
-              value={value._customer}
-              onChange={(event, newInputValue) =>
-                handleChange(event, newInputValue)
-              }
-              type="text"
-              label="Customer"
-            />
-          </Grid>
+          {selectedCustomerData ? (
+            <Grid item xs={12} sm={4} sx={12}>
+              <CustomerDataComponent customer={selectedCustomerData} />
+            </Grid>
+          ) : (
+            <Grid item xs={12} sm={4} sx={12}>
+              <Button onClick={handleOpenCustomerTable} variant="outlined">
+                Select Customer
+              </Button>
+            </Grid>
+          )}
           <Grid item>
             <InputField
               name="_paidStatus"
@@ -613,6 +654,16 @@ function SaleProductForm({ setOpenForm }) {
             handleCloseProductTable={handleCloseProductTable}
             setSelectedProduct={setSelectedProduct}
             selectedProduct={selectedProduct}
+            isOneChoise={true}
+          />
+        ) : null}
+        {openCustomerTable ? (
+          <CustomerSelectingPopup
+            setOpenCustomerTable={setOpenCustomerTable}
+            openCustomerTable={openCustomerTable}
+            handleCloseCustomerTable={handleCloseCustomerTable}
+            setSelectedCustomer={setSelectedCustomer}
+            selectedCustomer={selectedCustomer}
             isOneChoise={true}
           />
         ) : null}

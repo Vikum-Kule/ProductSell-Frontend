@@ -207,7 +207,7 @@ function SaleBills() {
           createData(
             saleBillList[x].sellingDate,
             saleBillList[x].billNumber,
-            saleBillList[x].customer,
+            saleBillList[x].customer?.customerName,
             saleBillList[x].paidStatus,
             saleBillList[x].totalProfit,
             saleBillList[x].totalPrice,

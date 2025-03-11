@@ -13,9 +13,11 @@ import {
 import CircularProgress from "@mui/material/CircularProgress";
 import TableItem from "../../../components/TableItem";
 import { makeStyles } from "@mui/styles";
-import { getSaleBillById } from "../../../services/Sales";
+import { getSaleBillById, getSaleBillPaymentsById } from "../../../services/Sales";
 import CloseIcon from "@mui/icons-material/Close";
 import { useHistory } from "react-router";
+import CustomerDataComponent from "../../../components/CustomerDataComponent";
+import PaymentList from "../../../components/PaymentList";
 
 const useStyles = makeStyles({
   container: {
@@ -41,19 +43,24 @@ const useStyles = makeStyles({
 });
 
 function SaleBillView() {
-    const classes = useStyles();
-    const history = useHistory();
+  const classes = useStyles();
+  const history = useHistory();
   const { billId } = useParams();
   const [saleBill, setSaleBill] = React.useState(null);
   const [rows, setRows] = React.useState([]);
   const [isLoading, setLoading] = React.useState(false);
+  const [errors, setErrors] = React.useState({})
+  const [payments, setPayments] = React.useState(null)
 
   const fetchData = async () => {
-    // setLoading(true);
-    const result = await getSaleBillById(billId);
-    if (result) {
-      setSaleBill(result);
-      const billItemSet = result.billItems || [];
+    setLoading(true);
+    const billResult = await getSaleBillById(billId);
+    const billPaymentResult = await getSaleBillPaymentsById(billId);
+    console.log(billPaymentResult);
+
+    if (billResult !== "Something went wrong...") {
+      setSaleBill(billResult);
+      const billItemSet = billResult.billItems || [];
 
       const itemRows = billItemSet.map((item) => ({
         productName: item.product.name,
@@ -67,7 +74,22 @@ function SaleBillView() {
       }));
       console.log("Items: ", itemRows);
       setRows(itemRows);
+    }else{
+      setErrors({
+        ...errors,
+        _billDataError: "Unable to fetch bill data"
+      })
     }
+
+    if (billPaymentResult !== "Something went wrong...") {
+      setPayments(billPaymentResult)
+    }else{
+      setErrors({
+        ...errors,
+        _billPaymentError: "Unable to fetch bill payment data"
+      })
+    }
+
     setLoading(false);
   };
 
@@ -197,9 +219,13 @@ function SaleBillView() {
             </Grid>
             <Grid item xs={6}>
               <Typography className={classes.label}>Customer:</Typography>
-              <Typography className={classes.value}>
-                {saleBill.customer}
-              </Typography>
+              {saleBill.customer ? (
+                <Grid item xs={12} sm={12} sx={12}>
+                  <CustomerDataComponent customer={saleBill.customer} />
+                </Grid>
+              ) : (
+                <Typography></Typography>
+              )}
             </Grid>
             <Grid item xs={6}>
               <Typography className={classes.label}>Discount:</Typography>
@@ -246,6 +272,9 @@ function SaleBillView() {
               handleAction={handleAction}
             />
           </Grid>
+          {
+            payments ? (<PaymentList payments={payments}/>): null
+          }
         </>
       ) : (
         <Box sx={{ padding: "20px", textAlign: "center" }}>

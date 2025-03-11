@@ -4,15 +4,20 @@
   "private": true,
   "proxy": "http://localhost:8000",
   "dependencies": {
+    "@date-io/date-fns": "^3.2.1",
     "@emotion/react": "^11.5.0",
     "@emotion/styled": "^11.3.0",
     "@mui/icons-material": "^5.0.5",
+    "@mui/lab": "^6.0.0-beta.30",
     "@mui/material": "^5.0.6",
     "@mui/styles": "^5.0.2",
+    "@mui/utils": "6.4.6",
+    "@mui/x-date-pickers": "^7.27.3",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
     "axios": "^0.24.0",
+    "dayjs": "^1.11.13",
     "jwt-decode": "^3.1.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -44,5 +49,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   }
 }
