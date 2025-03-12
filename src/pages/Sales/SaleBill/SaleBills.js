@@ -229,7 +229,7 @@ function SaleBills() {
         history.push("/template/sale_bill_view/" + id);
         break;
       case "edit":
-        history.push("/template/sale_product_edit/" + id);
+        history.push("/template/sale_bill_edit/" + id);
         break;
       case "disable":
         setIsMatched(false);

@@ -21,6 +21,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useHistory } from "react-router";
 import CustomerDataComponent from "../../../components/CustomerDataComponent";
 import PaymentList from "../../../components/PaymentList";
+import dayjs from "dayjs";
+import PaymentOptions from "../../../components/PaymentOptions";
 
 const useStyles = makeStyles({
   container: {
@@ -53,7 +55,7 @@ function SaleBillUpdatePayments() {
   const [rows, setRows] = React.useState([]);
   const [isLoading, setLoading] = React.useState(false);
   const [errors, setErrors] = React.useState({});
-  const [payments, setPayments] = React.useState(null);
+  const [paymentMethods, setPaymentMethods] = React.useState(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -86,15 +88,15 @@ function SaleBillUpdatePayments() {
 
     if (billPaymentResult !== "Something went wrong...") {
         const billPayments = billPaymentResult.map((p) => ({
-            type:p.paymentType,
-            amount:p.amount,
-            bank:p.bank,
-            chequeNumber:p.chequeNumber,
-            returnDate: p.returnDate
-            returnDateInput: {p.returnDate != null ? }
-            returnBillNumber:
+          type: p.paymentType,
+          amount: p.amount,
+          bank: p.bank,
+          chequeNumber: p.chequeNumber,
+          returnDate: p.returnDate,
+          returnDateInput: p.returnDate != null ? dayjs(p.returnDate) : null,
+          returnBillNumber: p.returnBillNumber,
         }));
-      setPayments(billPaymentResult);
+      setPaymentMethods(billPayments);
     } else {
       setErrors({
         ...errors,
@@ -284,13 +286,12 @@ function SaleBillUpdatePayments() {
               handleAction={handleAction}
             />
           </Grid>
-          {payments ? (
-            <Grid container spacing={3} className={classes.fieldContainer}>
-              <Grid item xs={7}>
-                <PaymentList payments={payments} />
-              </Grid>
-            </Grid>
-          ) : null}
+          <Grid >
+            <PaymentOptions
+              paymentMethods={paymentMethods}
+              setPaymentMethods={setPaymentMethods}
+            />
+          </Grid>
         </>
       ) : (
         <Box sx={{ padding: "20px", textAlign: "center" }}>
