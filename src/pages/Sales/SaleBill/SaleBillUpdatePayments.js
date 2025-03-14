@@ -9,6 +9,7 @@ import {
   Box,
   Tooltip,
   IconButton,
+  Button,
 } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import TableItem from "../../../components/TableItem";
@@ -16,6 +17,7 @@ import { makeStyles } from "@mui/styles";
 import {
   getSaleBillById,
   getSaleBillPaymentsById,
+  updateSaleBillPayments,
 } from "../../../services/Sales";
 import CloseIcon from "@mui/icons-material/Close";
 import { useHistory } from "react-router";
@@ -23,6 +25,7 @@ import CustomerDataComponent from "../../../components/CustomerDataComponent";
 import PaymentList from "../../../components/PaymentList";
 import dayjs from "dayjs";
 import PaymentOptions from "../../../components/PaymentOptions";
+import FormAlert from "../../../components/FormAlert";
 
 const useStyles = makeStyles({
   container: {
@@ -56,6 +59,12 @@ function SaleBillUpdatePayments() {
   const [isLoading, setLoading] = React.useState(false);
   const [errors, setErrors] = React.useState({});
   const [paymentMethods, setPaymentMethods] = React.useState(null);
+  const [displayAlert, setAlert] = React.useState(false);
+
+  const [alertData, setAlertData] = React.useState({
+    type: "",
+    message: "",
+  });
 
   const fetchData = async () => {
     setLoading(true);
@@ -87,15 +96,15 @@ function SaleBillUpdatePayments() {
     }
 
     if (billPaymentResult !== "Something went wrong...") {
-        const billPayments = billPaymentResult.map((p) => ({
-          type: p.paymentType,
-          amount: p.amount,
-          bank: p.bank,
-          chequeNumber: p.chequeNumber,
-          returnDate: p.returnDate,
-          returnDateInput: p.returnDate != null ? dayjs(p.returnDate) : null,
-          returnBillNumber: p.returnBillNumber,
-        }));
+      const billPayments = billPaymentResult.map((p) => ({
+        type: p.paymentType,
+        amount: p.amount,
+        bank: p.bank,
+        chequeNumber: p.chequeNumber,
+        returnDate: p.returnDate,
+        returnDateInput: p.returnDate != null ? dayjs(p.returnDate) : null,
+        returnBillNumber: p.returnBillNumber,
+      }));
       setPaymentMethods(billPayments);
     } else {
       setErrors({
@@ -173,6 +182,26 @@ function SaleBillUpdatePayments() {
       "/template/sale_bill_item_view/" + id + "/" + saleBill.billNumber
     );
     history.push(`/template/sale_bill_item_view/${id}/${saleBill.billNumber}`);
+  };
+
+  const submitValue = async () => {
+    // setError(Validation(value, rows));
+    // console.log("Selected Data: ", rows);
+    // console.log("Payment Data: ", paymentMethods);
+    if (paymentMethods.length > 0) {
+      console.log("Payment data: ", paymentMethods);
+      let submitBillPayment = await updateSaleBillPayments(billId, paymentMethods);
+
+      if (submitBillPayment) {
+        history.push("/template/sale_bill_view/" + billId);
+      } else {
+        setAlertData({
+          type: "error",
+          message: "Something went wrong...",
+        });
+        setAlert(true);
+      }
+    }
   };
 
   return (
@@ -286,11 +315,28 @@ function SaleBillUpdatePayments() {
               handleAction={handleAction}
             />
           </Grid>
-          <Grid >
+          <Grid>
             <PaymentOptions
               paymentMethods={paymentMethods}
               setPaymentMethods={setPaymentMethods}
             />
+          </Grid>
+          <Grid style={{ marginTop: "20px" }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={12} sx={12}>
+                {displayAlert ? (
+                  <FormAlert
+                    type={alertData.type}
+                    message={alertData.message}
+                  />
+                ) : null}
+              </Grid>
+              <Grid item xs={12} sm={4} sx={12}>
+                <Button fullWidth variant="contained" onClick={submitValue}>
+                  Submit
+                </Button>
+              </Grid>
+            </Grid>
           </Grid>
         </>
       ) : (

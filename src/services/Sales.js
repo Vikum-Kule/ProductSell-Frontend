@@ -363,6 +363,36 @@ const getSaleBillPaymentsById = async (billId) => {
   }
 };
 
+// update sale bill payments
+const updateSaleBillPayments = async (billId, values) => {
+  // check access tocken expiry function
+  let token_valid_result = await token_valid();
+  if (token_valid_result) {
+    let token = getToken();
+
+    // get user name
+    let user = getUser();
+    console.log("User" + user.username);
+
+    return axios
+      .post("/api/billpayment/" + billId, values, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      })
+      .then(async (response) => {
+        console.log(response);
+        return true;
+      })
+      .catch((error) => {
+        console.log("update sale bill payment error: " + error);
+        return false;
+      });
+  }
+};
+
+
 export {
   getSaleProductData,
   addSaleProduct,
@@ -374,4 +404,5 @@ export {
   getSaleProductbyBillId,
   deleteSaleBillById,
   getSaleBillPaymentsById,
+  updateSaleBillPayments,
 };

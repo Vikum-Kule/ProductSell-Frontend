@@ -14,14 +14,13 @@ import RequestQuoteIcon from "@mui/icons-material/RequestQuote";
 import DescriptionIcon from "@mui/icons-material/Description";
 import InputField from "../FormComponents/InputField";
 
-
 const chequeStatus = [
-    { value: "PENDING", label: "Pending" },
-    { value: "CLEARED", label: "Cleared" },
-    { value: "RETURNED", label: "Returned" },
-  ];
+  { value: "PENDING", label: "Pending" },
+  { value: "CLEARED", label: "Cleared" },
+  { value: "RETURNED", label: "Returned" },
+];
 
-function PaymentList({ payments}) {
+function PaymentList({ payments }) {
   // Function to format date
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -54,15 +53,14 @@ function PaymentList({ payments}) {
                       <AttachMoneyIcon />
                     </Avatar>
                   </ListItemAvatar>
-                  <Grid container direction="row" spacing={2}>
-                    <Grid item>
-                      <ListItemText
-                        primary="Cash"
-                        secondary={`Payment Date: ${formatDate(
-                          payment.paymentDate
-                        )}`}
-                      />
-                    </Grid>
+                  <ListItemText
+                    style={{ width: "100%" }}
+                    primary="Cash"
+                    secondary={`Payment Date: ${formatDate(
+                      payment.paymentDate
+                    )}`}
+                  />
+                  <Grid container spacing={1}>
                     <Grid item>
                       <InputField
                         name="_amount"
@@ -130,13 +128,26 @@ function PaymentList({ payments}) {
                       payment.paymentDate
                     )}`}
                   />
-                  <InputField
-                    name="_amount"
-                    value={formatAmount(payment.amount)}
-                    type="text"
-                    label="Amount"
-                    isdisabled={true}
-                  />
+                  <Grid container spacing={1}>
+                    <Grid item xs={6}>
+                      <InputField
+                        name="_amount"
+                        value={formatAmount(payment.amount)}
+                        type="text"
+                        label="Amount"
+                        isdisabled={true}
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <InputField
+                        name="_status"
+                        value={payment.returnBillNumber}
+                        type="text"
+                        label="Bill Number"
+                        isdisabled={true}
+                      />
+                    </Grid>
+                  </Grid>
                 </ListItem>
               </Paper>
             );
