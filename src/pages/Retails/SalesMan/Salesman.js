@@ -27,7 +27,7 @@ const useStyles = makeStyles({
 });
 
 // import items all functionalties..
-function Customers() {
+function Salesman() {
   const classes = useStyles();
   const history = useHistory();
 
@@ -299,4 +299,4 @@ function Customers() {
   );
 }
 
-export default Customers;
+export default Salesman;

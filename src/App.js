@@ -33,6 +33,7 @@ import Sale_BillItemView from "./pages/Sales/SaleBill/SaleBillItemView";
 import Signup from "./components/Signup";
 import Customers from "./pages/Customers/Customers";
 import Sale_BillEdit from "./pages/Sales/SaleBill/SaleBillUpdatePayments";
+import Retail_Sale_Bill from "./pages/Retails/RetailBills/RetailBills";
 
 const theme = createTheme({
   palette: {
@@ -40,18 +41,6 @@ const theme = createTheme({
       main: "#EF5D8E", // Red color
     },
   },
-  // components: {
-  //   MuiButton: {
-  //     styleOverrides: {
-  //       root: {
-  //         color: "#FFF", // Set text color of all buttons to white
-  //         "&.MuiButton-containedPrimary": {
-  //           color: "#FFF", // Set text color of primary contained buttons to white
-  //         },
-  //       },
-  //     },
-  //   },
-  // },
 });
 
 function App() {
@@ -151,6 +140,9 @@ function App() {
                 </Route>
                 <Route path="/template/customers">
                   <Customers />
+                </Route>
+                <Route path="/template/retail_sale_bills">
+                  <Retail_Sale_Bill />
                 </Route>
               </Switch>
             </Template>

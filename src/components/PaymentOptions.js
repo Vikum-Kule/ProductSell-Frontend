@@ -16,9 +16,10 @@ const paymentTypes = [
   { value: "CASH", label: "Cash" },
   { value: "CHEQUE", label: "Cheque" },
   { value: "BILL", label: "Return Bill" },
+  { value: "RECEIPT", label: "Receipt" },
 ];
 
-function PaymentOptions({ paymentMethods, setPaymentMethods }) {
+function PaymentOptions({ paymentMethods, setPaymentMethods, isRetail }) {
   const addPaymentMethod = () => {
     setPaymentMethods([...paymentMethods, { type: "", amount: "" }]);
   };
@@ -36,7 +37,7 @@ function PaymentOptions({ paymentMethods, setPaymentMethods }) {
     setPaymentMethods(paymentMethods.filter((_, i) => i !== index));
   };
 
-  const[selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   return (
     <Grid>
@@ -140,6 +141,33 @@ function PaymentOptions({ paymentMethods, setPaymentMethods }) {
                 }
               />
             </Grid>
+          )}
+
+          {payment.type === "RECEIPT" && isRetail && (
+            <>
+              <Grid item xs={3}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Receipt Number"
+                  value={payment.receiptNumber || ""}
+                  onChange={(e) =>
+                    updatePaymentMethod(index, "receiptNumber", e.target.value)
+                  }
+                />
+              </Grid>
+              <Grid item xs={3}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Shop Name"
+                  value={payment.shopName || ""}
+                  onChange={(e) =>
+                    updatePaymentMethod(index, "shopName", e.target.value)
+                  }
+                />
+              </Grid>
+            </>
           )}
 
           <Grid item xs={1}>
