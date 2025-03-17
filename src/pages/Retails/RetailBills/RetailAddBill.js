@@ -27,6 +27,7 @@ import PaymentOptions from "../../../components/PaymentOptions";
 import SalesmanSelectingPopup from "../../../components/SalesmanSelectingPopup";
 import { getSalesPersonById } from "../../../services/SalesPerson";
 import SalesmanDataComponent from "../../../components/SalesmanDataComponent";
+import { addRetailSaleBill } from "../../../services/RetailSales";
 
 const useStyles = makeStyles({
   categoryContainer: {
@@ -272,10 +273,10 @@ function RetailAddBill({ setOpenForm }) {
     setError(Validation(value, rows));
     console.log("Selected Data: ", rows);
     console.log("Payment Data: ", paymentMethods);
+    console.log(error);
     if (
       !error._products &&
       !error._salesman &&
-      !error._paidStatus &&
       !error._totalPrice &&
       !error._billNumber
     ) {
@@ -302,24 +303,24 @@ function RetailAddBill({ setOpenForm }) {
         })),
       }));
 
-        console.log("bill List: ", billItemList);
-        console.log("bill data: ", saleBillData);
-    //   let submitBill = await addSaleBill(saleBillData, billItemList);
+      console.log("bill List: ", billItemList);
+      console.log("bill data: ", saleBillData);
+      let submitBill = await addRetailSaleBill(saleBillData, billItemList);
 
-    //   if (submitBill) {
-    //     resetValues();
-    //     setAlertData({
-    //       type: "success",
-    //       message: "Item submitted..",
-    //     });
-    //     setAlert(true);
-    //   } else {
-    //     setAlertData({
-    //       type: "error",
-    //       message: "Something went wrong...",
-    //     });
-    //     setAlert(true);
-    //   }
+      //   if (submitBill) {
+      //     resetValues();
+      //     setAlertData({
+      //       type: "success",
+      //       message: "Item submitted..",
+      //     });
+      //     setAlert(true);
+      //   } else {
+      //     setAlertData({
+      //       type: "error",
+      //       message: "Something went wrong...",
+      //     });
+      //     setAlert(true);
+      //   }
     }
   };
 
