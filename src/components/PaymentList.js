@@ -113,7 +113,7 @@ function PaymentList({ payments }) {
                 </ListItem>
               </Paper>
             );
-          } else {
+          } else if (payment.paymentType === "BILL") {
             return (
               <Paper style={{ marginBottom: "5px" }}>
                 <ListItem key={index} sx={{ width: "100%" }}>
@@ -123,6 +123,7 @@ function PaymentList({ payments }) {
                     </Avatar>
                   </ListItemAvatar>
                   <ListItemText
+                    style={{ width: "100%" }}
                     primary="Return Bill"
                     secondary={`Payment Date: ${formatDate(
                       payment.paymentDate
@@ -144,6 +145,45 @@ function PaymentList({ payments }) {
                         value={payment.returnBillNumber}
                         type="text"
                         label="Bill Number"
+                        isdisabled={true}
+                      />
+                    </Grid>
+                  </Grid>
+                </ListItem>
+              </Paper>
+            );
+          } else {
+            return (
+              <Paper style={{ marginBottom: "5px" }}>
+                <ListItem key={index} sx={{ width: "100%" }}>
+                  <ListItemAvatar>
+                    <Avatar>
+                      <DescriptionIcon />
+                    </Avatar>
+                  </ListItemAvatar>
+                  <ListItemText
+                    style={{ width: "100%" }}
+                    primary="Receipt"
+                    secondary={`Payment Date: ${formatDate(
+                      payment.paymentDate
+                    )}`}
+                  />
+                  <Grid container spacing={1}>
+                    <Grid item xs={6}>
+                      <InputField
+                        name="_amount"
+                        value={formatAmount(payment.amount)}
+                        type="text"
+                        label="Amount"
+                        isdisabled={true}
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <InputField
+                        name="_shop"
+                        value={payment.shopName}
+                        type="text"
+                        label="Shop Name"
                         isdisabled={true}
                       />
                     </Grid>

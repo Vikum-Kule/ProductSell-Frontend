@@ -26,7 +26,6 @@ const useStyles = makeStyles({
   },
 });
 
-// import items all functionalties..
 function Salesman() {
   const classes = useStyles();
   const history = useHistory();
@@ -103,28 +102,31 @@ function Salesman() {
   };
 
   //fetch data for pagination actions
-  const fetchData = async (customerFilter, pageNo) => {
+  const fetchData = async (salesmanFilter, pageNo) => {
     setLoading(true);
     //get import items data when page loading...
-    console.log(page);
-    let result = await getCustomers(pageNo, rowsPerPage, customerFilter);
-    let customerSet = result.content;
+    let result = await getSalesPersonByPaging(
+      pageNo,
+      rowsPerPage,
+      salesmanFilter
+    );
+    let salesmanSet = result.content;
+    console.log("SalesmanSet", salesmanSet);
 
     //set total rows and pages
     setTotalPages(result.totalPages);
-    setTotalRows(result.totalElements);
 
     const newSet = [];
-    if (customerSet) {
-      for (let x = 0; x < customerSet.length; x++) {
+    if (salesmanSet) {
+      for (let x = 0; x < salesmanSet.length; x++) {
         //set data in new set list to display in the table
         newSet.push(
           createData(
-            customerSet[x].customerName,
-            customerSet[x].phone,
-            customerSet[x].email,
-            customerSet[x].status,
-            customerSet[x].customerId
+            salesmanSet[x].firstName + " " + salesmanSet[x].lastName,
+            salesmanSet[x].email,
+            salesmanSet[x].phoneNumber,
+            salesmanSet[x].status,
+            salesmanSet[x].salespersonId
           )
         );
       }

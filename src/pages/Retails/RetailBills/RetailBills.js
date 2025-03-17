@@ -208,12 +208,13 @@ function SaleBills() {
     if (saleBillList) {
       for (let x = 0; x < saleBillList.length; x++) {
         //set data in new set list to display in the table
-        console.log("Customer :", saleBillList[x].customer);
         newSet.push(
           createData(
             saleBillList[x].sellingDate,
             saleBillList[x].billNumber,
-            saleBillList[x].customer?.customerName,
+            saleBillList[x].salesPerson?.firstName +
+              " " +
+            saleBillList[x].salesPerson?.lastName,
             saleBillList[x].paidStatus,
             saleBillList[x].totalProfit,
             saleBillList[x].totalPrice,
@@ -232,10 +233,10 @@ function SaleBills() {
     switch (event) {
       case "view":
         console.log("View Id:", id);
-        history.push("/template/sale_bill_view/" + id);
+        history.push("/template/retail_bill_view/" + id);
         break;
       case "edit":
-        history.push("/template/sale_bill_edit/" + id);
+        history.push("/template/retail_bill_edit/" + id);
         break;
       case "disable":
         setIsMatched(false);

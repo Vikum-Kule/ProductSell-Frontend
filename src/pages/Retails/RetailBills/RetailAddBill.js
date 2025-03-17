@@ -307,20 +307,20 @@ function RetailAddBill({ setOpenForm }) {
       console.log("bill data: ", saleBillData);
       let submitBill = await addRetailSaleBill(saleBillData, billItemList);
 
-      //   if (submitBill) {
-      //     resetValues();
-      //     setAlertData({
-      //       type: "success",
-      //       message: "Item submitted..",
-      //     });
-      //     setAlert(true);
-      //   } else {
-      //     setAlertData({
-      //       type: "error",
-      //       message: "Something went wrong...",
-      //     });
-      //     setAlert(true);
-      //   }
+        if (submitBill) {
+          resetValues();
+          setAlertData({
+            type: "success",
+            message: "Retail Bill submitted..",
+          });
+          setAlert(true);
+        } else {
+          setAlertData({
+            type: "error",
+            message: "Something went wrong...",
+          });
+          setAlert(true);
+        }
     }
   };
 

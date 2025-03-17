@@ -144,13 +144,13 @@ export default function SalesmanSelectingPopup({
     },
   ];
 
-  function createData(_name, _email, _phone, _status, _cutomer_id) {
+  function createData(_name, _email, _phone, _status, _salesman_id) {
     return {
       _name,
       _email,
       _phone,
       _status,
-      _cutomer_id,
+      _salesman_id,
     };
   }
 
@@ -245,7 +245,7 @@ export default function SalesmanSelectingPopup({
                 rows={salesmanRows}
                 setSelected={setSelectedSalesman}
                 selected={selectedSalesman}
-                _key="_cutomer_id"
+                _key="_salesman_id"
                 setOpenTable={setOpenSalesmanTable}
               />
             </Grid>
