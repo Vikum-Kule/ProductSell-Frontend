@@ -466,11 +466,6 @@ function SaleAddBill({ setOpenForm }) {
       </Grid>
       <Grid item xs={12} sm={6} sx={12}>
         <Grid container direction="column" spacing={2}>
-          <Grid item xs={12} sm={4} sx={12}>
-            <Button onClick={handleOpenProductTable} variant="outlined">
-              Select Product
-            </Button>
-          </Grid>
           <Grid item>
             <InputField
               name="_billNumber"
@@ -494,25 +489,12 @@ function SaleAddBill({ setOpenForm }) {
               </Button>
             </Grid>
           )}
-          {/* <Grid item>
-            <InputField
-              name="_paidStatus"
-              errorMsg={error._paidStatus}
-              value={value._paidStatus}
-              onChange={(event, newInputValue) =>
-                handleChange(event, newInputValue)
-              }
-              type="text"
-              label="Paid Status"
-            />
-          </Grid> */}
+          <Grid item xs={12} sm={4} sx={12}>
+            <Button onClick={handleOpenProductTable} variant="outlined">
+              Select Product
+            </Button>
+          </Grid>
         </Grid>
-      </Grid>
-      <Grid item xs={12} sm={12} sx={12}>
-        <PaymentOptions
-          paymentMethods={paymentMethods}
-          setPaymentMethods={setPaymentMethods}
-        />
       </Grid>
       <Grid item xs={12} sm={12} sx={12}>
         {selectedProductData.length != 0 ? (
@@ -542,6 +524,13 @@ function SaleAddBill({ setOpenForm }) {
             </Typography>
           </Grid>
         )}
+      </Grid>
+
+      <Grid item xs={12} sm={12} sx={12}>
+        <PaymentOptions
+          paymentMethods={paymentMethods}
+          setPaymentMethods={setPaymentMethods}
+        />
       </Grid>
       {selectedProductData.length != 0 ? (
         <Grid item xs={12} sm={6} sx={12}>
