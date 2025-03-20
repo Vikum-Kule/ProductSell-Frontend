@@ -262,6 +262,7 @@ const addSaleBill = async (values, productList) => {
           addedBy: user.username,
           billNumber: values._billNumber,
           totalProfit: values._totalProfit,
+          remainingAmount: values._remainingAmount,
           note: "",
           billItems: productList,
         },
@@ -306,6 +307,39 @@ const getSaleBillById = async (billId) => {
       .catch((error) => {
         // return "Something went wrong...";
         console.log("get Sale product " + error);
+        return "Something went wrong...";
+      });
+  }
+};
+
+//get sale product according to the given Id
+const updateRemainingAmount = async (bill) => {
+  //check access tocken expiry function
+  let token_valid_result = await token_valid();
+  if (token_valid_result) {
+    let token = getToken();
+    return axios
+      .put(
+        "/api/salebill",
+        {
+          billId: bill.billId,
+          remainingAmount: bill.remainingAmount,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+        }
+      )
+      .then((response) => {
+        console.log(response);
+        console.log("Response all--", response.data);
+        return response.data;
+      })
+      .catch((error) => {
+        // return "Something went wrong...";
+        console.log("Update Bill Remaining Amount " + error);
         return "Something went wrong...";
       });
   }
@@ -392,7 +426,6 @@ const updateSaleBillPayments = async (billId, values) => {
   }
 };
 
-
 export {
   getSaleProductData,
   addSaleProduct,
@@ -405,4 +438,5 @@ export {
   deleteSaleBillById,
   getSaleBillPaymentsById,
   updateSaleBillPayments,
+  updateRemainingAmount,
 };

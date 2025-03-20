@@ -18,7 +18,6 @@ import Alart from "../../../components/Alart";
 import {
   deleteSaleBillById,
   getSaleBillData,
-  getSaleProductData,
 } from "../../../services/Sales";
 import SaleAddBill from "./SaleAddBill";
 import ConfirmationPopup from "../../../components/ConfirmationPopup";

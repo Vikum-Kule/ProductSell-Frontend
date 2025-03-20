@@ -17,6 +17,7 @@ import { makeStyles } from "@mui/styles";
 import {
   getSaleBillById,
   getSaleBillPaymentsById,
+  updateRemainingAmount,
   updateSaleBillPayments,
 } from "../../../services/Sales";
 import CloseIcon from "@mui/icons-material/Close";
@@ -26,6 +27,7 @@ import PaymentList from "../../../components/PaymentList";
 import dayjs from "dayjs";
 import PaymentOptions from "../../../components/PaymentOptions";
 import FormAlert from "../../../components/FormAlert";
+import InputField from "../../../FormComponents/InputField";
 
 const useStyles = makeStyles({
   container: {
@@ -65,6 +67,20 @@ function SaleBillUpdatePayments() {
     type: "",
     message: "",
   });
+
+  useEffect(() => {
+    console.log("Use effect called...");
+    handleRemainingAmounts();
+  }, [paymentMethods]);
+
+  const handleRemainingAmounts = () =>{
+    const remainingValue = paymentMethods?.reduce((sum, payment) => sum + parseFloat(payment.amount), 0);
+    const updatedRemainingValue = parseFloat(saleBill?.totalPrice) - remainingValue
+    setSaleBill({
+      ...saleBill,
+      remainingAmount: updatedRemainingValue
+    })
+  } 
 
   const fetchData = async () => {
     setLoading(true);
@@ -185,14 +201,15 @@ function SaleBillUpdatePayments() {
   };
 
   const submitValue = async () => {
-    // setError(Validation(value, rows));
-    // console.log("Selected Data: ", rows);
-    // console.log("Payment Data: ", paymentMethods);
     if (paymentMethods.length > 0) {
       console.log("Payment data: ", paymentMethods);
-      let submitBillPayment = await updateSaleBillPayments(billId, paymentMethods);
+      let submitBillPayment = await updateSaleBillPayments(
+        billId,
+        paymentMethods
+      );
+      let updateBillRemainingAmount = await updateRemainingAmount(saleBill)
 
-      if (submitBillPayment) {
+      if (submitBillPayment && updateBillRemainingAmount !== "Something went wrong...") {
         history.push("/template/sale_bill_view/" + billId);
       } else {
         setAlertData({
@@ -289,6 +306,15 @@ function SaleBillUpdatePayments() {
               <Typography className={classes.value}>
                 {saleBill.totalPrice}
               </Typography>
+            </Grid>
+            <Grid item>
+              <InputField
+                isdisabled={true}
+                name="_remainingAmount"
+                value={saleBill.remainingAmount}
+                type="text"
+                label="Remaining Amount"
+              />
             </Grid>
             <Grid item xs={12}>
               <Typography className={classes.label}>Note:</Typography>

@@ -139,7 +139,7 @@ function Customers() {
   const handleAction = async (event, id) => {
     switch (event) {
       case "view":
-        history.push("/template/im_item_view/" + id);
+        history.push("/template/customer_view/" + id);
         break;
       case "edit":
         history.push("/template/im_item_edit/" + id);

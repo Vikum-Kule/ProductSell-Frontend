@@ -36,6 +36,7 @@ import Sale_BillEdit from "./pages/Sales/SaleBill/SaleBillUpdatePayments";
 import Retail_Sale_Bill from "./pages/Retails/RetailBills/RetailBills";
 import Retail_BillView from "./pages/Retails/RetailBills/RetailBillView"
 import Retail_BillEdit from "./pages/Retails/RetailBills/RetailBillUpdatePayments";
+import CustomerView from "./pages/Customers/CustomerView"
 
 const theme = createTheme({
   palette: {
@@ -151,6 +152,9 @@ function App() {
                 </Route>
                 <Route path="/template/retail_bill_edit/:billId">
                   <Retail_BillEdit />
+                </Route>
+                <Route path="/template/customer_view/:customerId">
+                  <CustomerView />
                 </Route>
               </Switch>
             </Template>

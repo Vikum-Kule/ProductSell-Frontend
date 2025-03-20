@@ -43,6 +43,7 @@ function SaleAddBill({ setOpenForm }) {
     _customer: null,
     _paidStatus: "",
     _totalPrice: 0.0,
+    _remainingAmount: 0.0,
     _totalCost: 0.0,
     _discount_percentage: 0.0,
     _discount_value: 0.0,
@@ -56,6 +57,7 @@ function SaleAddBill({ setOpenForm }) {
       _customer: null,
       _paidStatus: "",
       _totalPrice: 0.0,
+      _remainingAmount: 0.0,
       _totalCost: 0.0,
       _discount_percentage: 0.0,
       _discount_value: 0.0,
@@ -112,7 +114,7 @@ function SaleAddBill({ setOpenForm }) {
   useEffect(() => {
     console.log("Use effect called...");
     handleTotalAmounts();
-  }, [openProductProcess, discountVal]);
+  }, [openProductProcess, discountVal, paymentMethods]);
 
   const handleOpenProductTable = async () => {
     setOpenProductTable(true);
@@ -126,6 +128,7 @@ function SaleAddBill({ setOpenForm }) {
     console.log("Setep in..");
     if (rows.length > 0) {
       let totalBillProfit = 0.0;
+      let remainingAmount = 0.0;
       let totalItemPrice = 0.0;
       let totalBillCost = 0.0;
       rows.map((row) => {
@@ -148,11 +151,17 @@ function SaleAddBill({ setOpenForm }) {
       console.log("Total Item Price: ", totalItemPrice);
       console.log("Total Bill Cost: ", totalBillCost);
       console.log("Total Bill Profit: ", totalBillProfit);
+
+      //Calculate Remaining amounts
+      const totalPayment = paymentMethods?.reduce((sum, payment) => sum + parseFloat(payment.amount), 0);
+      console.log(totalPayment)
+      remainingAmount = totalItemPrice - totalPayment
       setValue({
         ...value,
         _totalPrice: totalItemPrice,
         _totalCost: totalBillCost,
         _totalProfit: totalBillProfit,
+        _remainingAmount: remainingAmount,
       });
     }
   };
@@ -585,13 +594,22 @@ function SaleAddBill({ setOpenForm }) {
             <Grid item>
               <InputField
                 name="_totalPrice"
-                errorMsg={error._paidStatus}
+                errorMsg={error._totalPrice}
                 value={value._totalPrice}
                 onChange={(event, newInputValue) =>
                   handleChange(event, newInputValue)
                 }
                 type="text"
                 label="Total Price"
+              />
+            </Grid>
+            <Grid item>
+              <InputField
+                isdisabled={true}
+                name="_remainingAmount"
+                value={value._remainingAmount}
+                type="text"
+                label="Remaining Amount"
               />
             </Grid>
           </Grid>

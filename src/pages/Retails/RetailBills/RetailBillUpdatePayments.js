@@ -17,6 +17,7 @@ import { makeStyles } from "@mui/styles";
 import {
   getSaleBillById,
   getSaleBillPaymentsById,
+  updateRemainingAmount,
   updateSaleBillPayments,
 } from "../../../services/Sales";
 import CloseIcon from "@mui/icons-material/Close";
@@ -27,6 +28,7 @@ import dayjs from "dayjs";
 import PaymentOptions from "../../../components/PaymentOptions";
 import FormAlert from "../../../components/FormAlert";
 import SalesmanDataComponent from "../../../components/SalesmanDataComponent";
+import InputField from "../../../FormComponents/InputField";
 
 const useStyles = makeStyles({
   container: {
@@ -66,6 +68,24 @@ function RetailBillUpdatePayments() {
     type: "",
     message: "",
   });
+
+  useEffect(() => {
+    console.log("Use effect called...");
+    handleRemainingAmounts();
+  }, [paymentMethods]);
+
+  const handleRemainingAmounts = () => {
+    const remainingValue = paymentMethods?.reduce(
+      (sum, payment) => sum + parseFloat(payment.amount),
+      0
+    );
+    const updatedRemainingValue =
+      parseFloat(retailBill?.totalPrice) - remainingValue;
+    setRetailBill({
+      ...retailBill,
+      remainingAmount: updatedRemainingValue,
+    });
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -200,7 +220,12 @@ function RetailBillUpdatePayments() {
         paymentMethods
       );
 
-      if (submitBillPayment) {
+      let updateBillRemainingAmount = await updateRemainingAmount(retailBill);
+
+      if (
+        submitBillPayment &&
+        updateBillRemainingAmount !== "Something went wrong..."
+      ) {
         history.push("/template/sale_bill_view/" + billId);
       } else {
         setAlertData({
@@ -297,6 +322,15 @@ function RetailBillUpdatePayments() {
               <Typography className={classes.value}>
                 {retailBill.totalPrice}
               </Typography>
+            </Grid>
+            <Grid item>
+              <InputField
+                isdisabled={true}
+                name="_remainingAmount"
+                value={retailBill.remainingAmount}
+                type="text"
+                label="Remaining Amount"
+              />
             </Grid>
             <Grid item xs={12}>
               <Typography className={classes.label}>Note:</Typography>

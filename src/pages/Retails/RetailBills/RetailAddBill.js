@@ -47,6 +47,7 @@ function RetailAddBill({ setOpenForm }) {
     _salesman: null,
     _paidStatus: "",
     _totalPrice: 0.0,
+    _remainingAmount: 0.0,
     _totalCost: 0.0,
     _discount_percentage: 0.0,
     _discount_value: 0.0,
@@ -60,6 +61,7 @@ function RetailAddBill({ setOpenForm }) {
       _salesman: null,
       _paidStatus: "",
       _totalPrice: 0.0,
+      _remainingAmount: 0.0,
       _totalCost: 0.0,
       _discount_percentage: 0.0,
       _discount_value: 0.0,
@@ -116,7 +118,7 @@ function RetailAddBill({ setOpenForm }) {
   useEffect(() => {
     console.log("Use effect called...");
     handleTotalAmounts();
-  }, [openProductProcess, discountVal]);
+  }, [openProductProcess, discountVal, paymentMethods]);
 
   const handleOpenProductTable = async () => {
     setOpenProductTable(true);
@@ -131,6 +133,7 @@ function RetailAddBill({ setOpenForm }) {
     if (rows.length > 0) {
       let totalBillProfit = 0.0;
       let totalItemPrice = 0.0;
+      let remainingAmount = 0.0;
       let totalBillCost = 0.0;
       rows.map((row) => {
         if (row.totalCost != 0.0) {
@@ -152,11 +155,21 @@ function RetailAddBill({ setOpenForm }) {
       console.log("Total Item Price: ", totalItemPrice);
       console.log("Total Bill Cost: ", totalBillCost);
       console.log("Total Bill Profit: ", totalBillProfit);
+
+      //Calculate Remaining amounts
+      const totalPayment = paymentMethods?.reduce(
+        (sum, payment) => sum + parseFloat(payment.amount),
+        0
+      );
+      console.log(totalPayment);
+      remainingAmount = totalItemPrice - totalPayment;
+
       setValue({
         ...value,
         _totalPrice: totalItemPrice,
         _totalCost: totalBillCost,
         _totalProfit: totalBillProfit,
+        _remainingAmount: remainingAmount,
       });
     }
   };
@@ -307,20 +320,20 @@ function RetailAddBill({ setOpenForm }) {
       console.log("bill data: ", saleBillData);
       let submitBill = await addRetailSaleBill(saleBillData, billItemList);
 
-        if (submitBill) {
-          resetValues();
-          setAlertData({
-            type: "success",
-            message: "Retail Bill submitted..",
-          });
-          setAlert(true);
-        } else {
-          setAlertData({
-            type: "error",
-            message: "Something went wrong...",
-          });
-          setAlert(true);
-        }
+      if (submitBill) {
+        resetValues();
+        setAlertData({
+          type: "success",
+          message: "Retail Bill submitted..",
+        });
+        setAlert(true);
+      } else {
+        setAlertData({
+          type: "error",
+          message: "Something went wrong...",
+        });
+        setAlert(true);
+      }
     }
   };
 
@@ -471,11 +484,6 @@ function RetailAddBill({ setOpenForm }) {
       </Grid>
       <Grid item xs={12} sm={6} sx={12}>
         <Grid container direction="column" spacing={2}>
-          <Grid item xs={12} sm={4} sx={12}>
-            <Button onClick={handleOpenProductTable} variant="outlined">
-              Select Product
-            </Button>
-          </Grid>
           <Grid item>
             <InputField
               name="_billNumber"
@@ -488,6 +496,7 @@ function RetailAddBill({ setOpenForm }) {
               label="Bill Number"
             />
           </Grid>
+
           {selectedSalesmanData ? (
             <Grid item xs={12} sm={4} sx={12}>
               <SalesmanDataComponent salesman={selectedSalesmanData} />
@@ -499,14 +508,13 @@ function RetailAddBill({ setOpenForm }) {
               </Button>
             </Grid>
           )}
+
+          <Grid item xs={12} sm={4} sx={12}>
+            <Button onClick={handleOpenProductTable} variant="outlined">
+              Select Product
+            </Button>
+          </Grid>
         </Grid>
-      </Grid>
-      <Grid item xs={12} sm={12} sx={12}>
-        <PaymentOptions
-          paymentMethods={paymentMethods}
-          setPaymentMethods={setPaymentMethods}
-          isRetail={true}
-        />
       </Grid>
       <Grid item xs={12} sm={12} sx={12}>
         {selectedProductData.length != 0 ? (
@@ -536,6 +544,14 @@ function RetailAddBill({ setOpenForm }) {
             </Typography>
           </Grid>
         )}
+      </Grid>
+
+      <Grid item xs={12} sm={12} sx={12}>
+        <PaymentOptions
+          paymentMethods={paymentMethods}
+          setPaymentMethods={setPaymentMethods}
+          isRetail={true}
+        />
       </Grid>
       {selectedProductData.length != 0 ? (
         <Grid item xs={12} sm={6} sx={12}>
@@ -597,6 +613,15 @@ function RetailAddBill({ setOpenForm }) {
                 }
                 type="text"
                 label="Total Price"
+              />
+            </Grid>
+            <Grid item>
+              <InputField
+                isdisabled={true}
+                name="_remainingAmount"
+                value={value._remainingAmount}
+                type="text"
+                label="Remaining Amount"
               />
             </Grid>
           </Grid>

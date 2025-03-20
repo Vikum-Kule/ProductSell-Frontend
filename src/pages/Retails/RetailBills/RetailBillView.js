@@ -162,7 +162,9 @@ function RetailBillView() {
       "url: ",
       "/template/sale_bill_item_view/" + id + "/" + retailBill.billNumber
     );
-    history.push(`/template/sale_bill_item_view/${id}/${retailBill.billNumber}`);
+    history.push(
+      `/template/sale_bill_item_view/${id}/${retailBill.billNumber}`
+    );
   };
 
   return (
@@ -250,6 +252,12 @@ function RetailBillView() {
               <Typography className={classes.value}>
                 {retailBill.totalPrice}
               </Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="h7" fontWeight="700">
+                Remaining Amount
+              </Typography>
+              <Typography>{retailBill.remainingAmount}</Typography>
             </Grid>
             <Grid item xs={12}>
               <Typography className={classes.label}>Note:</Typography>

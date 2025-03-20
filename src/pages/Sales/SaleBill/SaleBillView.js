@@ -250,6 +250,12 @@ function SaleBillView() {
                 {saleBill.totalPrice}
               </Typography>
             </Grid>
+            <Grid item xs={6}>
+              <Typography variant="h7" fontWeight="700">
+                Remaining Amount
+              </Typography>
+              <Typography>{saleBill.remainingAmount}</Typography>
+            </Grid>
             <Grid item xs={12}>
               <Typography className={classes.label}>Note:</Typography>
               <Typography className={classes.value}>{saleBill.note}</Typography>
