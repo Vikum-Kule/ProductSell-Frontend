@@ -25,6 +25,8 @@ import ConfirmationPopup from "../../../components/ConfirmationPopup";
 import FormAlert from "../../../components/FormAlert";
 import { getRetailSaleBillData } from "../../../services/RetailSales";
 import RetailAddBill from "./RetailAddBill";
+import SalesmanSelectingPopup from "../../../components/SalesmanSelectingPopup";
+import Ex_ProductSelectingPopup from "../../../components/Ex_ProductSelectingPopup";
 
 const useStyles = makeStyles({
   container: {
@@ -141,6 +143,12 @@ function SaleBills() {
   const [confirmationText, setConfirmationText] = React.useState("");
   const [deletingRow, setDeletingRow] = React.useState("");
 
+  const [openProductSelection, setOpenProductSelection] = React.useState(false);
+  const [openSalesPersonSelection, setOpenSalesPersonSelection] =
+    React.useState();
+  const [selectedSalesman, setSelectedSalesman] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState([]);
+
   const [displayAlert, setAlert] = useState(false);
   const [alertData, setAlertData] = useState({
     type: "",
@@ -214,7 +222,7 @@ function SaleBills() {
             saleBillList[x].billNumber,
             saleBillList[x].salesPerson?.firstName +
               " " +
-            saleBillList[x].salesPerson?.lastName,
+              saleBillList[x].salesPerson?.lastName,
             saleBillList[x].paidStatus,
             saleBillList[x].totalProfit,
             saleBillList[x].totalPrice,
@@ -290,6 +298,20 @@ function SaleBills() {
     });
   };
 
+  const handleOpenProductTable = () => {
+    setOpenProductSelection(!openProductSelection);
+    if (!openProductSelection) {
+      console.log("Closed product selection");
+    }
+  };
+
+  const handleOpenSalesmanSelection = () => {
+    setOpenSalesPersonSelection(!openSalesPersonSelection);
+    if (openSalesPersonSelection) {
+      console.log("Closed product salesman selection");
+    }
+  };
+
   return (
     <>
       <Paper className={classes.container} elevation={8}>
@@ -326,6 +348,16 @@ function SaleBills() {
                     type="text"
                     label="Bill Number"
                   />
+                </Grid>
+                <Grid item xs={12} sm={4} sx={12}>
+                  <Button onClick={handleOpenProductTable} variant="outlined">
+                    Select Product
+                  </Button>
+                </Grid>
+                <Grid item xs={12} sm={4} sx={12}>
+                  <Button onClick={handleOpenSalesmanSelection} variant="outlined">
+                    Select Salesman
+                  </Button>
                 </Grid>
                 <Grid item xs={12} sm={3} sx={12}>
                   <InputField
@@ -452,6 +484,26 @@ function SaleBills() {
                   setIsMatched={setIsMatched}
                 />
               ) : null}
+              {openSalesPersonSelection ? (
+                <SalesmanSelectingPopup
+                  setOpenSalesmanTable={setOpenSalesPersonSelection}
+                  openSalesmanTable={openSalesPersonSelection}
+                  handleCloseSalesmanTable={handleOpenSalesmanSelection}
+                  setSelectedSalesman={setSelectedSalesman}
+                  selectedSalesman={selectedSalesman}
+                  isOneChoise={true}
+                />
+              ) : null}
+              {openProductSelection ? (
+                        <Ex_ProductSelectingPopup
+                          setOpenProductTable={setOpenProductSelection}
+                          openProductTable={openProductSelection}
+                          handleCloseProductTable={handleOpenProductTable}
+                          setSelectedProduct={setSelectedProduct}
+                          selectedProduct={selectedProduct}
+                          isOneChoise={false}
+                        />
+                      ) : null}
             </Grid>
           </Grid>
         )}
