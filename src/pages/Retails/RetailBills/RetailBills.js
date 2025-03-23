@@ -1,9 +1,11 @@
 import {
   Button,
   Grid,
+  MenuItem,
   Pagination,
   Paper,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
@@ -27,6 +29,7 @@ import { getRetailSaleBillData } from "../../../services/RetailSales";
 import RetailAddBill from "./RetailAddBill";
 import SalesmanSelectingPopup from "../../../components/SalesmanSelectingPopup";
 import Ex_ProductSelectingPopup from "../../../components/Ex_ProductSelectingPopup";
+import BillListTable from "../../../components/BillListTable";
 
 const useStyles = makeStyles({
   container: {
@@ -36,6 +39,15 @@ const useStyles = makeStyles({
     padding: "10px",
   },
 });
+
+const billStatus = [
+  { value: "DRAFT", label: "Draft" },
+  { value: "REJECTED", label: "Rejected" },
+  { value: "APPROVED", label: "Approved" },
+  { value: "AWAITING", label: "Awaiting Approval" },
+  { value: "PENDING", label: "Pending" },
+  { value: "SETTLED", label: "Settled" },
+];
 
 // Sale products all functionalties..
 function SaleBills() {
@@ -96,7 +108,7 @@ function SaleBills() {
     { id: "date", label: "Date", minWidth: 80 },
     { id: "billNumber", label: "Bill Number", minWidth: 100 },
     { id: "customer", label: "Customer", minWidth: 80 },
-    { id: "paidStatus", label: "Paid Status", minWidth: 100 },
+    { id: "status", label: "Status", minWidth: 100 },
     {
       id: "totalProfit",
       label: "Total Profit",
@@ -116,7 +128,7 @@ function SaleBills() {
     date,
     billNumber,
     customer,
-    paidStatus,
+    status,
     totalProfit,
     totalAmount,
     action,
@@ -126,7 +138,7 @@ function SaleBills() {
       date,
       billNumber,
       customer,
-      paidStatus,
+      status,
       totalProfit,
       totalAmount,
       action,
@@ -223,7 +235,7 @@ function SaleBills() {
             saleBillList[x].salesPerson?.firstName +
               " " +
               saleBillList[x].salesPerson?.lastName,
-            saleBillList[x].paidStatus,
+            saleBillList[x].status,
             saleBillList[x].totalProfit,
             saleBillList[x].totalPrice,
             saleBillList[x].billId
@@ -243,7 +255,7 @@ function SaleBills() {
         console.log("View Id:", id);
         history.push("/template/retail_bill_view/" + id);
         break;
-      case "edit":
+      case "production":
         history.push("/template/retail_bill_edit/" + id);
         break;
       case "disable":
@@ -271,27 +283,29 @@ function SaleBills() {
   // filter values
   const [filter, setFilter] = useState({
     _billNumber: "",
-    _productName: "",
+    _products: [],
     _barcode: "",
     _addedBy: "",
-    _customer: "",
-    _paidStatus: "",
+    _salesman: [],
+    _status: "",
   });
 
   //reset filters
   const resetFilters = () => {
     setFilter({
       _billNumber: "",
-      _productName: "",
+      _products: [],
       _barcode: "",
       _addedBy: "",
-      _customer: "",
-      _paidStatus: "",
+      _salesman: [],
+      _status: "",
     });
+    setSelectedProduct([]);
+    setSelectedSalesman([]);
   };
 
   //to handle changing filters
-  const handleFilterChange = (name, val) => {
+    const handleFilterChange = (name, val) => {
     setFilter({
       ...filter,
       [name]: val,
@@ -300,15 +314,21 @@ function SaleBills() {
 
   const handleOpenProductTable = () => {
     setOpenProductSelection(!openProductSelection);
-    if (!openProductSelection) {
-      console.log("Closed product selection");
+    if (openProductSelection) {
+      setFilter({
+        ...filter,
+        _products: selectedProduct,
+      });
     }
   };
 
   const handleOpenSalesmanSelection = () => {
     setOpenSalesPersonSelection(!openSalesPersonSelection);
     if (openSalesPersonSelection) {
-      console.log("Closed product salesman selection");
+      setFilter({
+        ...filter,
+        _salesman: selectedSalesman,
+      });
     }
   };
 
@@ -338,7 +358,7 @@ function SaleBills() {
             </Grid>
             <Grid item xs={12} sm={12} sx={12}>
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={2} sx={12}>
+                <Grid item xs={12} sm={4} sx={12}>
                   <InputField
                     name="_billNumber"
                     value={filter._barcode}
@@ -347,38 +367,6 @@ function SaleBills() {
                     }
                     type="text"
                     label="Bill Number"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={4} sx={12}>
-                  <Button onClick={handleOpenProductTable} variant="outlined">
-                    Select Product
-                  </Button>
-                </Grid>
-                <Grid item xs={12} sm={4} sx={12}>
-                  <Button onClick={handleOpenSalesmanSelection} variant="outlined">
-                    Select Salesman
-                  </Button>
-                </Grid>
-                <Grid item xs={12} sm={3} sx={12}>
-                  <InputField
-                    name="_productName"
-                    value={filter._productName}
-                    onChange={(event, newInputValue) =>
-                      handleFilterChange(event, newInputValue)
-                    }
-                    type="text"
-                    label="Product Name"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={3} sx={12}>
-                  <InputField
-                    name="_barcode"
-                    value={filter._billNumber}
-                    onChange={(event, newInputValue) =>
-                      handleFilterChange(event, newInputValue)
-                    }
-                    type="text"
-                    label="Barcode"
                   />
                 </Grid>
                 <Grid item xs={12} sm={3} sx={12}>
@@ -393,26 +381,36 @@ function SaleBills() {
                   />
                 </Grid>
                 <Grid item xs={12} sm={4} sx={12}>
-                  <InputField
-                    name="_customer"
-                    value={filter._customer}
-                    onChange={(event, newInputValue) =>
-                      handleFilterChange(event, newInputValue)
+                  <TextField
+                    select
+                    fullWidth
+                    size="small"
+                    label="Status"
+                    name="_status"
+                    value={filter._status}
+                    onChange={(event) =>
+                      handleFilterChange(event.target.name, event.target.value)
                     }
-                    type="text"
-                    label="Customer"
-                  />
+                  >
+                    {billStatus.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
                 </Grid>
-                <Grid item xs={12} sm={2} sx={12}>
-                  <InputField
-                    name="_paidStatus"
-                    value={filter._paidStatus}
-                    onChange={(event, newInputValue) =>
-                      handleFilterChange(event, newInputValue)
-                    }
-                    type="text"
-                    label="Paid Status"
-                  />
+                <Grid item xs={12} sm={4} sx={12}>
+                  <Button onClick={handleOpenProductTable} variant="outlined">
+                    Select Product
+                  </Button>
+                </Grid>
+                <Grid item xs={12} sm={4} sx={12}>
+                  <Button
+                    onClick={handleOpenSalesmanSelection}
+                    variant="outlined"
+                  >
+                    Select Salesman
+                  </Button>
                 </Grid>
                 <Grid item xs={12} sm={4} sx={12}>
                   <Stack direction="row" spacing={2}>
@@ -449,7 +447,7 @@ function SaleBills() {
                   <CircularProgress />
                 </Box>
               ) : (
-                <TableItem
+                <BillListTable
                   columns={columns}
                   rows={rows}
                   page={page}
@@ -457,7 +455,7 @@ function SaleBills() {
                   tablePagin={true}
                   totalPages={totalPages}
                   handleAction={handleAction}
-                  showActions={["view", "edit", "disable"]}
+                  showActions={["view", "production", "disable", "saleProduct"]}
                 />
               )}
             </Grid>
@@ -495,15 +493,15 @@ function SaleBills() {
                 />
               ) : null}
               {openProductSelection ? (
-                        <Ex_ProductSelectingPopup
-                          setOpenProductTable={setOpenProductSelection}
-                          openProductTable={openProductSelection}
-                          handleCloseProductTable={handleOpenProductTable}
-                          setSelectedProduct={setSelectedProduct}
-                          selectedProduct={selectedProduct}
-                          isOneChoise={false}
-                        />
-                      ) : null}
+                <Ex_ProductSelectingPopup
+                  setOpenProductTable={setOpenProductSelection}
+                  openProductTable={openProductSelection}
+                  handleCloseProductTable={handleOpenProductTable}
+                  setSelectedProduct={setSelectedProduct}
+                  selectedProduct={selectedProduct}
+                  isOneChoise={false}
+                />
+              ) : null}
             </Grid>
           </Grid>
         )}

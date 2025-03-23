@@ -9,11 +9,13 @@ import {
   Box,
   Tooltip,
   IconButton,
+  Button,
 } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import TableItem from "../../../components/TableItem";
 import { makeStyles } from "@mui/styles";
 import {
+    billSendingForApproval,
   getSaleBillById,
   getSaleBillPaymentsById,
 } from "../../../services/Sales";
@@ -36,7 +38,8 @@ const useStyles = makeStyles({
     marginBottom: "15px",
   },
   tableContainer: {
-    marginTop: "20px",
+      marginTop: "20px",
+      marginBottom: "20px",
   },
   label: {
     fontWeight: 700,
@@ -167,6 +170,10 @@ function RetailBillView() {
     );
   };
 
+  const sendingBillForApproval = async () => {
+    let result = await billSendingForApproval(billId);
+  };
+
   return (
     <Paper className={classes.container} elevation={8}>
       {isLoading ? (
@@ -218,9 +225,9 @@ function RetailBillView() {
               </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography className={classes.label}>Paid Status:</Typography>
+              <Typography className={classes.label}>Status:</Typography>
               <Typography className={classes.value}>
-                {retailBill.paidStatus}
+                {retailBill.status}
               </Typography>
             </Grid>
             <Grid item xs={6}>
@@ -253,6 +260,7 @@ function RetailBillView() {
                 {retailBill.totalPrice}
               </Typography>
             </Grid>
+
             <Grid item xs={6}>
               <Typography variant="h7" fontWeight="700">
                 Remaining Amount
@@ -286,13 +294,20 @@ function RetailBillView() {
               handleAction={handleAction}
             />
           </Grid>
-          {payments ? (
+          {payments && payments.lenth > 0 ? (
             <Grid container spacing={3} className={classes.fieldContainer}>
               <Grid item xs={10}>
                 <PaymentList payments={payments} />
               </Grid>
             </Grid>
           ) : null}
+          {/* {retailBill.status === "DRAFT" ? ( */}
+            <Grid item xs={12} sm={4} sx={12}>
+              <Button onClick={sendingBillForApproval} variant="outlined">
+                Send
+              </Button>
+            </Grid>
+          {/* ) : null} */}
         </>
       ) : (
         <Box sx={{ padding: "20px", textAlign: "center" }}>

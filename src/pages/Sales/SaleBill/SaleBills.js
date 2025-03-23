@@ -1,9 +1,11 @@
 import {
   Button,
   Grid,
+  MenuItem,
   Pagination,
   Paper,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
@@ -15,13 +17,12 @@ import { useHistory } from "react-router";
 import Box from "@mui/material/Box";
 import InputField from "../../../FormComponents/InputField";
 import Alart from "../../../components/Alart";
-import {
-  deleteSaleBillById,
-  getSaleBillData,
-} from "../../../services/Sales";
+import { deleteSaleBillById, getSaleBillData } from "../../../services/Sales";
 import SaleAddBill from "./SaleAddBill";
 import ConfirmationPopup from "../../../components/ConfirmationPopup";
 import FormAlert from "../../../components/FormAlert";
+import Ex_ProductSelectingPopup from "../../../components/Ex_ProductSelectingPopup";
+import CustomerSelectingPopup from "../../../components/CustomerSelectingPopup";
 
 const useStyles = makeStyles({
   container: {
@@ -31,6 +32,15 @@ const useStyles = makeStyles({
     padding: "10px",
   },
 });
+
+const billStatus = [
+  { value: "DRAFT", label: "Draft" },
+  { value: "REJECTED", label: "Rejected" },
+  { value: "APPROVED", label: "Approved" },
+  { value: "AWAITING", label: "Awaiting Approval" },
+  { value: "PENDING", label: "Pending" },
+  { value: "SETTLED", label: "Settled" },
+];
 
 // Sale products all functionalties..
 function SaleBills() {
@@ -91,7 +101,7 @@ function SaleBills() {
     { id: "date", label: "Date", minWidth: 80 },
     { id: "billNumber", label: "Bill Number", minWidth: 100 },
     { id: "customer", label: "Customer", minWidth: 80 },
-    { id: "paidStatus", label: "Paid Status", minWidth: 100 },
+    { id: "status", label: "Status", minWidth: 100 },
     {
       id: "totalProfit",
       label: "Total Profit",
@@ -111,7 +121,7 @@ function SaleBills() {
     date,
     billNumber,
     customer,
-    paidStatus,
+    status,
     totalProfit,
     totalAmount,
     action,
@@ -121,7 +131,7 @@ function SaleBills() {
       date,
       billNumber,
       customer,
-      paidStatus,
+      status,
       totalProfit,
       totalAmount,
       action,
@@ -137,6 +147,11 @@ function SaleBills() {
   const [matchingText, setMachingText] = React.useState("");
   const [confirmationText, setConfirmationText] = React.useState("");
   const [deletingRow, setDeletingRow] = React.useState("");
+
+  const [openProductSelection, setOpenProductSelection] = React.useState(false);
+  const [openCustomerSelection, setOpenCustomerSelection] = React.useState();
+  const [selectedCustomer, setSelectedCustomer] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState([]);
 
   const [displayAlert, setAlert] = useState(false);
   const [alertData, setAlertData] = useState({
@@ -185,6 +200,26 @@ function SaleBills() {
     await fetchData(filter, value - 1);
   };
 
+  const handleOpenProductTable = () => {
+    setOpenProductSelection(!openProductSelection);
+    if (openProductSelection) {
+      setFilter({
+        ...filter,
+        _products: selectedProduct,
+      });
+    }
+  };
+
+  const handleOpenCustomerSelection = () => {
+    setOpenCustomerSelection(!openCustomerSelection);
+    if (openCustomerSelection) {
+      setFilter({
+        ...filter,
+        _customer: selectedCustomer,
+      });
+    }
+  };
+
   //fetch data for pagination actions
   const fetchData = async (productFilter, pageNo) => {
     setLoading(true);
@@ -207,7 +242,7 @@ function SaleBills() {
             saleBillList[x].sellingDate,
             saleBillList[x].billNumber,
             saleBillList[x].customer?.customerName,
-            saleBillList[x].paidStatus,
+            saleBillList[x].status,
             saleBillList[x].totalProfit,
             saleBillList[x].totalPrice,
             saleBillList[x].billId
@@ -227,7 +262,7 @@ function SaleBills() {
         console.log("View Id:", id);
         history.push("/template/sale_bill_view/" + id);
         break;
-      case "edit":
+      case "production":
         history.push("/template/sale_bill_edit/" + id);
         break;
       case "disable":
@@ -255,23 +290,26 @@ function SaleBills() {
   // filter values
   const [filter, setFilter] = useState({
     _billNumber: "",
-    _productName: "",
+    _products: [],
     _barcode: "",
     _addedBy: "",
-    _customer: "",
-    _paidStatus: "",
+    _customer: [],
+    _status: "",
   });
 
   //reset filters
   const resetFilters = () => {
     setFilter({
       _billNumber: "",
-      _productName: "",
+      _products: [],
       _barcode: "",
       _addedBy: "",
-      _customer: "",
-      _paidStatus: "",
+      _customer: [],
+      _status: "",
     });
+
+    setSelectedProduct([]);
+    setSelectedCustomer([]);
   };
 
   //to handle changing filters
@@ -321,28 +359,6 @@ function SaleBills() {
                 </Grid>
                 <Grid item xs={12} sm={3} sx={12}>
                   <InputField
-                    name="_productName"
-                    value={filter._productName}
-                    onChange={(event, newInputValue) =>
-                      handleFilterChange(event, newInputValue)
-                    }
-                    type="text"
-                    label="Product Name"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={3} sx={12}>
-                  <InputField
-                    name="_barcode"
-                    value={filter._billNumber}
-                    onChange={(event, newInputValue) =>
-                      handleFilterChange(event, newInputValue)
-                    }
-                    type="text"
-                    label="Barcode"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={3} sx={12}>
-                  <InputField
                     name="_addedBy"
                     value={filter._addedBy}
                     onChange={(event, newInputValue) =>
@@ -353,26 +369,36 @@ function SaleBills() {
                   />
                 </Grid>
                 <Grid item xs={12} sm={4} sx={12}>
-                  <InputField
-                    name="_customer"
-                    value={filter._customer}
-                    onChange={(event, newInputValue) =>
-                      handleFilterChange(event, newInputValue)
+                  <TextField
+                    select
+                    fullWidth
+                    size="small"
+                    label="Status"
+                    name="_status"
+                    value={filter._status}
+                    onChange={(event) =>
+                      handleFilterChange(event.target.name, event.target.value)
                     }
-                    type="text"
-                    label="Customer"
-                  />
+                  >
+                    {billStatus.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
                 </Grid>
-                <Grid item xs={12} sm={2} sx={12}>
-                  <InputField
-                    name="_paidStatus"
-                    value={filter._paidStatus}
-                    onChange={(event, newInputValue) =>
-                      handleFilterChange(event, newInputValue)
-                    }
-                    type="text"
-                    label="Paid Status"
-                  />
+                <Grid item xs={12} sm={4} sx={12}>
+                  <Button onClick={handleOpenProductTable} variant="outlined">
+                    Select Product
+                  </Button>
+                </Grid>
+                <Grid item xs={12} sm={4} sx={12}>
+                  <Button
+                    onClick={handleOpenCustomerSelection}
+                    variant="outlined"
+                  >
+                    Select Customer
+                  </Button>
                 </Grid>
                 <Grid item xs={12} sm={4} sx={12}>
                   <Stack direction="row" spacing={2}>
@@ -417,7 +443,7 @@ function SaleBills() {
                   tablePagin={true}
                   totalPages={totalPages}
                   handleAction={handleAction}
-                  showActions={["view", "edit", "disable"]}
+                  showActions={["view", "production", "disable", "saleProduct"]}
                 />
               )}
             </Grid>
@@ -442,6 +468,26 @@ function SaleBills() {
                   message={confirmationText}
                   isMatched={isMatched}
                   setIsMatched={setIsMatched}
+                />
+              ) : null}
+              {openCustomerSelection ? (
+                <CustomerSelectingPopup
+                  setOpenCustomerTable={setOpenCustomerSelection}
+                  openCustomerTable={openCustomerSelection}
+                  handleCloseCustomerTable={handleOpenCustomerSelection}
+                  setSelectedCustomer={setSelectedCustomer}
+                  selectedCustomer={selectedCustomer}
+                  isOneChoise={true}
+                />
+              ) : null}
+              {openProductSelection ? (
+                <Ex_ProductSelectingPopup
+                  setOpenProductTable={setOpenProductSelection}
+                  openProductTable={openProductSelection}
+                  handleCloseProductTable={handleOpenProductTable}
+                  setSelectedProduct={setSelectedProduct}
+                  selectedProduct={selectedProduct}
+                  isOneChoise={false}
                 />
               ) : null}
             </Grid>

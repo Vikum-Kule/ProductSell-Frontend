@@ -9,11 +9,13 @@ import {
   Box,
   Tooltip,
   IconButton,
+  Button,
 } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import TableItem from "../../../components/TableItem";
 import { makeStyles } from "@mui/styles";
 import {
+  billSendingForApproval,
   getSaleBillById,
   getSaleBillPaymentsById,
 } from "../../../services/Sales";
@@ -36,6 +38,7 @@ const useStyles = makeStyles({
   },
   tableContainer: {
     marginTop: "20px",
+    marginBottom: "20px",
   },
   label: {
     fontWeight: 700,
@@ -164,6 +167,10 @@ function SaleBillView() {
     history.push(`/template/sale_bill_item_view/${id}/${saleBill.billNumber}`);
   };
 
+  const sendingBillForApproval = async () => {
+    let result = await billSendingForApproval(billId);
+  };
+
   return (
     <Paper className={classes.container} elevation={8}>
       {isLoading ? (
@@ -215,9 +222,9 @@ function SaleBillView() {
               </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography className={classes.label}>Paid Status:</Typography>
+              <Typography className={classes.label}>Status:</Typography>
               <Typography className={classes.value}>
-                {saleBill.paidStatus}
+                {saleBill.status}
               </Typography>
             </Grid>
             <Grid item xs={6}>
@@ -281,11 +288,18 @@ function SaleBillView() {
               handleAction={handleAction}
             />
           </Grid>
-          {payments ? (
+          {payments && payments.lenth > 0 ? (
             <Grid container spacing={3} className={classes.fieldContainer}>
               <Grid item xs={10}>
                 <PaymentList payments={payments} />
               </Grid>
+            </Grid>
+          ) : null}
+          {saleBill.status === "DRAFT" ? (
+            <Grid item xs={12} sm={4} sx={12}>
+              <Button onClick={sendingBillForApproval} variant="outlined">
+                Send
+              </Button>
             </Grid>
           ) : null}
         </>

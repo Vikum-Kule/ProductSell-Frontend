@@ -14,11 +14,10 @@ const getRetailSaleBillData = async (offset, pageSize, filter) => {
         "/api/retail_bill/all/" + offset + "/" + pageSize,
         {
           billNumber: filter._productName ? filter._productName.trim() : null,
-          productName: filter._barcode ? filter._barcode.trim() : null,
-          customer: filter._billNumber ? filter._billNumber.trim() : null,
+          productIds: filter._products.length != 0 ? filter._products : null,
+          salesmanIds: filter._salesman.length != 0 ? filter._salesman : null,
           addedBy: filter._addedBy ? filter._addedBy.trim() : null,
-          barcode: filter._customer ? filter._customer.trim() : null,
-          paidStatus: filter._paidStatus ? filter._paidStatus.trim() : null,
+          status: filter._status ? filter._status.trim() : null,
         },
         {
           headers: {

@@ -52,24 +52,24 @@ function PaymentOptions({ paymentMethods, setPaymentMethods, isRetail }) {
           alignItems="center"
           style={{ paddingBottom: "10px" }}
         >
-          <Grid item xs={2}>
-            <TextField
-              select
-              fullWidth
-              size="small"
-              label="Payment Type"
-              value={payment.type}
-              onChange={(e) =>
-                updatePaymentMethod(index, "type", e.target.value)
-              }
-            >
-              {paymentTypes.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
+            <Grid item xs={2}>
+              <TextField
+                select
+                fullWidth
+                size="small"
+                label="Payment Type"
+                value={payment.type}
+                onChange={(e) =>
+                  updatePaymentMethod(index, "type", e.target.value)
+                }
+              >
+                {paymentTypes.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))} 
+              </TextField>
+            </Grid>
 
           <Grid item xs={2}>
             <TextField

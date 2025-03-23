@@ -212,11 +212,10 @@ const getSaleBillData = async (offset, pageSize, filter) => {
         "/api/salebill/all/" + offset + "/" + pageSize,
         {
           billNumber: filter._productName ? filter._productName.trim() : null,
-          productName: filter._barcode ? filter._barcode.trim() : null,
-          customer: filter._billNumber ? filter._billNumber.trim() : null,
+          productIds: filter._products.length != 0 ? filter._products : null,
+          customerIds: filter._customer.length != 0 ? filter._customer : null,
           addedBy: filter._addedBy ? filter._addedBy.trim() : null,
-          barcode: filter._customer ? filter._customer.trim() : null,
-          paidStatus: filter._paidStatus ? filter._paidStatus.trim() : null,
+          status: filter._status ? filter._status.trim() : null,
         },
         {
           headers: {
@@ -426,6 +425,58 @@ const updateSaleBillPayments = async (billId, values) => {
   }
 };
 
+//sending for approval
+const billSendingForApproval = async (billId) => {
+  //check access tocken expiry function
+  let token_valid_result = await token_valid();
+  if (token_valid_result) {
+    let token = getToken();
+    return axios
+      .get("/api/salebill/approval/" + billId, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        console.log("Response all--", response.data);
+        return response.data;
+      })
+      .catch((error) => {
+        // return "Something went wrong...";
+        console.log("get Sale Bill Payment " + error);
+        return "Something went wrong...";
+      });
+  }
+};
+
+//sending for approval
+const approveBill = async (billId) => {
+  //check access tocken expiry function
+  let token_valid_result = await token_valid();
+  if (token_valid_result) {
+    let token = getToken();
+    return axios
+      .get("/api/salebill//approved/" + billId, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        console.log("Response all--", response.data);
+        return response.data;
+      })
+      .catch((error) => {
+        // return "Something went wrong...";
+        console.log("faild to approve bill " + error);
+        return "Something went wrong...";
+      });
+  }
+};
+
 export {
   getSaleProductData,
   addSaleProduct,
@@ -439,4 +490,6 @@ export {
   getSaleBillPaymentsById,
   updateSaleBillPayments,
   updateRemainingAmount,
+  billSendingForApproval,
+  approveBill,
 };

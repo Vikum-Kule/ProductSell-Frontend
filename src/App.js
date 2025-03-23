@@ -37,6 +37,7 @@ import Retail_Sale_Bill from "./pages/Retails/RetailBills/RetailBills";
 import Retail_BillView from "./pages/Retails/RetailBills/RetailBillView"
 import Retail_BillEdit from "./pages/Retails/RetailBills/RetailBillUpdatePayments";
 import CustomerView from "./pages/Customers/CustomerView"
+import EmailAuthentication from "./components/EmailAuthentication";
 
 const theme = createTheme({
   palette: {
@@ -53,6 +54,9 @@ function App() {
         <Switch>
           <Route exact path="/">
             <Login />
+          </Route>
+          <Route exact path="/:billId">
+            <EmailAuthentication />
           </Route>
           <Route exact path="/register">
             <Signup />
