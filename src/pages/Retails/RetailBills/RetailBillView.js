@@ -15,15 +15,14 @@ import CircularProgress from "@mui/material/CircularProgress";
 import TableItem from "../../../components/TableItem";
 import { makeStyles } from "@mui/styles";
 import {
-    billSendingForApproval,
   getSaleBillById,
   getSaleBillPaymentsById,
 } from "../../../services/Sales";
 import CloseIcon from "@mui/icons-material/Close";
 import { useHistory } from "react-router";
-import CustomerDataComponent from "../../../components/CustomerDataComponent";
 import PaymentList from "../../../components/PaymentList";
 import SalesmanDataComponent from "../../../components/SalesmanDataComponent";
+import { retailBillSendingForApproval } from "../../../services/RetailSales";
 
 const useStyles = makeStyles({
   container: {
@@ -171,7 +170,7 @@ function RetailBillView() {
   };
 
   const sendingBillForApproval = async () => {
-    let result = await billSendingForApproval(billId);
+    let result = await retailBillSendingForApproval(billId);
   };
 
   return (

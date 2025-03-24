@@ -30,6 +30,7 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import SyncIcon from "@mui/icons-material/Sync";
 import ItemSelectingPopup from "../../../components/ItemSelectingPopup";
+import Validation from "../../../Validation/ImportBillValidation";
 
 const style = {
   position: "absolute",
@@ -102,10 +103,7 @@ function Im_addBill({ setOpenForm }) {
   const [openTable, setOpenTable] = useState(false);
 
   // errors for inputfeild
-  const [error, setError] = useState({
-    _billNo: "",
-    _shop: "",
-  });
+  const [error, setError] = useState({});
 
   const handleChange = (name, val) => {
     console.log(name, val);
@@ -131,7 +129,16 @@ function Im_addBill({ setOpenForm }) {
       type: "number",
       isDecimal: false,
     },
+    { id: "billUnit", label: "Bill Unit", minWidth: 100, editable: true },
     { id: "unitType", label: "Unit", minWidth: 100, editable: false },
+    {
+      id: "itemUintsPerBillUnit",
+      label: "Item Units Amount",
+      minWidth: 100,
+      editable: true,
+      type: "number",
+      isDecimal: true,
+    },
     {
       id: "unitPrice",
       label: "Unit Price",
@@ -195,8 +202,10 @@ function Im_addBill({ setOpenForm }) {
         createDataForSelectedTable(
           importItem.itemName,
           importItem.brand,
-          0,
+          0.0,
           importItem.unitType,
+          importItem.unitType,
+          0.0,
           0.0,
           0.0,
           0.0,
@@ -213,7 +222,9 @@ function Im_addBill({ setOpenForm }) {
     item,
     brand,
     qty,
+    billUnit,
     unitType,
+    itemUintsPerBillUnit,
     unitPrice,
     discountPerItem,
     price,
@@ -223,7 +234,9 @@ function Im_addBill({ setOpenForm }) {
       item,
       brand,
       qty,
+      billUnit,
       unitType,
+      itemUintsPerBillUnit,
       unitPrice,
       discountPerItem,
       price,
@@ -241,7 +254,7 @@ function Im_addBill({ setOpenForm }) {
         let _unitPrice =
           (parseFloat(billRows[x].price) -
             parseFloat(billRows[x].discountPerItem)) /
-          parseInt(billRows[x].qty);
+          parseFloat(billRows[x].qty);
         billRows[x] = { ...billRows[x], unitPrice: _unitPrice };
         _totalPrice = _totalPrice + parseFloat(billRows[x].price);
       } else if (
@@ -250,7 +263,7 @@ function Im_addBill({ setOpenForm }) {
         selectedRows[x].price === 0
       ) {
         let _itemPrice =
-          parseInt(billRows[x].qty) * parseFloat(billRows[x].unitPrice) -
+          parseFloat(billRows[x].qty) * parseFloat(billRows[x].unitPrice) -
           parseFloat(billRows[x].discountPerItem);
         billRows[x] = { ...billRows[x], price: _itemPrice };
         _totalPrice = _totalPrice + parseFloat(_itemPrice);
@@ -271,11 +284,15 @@ function Im_addBill({ setOpenForm }) {
       const importBillItems = [];
       for (let x = 0; x < selectedRows.length; x++) {
         const item = {
-          qty: parseInt(selectedRows[x].qty),
+          qty: parseFloat(selectedRows[x].qty),
           discount_perItem: parseFloat(selectedRows[x].discountPerItem),
           price: parseFloat(selectedRows[x].price),
           importId: selectedRows[x].importId,
-          pricePerItem: selectedRows[x].unitPrice,
+          pricePerItem: parseFloat(selectedRows[x].unitPrice),
+          billUnit: selectedRows[x].billUnit,
+          prodUnitAmountPerBillUnit: parseFloat(
+            selectedRows[x].itemUintsPerBillUnit
+          ),
         };
         importBillItems.push(item);
       }
@@ -295,23 +312,30 @@ function Im_addBill({ setOpenForm }) {
         import_billItems: importBillItems,
       };
 
-      console.log(billBody);
-      let result = await addImportBill(billBody);
+      setError(Validation(billBody, selectedRows));
+      console.log(error);
 
-      if (result) {
-        resetValues();
-        setAlertData({
-          type: "success",
-          message: "Item submitted..",
-        });
-        setAlert(true);
-      } else {
-        setAlertData({
-          type: "error",
-          message: "Something went wrong...",
-        });
-        setAlert(true);
+      if (!error._billNo && !error._shop && !error._total && !error._items) {
+        console.log("Errors empty");
       }
+
+      // console.log(billBody);
+      // let result = await addImportBill(billBody);
+
+      // if (result) {
+      //   resetValues();
+      //   setAlertData({
+      //     type: "success",
+      //     message: "Item submitted..",
+      //   });
+      //   setAlert(true);
+      // } else {
+      //   setAlertData({
+      //     type: "error",
+      //     message: "Something went wrong...",
+      //   });
+      //   setAlert(true);
+      // }
     }
   };
 
@@ -382,6 +406,20 @@ function Im_addBill({ setOpenForm }) {
           />
         ) : null}
       </Grid>
+      <Grid item xs={12} sm={12} sx={12}>
+        <Typography
+          align="left"
+          variant="caption"
+          style={{
+            color: "red",
+            fontSize: 16,
+            fontWeight: "bold",
+            paddingLeft: 40,
+          }}
+        >
+          {error._items}
+        </Typography>
+      </Grid>
       <Grid item xs={12} sm={3} sx={12}>
         <InputField
           name="_discount"
@@ -409,11 +447,6 @@ function Im_addBill({ setOpenForm }) {
             <MenuItem value={"cheque"}>Cheque</MenuItem>
           </Select>
         </FormControl>
-      </Grid>
-      <Grid item xs={12} sm={1} sx={12}>
-        <Typography variant="subtitle2" gutterBottom component="div">
-          Total :
-        </Typography>
       </Grid>
       <Grid item xs={12} sm={3} sx={12}>
         <InputField
