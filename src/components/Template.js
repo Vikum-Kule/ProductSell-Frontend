@@ -30,6 +30,7 @@ import Menu from "@mui/material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { getUser } from "../Utils/Common";
 import { useEffect } from "react";
+import { getUnreadNotificationCount } from "../services/Notification";
 
 const drawerWidth = 240;
 
@@ -51,10 +52,12 @@ function Template({ children }) {
   const [openRatails, setOpenRetails] = React.useState(false);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [user, setUser] = React.useState("");
+  const [notificationCount, setNotificationCount] = React.useState(0);
 
   useEffect(async () => {
     let userData = getUser();
     setUser(userData.fname + " " + userData.lname);
+    getUnreadNotifications();
   });
 
   const handleProfileMenuOpen = (event) => {
@@ -143,6 +146,14 @@ function Template({ children }) {
     setOpenRetails(!openRatails);
   };
 
+  const getUnreadNotifications = async () => {
+    let result = await getUnreadNotificationCount();
+    console.log(result);
+    if(result !== "Something went wrong..."){
+      setNotificationCount(result);
+    }
+  };
+
   const text = {
     fontSize: "15px",
     fontWeight: "bold",
@@ -175,21 +186,11 @@ function Template({ children }) {
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
             <IconButton
               size="large"
-              aria-label="show 4 new mails"
+              aria-label=""
               color="inherit"
               sx={{ color: "black" }}
             >
-              <Badge badgeContent={4} color="error">
-                <MailIcon />
-              </Badge>
-            </IconButton>
-            <IconButton
-              size="large"
-              aria-label="show 17 new notifications"
-              color="inherit"
-              sx={{ color: "black" }}
-            >
-              <Badge badgeContent={17} color="error">
+              <Badge badgeContent={notificationCount} color="error">
                 <NotificationsIcon />
               </Badge>
             </IconButton>
