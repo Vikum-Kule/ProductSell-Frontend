@@ -633,6 +633,7 @@ const getImportUpdateDurationByImportId = async (importId) => {
 
 //add export product
 const addStockIntakeItem = async (values) => {
+  console.log("Add Stock Intake Item", values);
   //check access tocken expiry function
   let token_valid_result = await token_valid();
   if (token_valid_result) {
@@ -646,14 +647,14 @@ const addStockIntakeItem = async (values) => {
       .post(
         "/api/stockintake/add/" + values._importitem.importId,
         {
-          importId: values._importitem
-            ? values._importitem.importId
-            : null,
+          importId: values._importitem ? values._importitem.importId : null,
           intake_qty: values._importQty,
           discountPerItem: values._discount ? values._discount : 0.0,
           pricePerItem: values._pricePerItem,
           totalPrice: values._totalPrice,
           addedBy: user.username,
+          billUnit: values._billUnit,
+          prodUnitAmountPerBillUnit: values._itemUintsPerBillUnit,
           note: values._note ? values._note.trim() : null,
         },
         {

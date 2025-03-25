@@ -26,8 +26,7 @@ const useStyles = makeStyles({
   },
 });
 
-// import items all functionalties..
-function Customers() {
+function Salesman() {
   const classes = useStyles();
   const history = useHistory();
 
@@ -97,35 +96,37 @@ function Customers() {
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [openForm, setOpenForm] = React.useState(false);
 
-
   const handleChange = async (event, value) => {
     setPage(value - 1);
     await fetchData(filter, value - 1);
   };
 
   //fetch data for pagination actions
-  const fetchData = async (customerFilter, pageNo) => {
+  const fetchData = async (salesmanFilter, pageNo) => {
     setLoading(true);
     //get import items data when page loading...
-    console.log(page);
-    let result = await getCustomers(pageNo, rowsPerPage, customerFilter);
-    let customerSet = result.content;
+    let result = await getSalesPersonByPaging(
+      pageNo,
+      rowsPerPage,
+      salesmanFilter
+    );
+    let salesmanSet = result.content;
+    console.log("SalesmanSet", salesmanSet);
 
     //set total rows and pages
     setTotalPages(result.totalPages);
-    setTotalRows(result.totalElements);
 
     const newSet = [];
-    if (customerSet) {
-      for (let x = 0; x < customerSet.length; x++) {
+    if (salesmanSet) {
+      for (let x = 0; x < salesmanSet.length; x++) {
         //set data in new set list to display in the table
         newSet.push(
           createData(
-            customerSet[x].customerName,
-            customerSet[x].phone,
-            customerSet[x].email,
-            customerSet[x].status,
-            customerSet[x].customerId
+            salesmanSet[x].firstName + " " + salesmanSet[x].lastName,
+            salesmanSet[x].email,
+            salesmanSet[x].phoneNumber,
+            salesmanSet[x].status,
+            salesmanSet[x].salespersonId
           )
         );
       }
@@ -139,7 +140,7 @@ function Customers() {
   const handleAction = async (event, id) => {
     switch (event) {
       case "view":
-        history.push("/template/customer_view/" + id);
+        history.push("/template/im_item_view/" + id);
         break;
       case "edit":
         history.push("/template/im_item_edit/" + id);
@@ -157,7 +158,7 @@ function Customers() {
     _name: "",
     _email: "",
     _status: "",
-    _address: ""
+    _address: "",
   });
 
   //reset filters
@@ -300,4 +301,4 @@ function Customers() {
   );
 }
 
-export default Customers;
+export default Salesman;

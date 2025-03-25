@@ -1,22 +1,44 @@
 import jwtDecode from "jwt-decode";
-import { getToken } from "../Utils/Common";
+import { getToken, removeUserSession } from "../Utils/Common";
 import { RefreshToken } from "./Auth";
 
-const token_valid = async () => {
+const TokenValid = async () => {
   let token = getToken();
-  //decode the access tocken
-  const decodedJwt = jwtDecode(token);
-  console.log("decode data" + decodedJwt.exp + " " + (Date.now() - 10 * 1000));
 
-  //check the expiration of the decoded tocken in miliseconds
-  if (decodedJwt.exp * 1000 > Date.now() - 10 * 1000) {
-    console.log("Not required to Refresh ");
-    return true;
-  } else {
-    let refresh_result = await RefreshToken();
-    console.log("Refresh Result " + refresh_result);
-    return true;
+  if (!token) {
+    console.error("No token found. Redirecting to login...");
+    removeUserSession();
+    window.location.href = "/"; // Redirect to login
+    return false;
+  }
+
+  try {
+    const decodedJwt = jwtDecode(token);
+    const isTokenExpired = decodedJwt.exp * 1000 < Date.now();
+
+    if (!isTokenExpired) {
+      console.log("Token is still valid.");
+      return true;
+    } else {
+      console.log("Token expired. Attempting to refresh...");
+      let refresh_result = await RefreshToken();
+
+      if (refresh_result === "Token expired" || !refresh_result) {
+        console.error("Refresh failed. Redirecting to login...");
+        removeUserSession();
+        window.location.href = "/"; // Redirect to login
+        return false;
+      }
+
+      console.log("Token refreshed successfully.");
+      return true;
+    }
+  } catch (error) {
+    console.error("Invalid token. Redirecting to login...", error);
+    removeUserSession();
+    window.location.href = "/"; // Redirect to login
+    return false;
   }
 };
 
-export default token_valid;
+export default TokenValid;

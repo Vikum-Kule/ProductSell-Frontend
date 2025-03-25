@@ -12,8 +12,8 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
-import GroupIcon from '@mui/icons-material/Group';
-import AddBusinessIcon from '@mui/icons-material/AddBusiness';
+import GroupIcon from "@mui/icons-material/Group";
+import AddBusinessIcon from "@mui/icons-material/AddBusiness";
 import { Collapse, IconButton, ListItemButton } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import ArrowCircleDownIcon from "@mui/icons-material/ArrowCircleDown";
@@ -591,7 +591,11 @@ function Template({ children }) {
                   sx={{ pl: 4 }}
                   selected={selectedIndex == 17}
                   onClick={(event) =>
-                    handleListItemClick(event, 17, "/template/sale_products")
+                    handleListItemClick(
+                      event,
+                      17,
+                      "/template/retail_sale_bills"
+                    )
                   }
                 >
                   <ListItemIcon>{/* <StarBorder /> */}</ListItemIcon>

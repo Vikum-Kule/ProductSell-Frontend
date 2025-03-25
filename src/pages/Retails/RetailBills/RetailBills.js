@@ -17,12 +17,18 @@ import { useHistory } from "react-router";
 import Box from "@mui/material/Box";
 import InputField from "../../../FormComponents/InputField";
 import Alart from "../../../components/Alart";
-import { deleteSaleBillById, getSaleBillData } from "../../../services/Sales";
-import SaleAddBill from "./SaleAddBill";
+import {
+  deleteSaleBillById,
+  getSaleBillData,
+  getSaleProductData,
+} from "../../../services/Sales";
+// import SaleAddBill from "./SaleAddBill";
 import ConfirmationPopup from "../../../components/ConfirmationPopup";
 import FormAlert from "../../../components/FormAlert";
+import { getRetailSaleBillData } from "../../../services/RetailSales";
+import RetailAddBill from "./RetailAddBill";
+import SalesmanSelectingPopup from "../../../components/SalesmanSelectingPopup";
 import Ex_ProductSelectingPopup from "../../../components/Ex_ProductSelectingPopup";
-import CustomerSelectingPopup from "../../../components/CustomerSelectingPopup";
 import BillListTable from "../../../components/BillListTable";
 
 const useStyles = makeStyles({
@@ -150,8 +156,9 @@ function SaleBills() {
   const [deletingRow, setDeletingRow] = React.useState("");
 
   const [openProductSelection, setOpenProductSelection] = React.useState(false);
-  const [openCustomerSelection, setOpenCustomerSelection] = React.useState();
-  const [selectedCustomer, setSelectedCustomer] = useState([]);
+  const [openSalesPersonSelection, setOpenSalesPersonSelection] =
+    React.useState();
+  const [selectedSalesman, setSelectedSalesman] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState([]);
 
   const [displayAlert, setAlert] = useState(false);
@@ -201,32 +208,16 @@ function SaleBills() {
     await fetchData(filter, value - 1);
   };
 
-  const handleOpenProductTable = () => {
-    setOpenProductSelection(!openProductSelection);
-    if (openProductSelection) {
-      setFilter({
-        ...filter,
-        _products: selectedProduct,
-      });
-    }
-  };
-
-  const handleOpenCustomerSelection = () => {
-    setOpenCustomerSelection(!openCustomerSelection);
-    if (openCustomerSelection) {
-      setFilter({
-        ...filter,
-        _customer: selectedCustomer,
-      });
-    }
-  };
-
   //fetch data for pagination actions
   const fetchData = async (productFilter, pageNo) => {
     setLoading(true);
     //get import items data when page loading...
     console.log(page);
-    let result = await getSaleBillData(pageNo, rowsPerPage, productFilter);
+    let result = await getRetailSaleBillData(
+      pageNo,
+      rowsPerPage,
+      productFilter
+    );
     let saleBillList = result.content;
 
     //set total rows and pages
@@ -237,12 +228,13 @@ function SaleBills() {
     if (saleBillList) {
       for (let x = 0; x < saleBillList.length; x++) {
         //set data in new set list to display in the table
-        console.log("Customer :", saleBillList[x].customer);
         newSet.push(
           createData(
             saleBillList[x].sellingDate,
             saleBillList[x].billNumber,
-            saleBillList[x].customer?.customerName,
+            saleBillList[x].salesPerson?.firstName +
+              " " +
+              saleBillList[x].salesPerson?.lastName,
             saleBillList[x].status,
             saleBillList[x].totalProfit,
             saleBillList[x].totalPrice,
@@ -261,10 +253,10 @@ function SaleBills() {
     switch (event) {
       case "view":
         console.log("View Id:", id);
-        history.push("/template/sale_bill_view/" + id);
+        history.push("/template/retail_bill_view/" + id);
         break;
       case "production":
-        history.push("/template/sale_bill_edit/" + id);
+        history.push("/template/retail_bill_edit/" + id);
         break;
       case "disable":
         setIsMatched(false);
@@ -294,7 +286,7 @@ function SaleBills() {
     _products: [],
     _barcode: "",
     _addedBy: "",
-    _customer: [],
+    _salesman: [],
     _status: "",
   });
 
@@ -305,20 +297,39 @@ function SaleBills() {
       _products: [],
       _barcode: "",
       _addedBy: "",
-      _customer: [],
+      _salesman: [],
       _status: "",
     });
-
     setSelectedProduct([]);
-    setSelectedCustomer([]);
+    setSelectedSalesman([]);
   };
 
   //to handle changing filters
-  const handleFilterChange = (name, val) => {
+    const handleFilterChange = (name, val) => {
     setFilter({
       ...filter,
       [name]: val,
     });
+  };
+
+  const handleOpenProductTable = () => {
+    setOpenProductSelection(!openProductSelection);
+    if (openProductSelection) {
+      setFilter({
+        ...filter,
+        _products: selectedProduct,
+      });
+    }
+  };
+
+  const handleOpenSalesmanSelection = () => {
+    setOpenSalesPersonSelection(!openSalesPersonSelection);
+    if (openSalesPersonSelection) {
+      setFilter({
+        ...filter,
+        _salesman: selectedSalesman,
+      });
+    }
   };
 
   return (
@@ -326,13 +337,13 @@ function SaleBills() {
       <Paper className={classes.container} elevation={8}>
         {/* import list or import from */}
         {openForm ? (
-          <SaleAddBill setOpenForm={setOpenForm} />
+          <RetailAddBill setOpenForm={setOpenForm} />
         ) : (
           <Grid container spacing={5}>
             <Grid item xs={12} sm={10} sx={12}>
               <Typography mt={1} variant="h6">
                 {" "}
-                Sale Bills{" "}
+                Retail Bills{" "}
               </Typography>
             </Grid>
             <Grid item xs={12} sm={2} sx={12}>
@@ -347,7 +358,7 @@ function SaleBills() {
             </Grid>
             <Grid item xs={12} sm={12} sx={12}>
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={2} sx={12}>
+                <Grid item xs={12} sm={4} sx={12}>
                   <InputField
                     name="_billNumber"
                     value={filter._barcode}
@@ -395,10 +406,10 @@ function SaleBills() {
                 </Grid>
                 <Grid item xs={12} sm={4} sx={12}>
                   <Button
-                    onClick={handleOpenCustomerSelection}
+                    onClick={handleOpenSalesmanSelection}
                     variant="outlined"
                   >
-                    Select Customer
+                    Select Salesman
                   </Button>
                 </Grid>
                 <Grid item xs={12} sm={4} sx={12}>
@@ -471,13 +482,13 @@ function SaleBills() {
                   setIsMatched={setIsMatched}
                 />
               ) : null}
-              {openCustomerSelection ? (
-                <CustomerSelectingPopup
-                  setOpenCustomerTable={setOpenCustomerSelection}
-                  openCustomerTable={openCustomerSelection}
-                  handleCloseCustomerTable={handleOpenCustomerSelection}
-                  setSelectedCustomer={setSelectedCustomer}
-                  selectedCustomer={selectedCustomer}
+              {openSalesPersonSelection ? (
+                <SalesmanSelectingPopup
+                  setOpenSalesmanTable={setOpenSalesPersonSelection}
+                  openSalesmanTable={openSalesPersonSelection}
+                  handleCloseSalesmanTable={handleOpenSalesmanSelection}
+                  setSelectedSalesman={setSelectedSalesman}
+                  selectedSalesman={selectedSalesman}
                   isOneChoise={true}
                 />
               ) : null}

@@ -15,14 +15,20 @@ import CircularProgress from "@mui/material/CircularProgress";
 import TableItem from "../../../components/TableItem";
 import { makeStyles } from "@mui/styles";
 import {
-  billSendingForApproval,
   getSaleBillById,
   getSaleBillPaymentsById,
+  updateRemainingAmount,
+  updateSaleBillPayments,
 } from "../../../services/Sales";
 import CloseIcon from "@mui/icons-material/Close";
 import { useHistory } from "react-router";
 import CustomerDataComponent from "../../../components/CustomerDataComponent";
 import PaymentList from "../../../components/PaymentList";
+import dayjs from "dayjs";
+import PaymentOptions from "../../../components/PaymentOptions";
+import FormAlert from "../../../components/FormAlert";
+import SalesmanDataComponent from "../../../components/SalesmanDataComponent";
+import InputField from "../../../FormComponents/InputField";
 
 const useStyles = makeStyles({
   container: {
@@ -38,7 +44,6 @@ const useStyles = makeStyles({
   },
   tableContainer: {
     marginTop: "20px",
-    marginBottom: "20px",
   },
   label: {
     fontWeight: 700,
@@ -48,15 +53,39 @@ const useStyles = makeStyles({
   },
 });
 
-function SaleBillView() {
+function RetailBillUpdatePayments() {
   const classes = useStyles();
   const history = useHistory();
   const { billId } = useParams();
-  const [saleBill, setSaleBill] = React.useState(null);
+  const [retailBill, setRetailBill] = React.useState(null);
   const [rows, setRows] = React.useState([]);
   const [isLoading, setLoading] = React.useState(false);
   const [errors, setErrors] = React.useState({});
-  const [payments, setPayments] = React.useState(null);
+  const [paymentMethods, setPaymentMethods] = React.useState(null);
+  const [displayAlert, setAlert] = React.useState(false);
+
+  const [alertData, setAlertData] = React.useState({
+    type: "",
+    message: "",
+  });
+
+  useEffect(() => {
+    console.log("Use effect called...");
+    handleRemainingAmounts();
+  }, [paymentMethods]);
+
+  const handleRemainingAmounts = () => {
+    const remainingValue = paymentMethods?.reduce(
+      (sum, payment) => sum + parseFloat(payment.amount),
+      0
+    );
+    const updatedRemainingValue =
+      parseFloat(retailBill?.totalPrice) - remainingValue;
+    setRetailBill({
+      ...retailBill,
+      remainingAmount: updatedRemainingValue,
+    });
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -65,7 +94,7 @@ function SaleBillView() {
     console.log(billPaymentResult);
 
     if (billResult !== "Something went wrong...") {
-      setSaleBill(billResult);
+      setRetailBill(billResult);
       const billItemSet = billResult.billItems || [];
 
       const itemRows = billItemSet.map((item) => ({
@@ -88,7 +117,18 @@ function SaleBillView() {
     }
 
     if (billPaymentResult !== "Something went wrong...") {
-      setPayments(billPaymentResult);
+      const billPayments = billPaymentResult.map((p) => ({
+        type: p.paymentType,
+        amount: p.amount,
+        bank: p.bank,
+        chequeNumber: p.chequeNumber,
+        returnDate: p.returnDate,
+        receiptNumber: p.receiptNumber,
+        shopName: p.shopName,
+        returnDateInput: p.returnDate != null ? dayjs(p.returnDate) : null,
+        returnBillNumber: p.returnBillNumber,
+      }));
+      setPaymentMethods(billPayments);
     } else {
       setErrors({
         ...errors,
@@ -162,13 +202,39 @@ function SaleBillView() {
   const handleAction = async (event, id) => {
     console.log(
       "url: ",
-      "/template/sale_bill_item_view/" + id + "/" + saleBill.billNumber
+      "/template/sale_bill_item_view/" + id + "/" + retailBill.billNumber
     );
-    history.push(`/template/sale_bill_item_view/${id}/${saleBill.billNumber}`);
+    history.push(
+      `/template/sale_bill_item_view/${id}/${retailBill.billNumber}`
+    );
   };
 
-  const sendingBillForApproval = async () => {
-    let result = await billSendingForApproval(billId);
+  const submitValue = async () => {
+    // setError(Validation(value, rows));
+    // console.log("Selected Data: ", rows);
+    // console.log("Payment Data: ", paymentMethods);
+    if (paymentMethods.length > 0) {
+      console.log("Payment data: ", paymentMethods);
+      let submitBillPayment = await updateSaleBillPayments(
+        billId,
+        paymentMethods
+      );
+
+      let updateBillRemainingAmount = await updateRemainingAmount(retailBill);
+
+      if (
+        submitBillPayment &&
+        updateBillRemainingAmount !== "Something went wrong..."
+      ) {
+        history.push("/template/sale_bill_view/" + billId);
+      } else {
+        setAlertData({
+          type: "error",
+          message: "Something went wrong...",
+        });
+        setAlert(true);
+      }
+    }
   };
 
   return (
@@ -179,7 +245,7 @@ function SaleBillView() {
         >
           <CircularProgress />
         </Box>
-      ) : saleBill ? (
+      ) : retailBill ? (
         <>
           <Grid>
             <Tooltip title="Close">
@@ -198,7 +264,7 @@ function SaleBillView() {
             className={classes.sectionHeader}
             align="center"
           >
-            Sale Bill Details
+            Retail Bill Details
           </Typography>
           <Divider />
 
@@ -206,32 +272,32 @@ function SaleBillView() {
             <Grid item xs={6}>
               <Typography className={classes.label}>Bill No:</Typography>
               <Typography className={classes.value}>
-                {saleBill.billNumber}
+                {retailBill.billNumber}
               </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography className={classes.label}>Bill Date:</Typography>
               <Typography className={classes.value}>
-                {saleBill.sellingDate}
+                {retailBill.sellingDate}
               </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography className={classes.label}>Added By:</Typography>
               <Typography className={classes.value}>
-                {saleBill.addedBy}
+                {retailBill.addedBy}
               </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography className={classes.label}>Status:</Typography>
+              <Typography className={classes.label}>Paid Status:</Typography>
               <Typography className={classes.value}>
-                {saleBill.status}
+                {retailBill.paidStatus}
               </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography className={classes.label}>Customer:</Typography>
-              {saleBill.customer ? (
+              <Typography className={classes.label}>Sales Person:</Typography>
+              {retailBill.salesPerson ? (
                 <Grid item xs={12} sm={12} sx={12}>
-                  <CustomerDataComponent customer={saleBill.customer} />
+                  <SalesmanDataComponent salesman={retailBill.salesPerson} />
                 </Grid>
               ) : (
                 <Typography></Typography>
@@ -240,32 +306,37 @@ function SaleBillView() {
             <Grid item xs={6}>
               <Typography className={classes.label}>Discount:</Typography>
               <Typography className={classes.value}>
-                {saleBill.discount_percentage > 0.0
-                  ? saleBill.discount_percentage + "%"
-                  : "Rs: " + saleBill.discount_amount}
+                {retailBill.discount_percentage > 0.0
+                  ? retailBill.discount_percentage + "%"
+                  : "Rs: " + retailBill.discount_amount}
               </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography className={classes.label}>Total Profit:</Typography>
               <Typography className={classes.value}>
-                {saleBill.totalProfit}
+                {retailBill.totalProfit}
               </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography className={classes.label}>Total Amount:</Typography>
               <Typography className={classes.value}>
-                {saleBill.totalPrice}
+                {retailBill.totalPrice}
               </Typography>
             </Grid>
-            <Grid item xs={6}>
-              <Typography variant="h7" fontWeight="700">
-                Remaining Amount
-              </Typography>
-              <Typography>{saleBill.remainingAmount}</Typography>
+            <Grid item>
+              <InputField
+                isdisabled={true}
+                name="_remainingAmount"
+                value={retailBill.remainingAmount}
+                type="text"
+                label="Remaining Amount"
+              />
             </Grid>
             <Grid item xs={12}>
               <Typography className={classes.label}>Note:</Typography>
-              <Typography className={classes.value}>{saleBill.note}</Typography>
+              <Typography className={classes.value}>
+                {retailBill.note}
+              </Typography>
             </Grid>
           </Grid>
 
@@ -288,20 +359,30 @@ function SaleBillView() {
               handleAction={handleAction}
             />
           </Grid>
-          {payments && payments.lenth > 0 ? (
-            <Grid container spacing={3} className={classes.fieldContainer}>
-              <Grid item xs={10}>
-                <PaymentList payments={payments} />
+          <Grid>
+            <PaymentOptions
+              paymentMethods={paymentMethods}
+              setPaymentMethods={setPaymentMethods}
+              isRetail={true}
+            />
+          </Grid>
+          <Grid style={{ marginTop: "20px" }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={12} sx={12}>
+                {displayAlert ? (
+                  <FormAlert
+                    type={alertData.type}
+                    message={alertData.message}
+                  />
+                ) : null}
+              </Grid>
+              <Grid item xs={12} sm={4} sx={12}>
+                <Button fullWidth variant="contained" onClick={submitValue}>
+                  Submit
+                </Button>
               </Grid>
             </Grid>
-          ) : null}
-          {saleBill.status === "DRAFT" ? (
-            <Grid item xs={12} sm={4} sx={12}>
-              <Button onClick={sendingBillForApproval} variant="outlined">
-                Send
-              </Button>
-            </Grid>
-          ) : null}
+          </Grid>
         </>
       ) : (
         <Box sx={{ padding: "20px", textAlign: "center" }}>
@@ -312,8 +393,8 @@ function SaleBillView() {
   );
 }
 
-SaleBillView.propTypes = {
+RetailBillUpdatePayments.propTypes = {
   billId: PropTypes.any,
 };
 
-export default SaleBillView;
+export default RetailBillUpdatePayments;

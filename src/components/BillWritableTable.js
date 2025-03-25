@@ -36,14 +36,14 @@ function BillWritableTable({ columns, rows, setRows, setTotalCount }) {
                 <TableCell
                   key={column.id}
                   align={column.align}
-                  style={{ minWidth: column.minWidth }}
+                  style={{ minWidth: column.minWidth, fontSize: "0.8rem" }}
                 >
                   {column.label}
                 </TableCell>
               ))}
             </TableRow>
           </TableHead>
-          <TableBody>
+          <TableBody style={{ fontSize: 80 }}>
             {rows
               // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row, index) => {
@@ -52,7 +52,11 @@ function BillWritableTable({ columns, rows, setRows, setTotalCount }) {
                     {columns.map((column) => {
                       const value = row[column.id];
                       return (
-                        <TableCell key={column.id} align={column.align}>
+                        <TableCell
+                          key={column.id}
+                          align={column.align}
+                          style={{fontSize: '0.8rem', padding: '10px'}}
+                        >
                           {column.editable ? (
                             <TextField
                               onChange={(event) =>
@@ -63,14 +67,25 @@ function BillWritableTable({ columns, rows, setRows, setTotalCount }) {
                                   event.target.value
                                 )
                               }
-                              label={column.label}
+                              label={""}
                               id="outlined-size-small"
                               size="small"
                               type={column.type}
                               value={
                                 column.isDecimal ? parseFloat(value) : value
                               }
-                              disabled={column.id !== "qty" && row.qty === 0 ? true : false}
+                              disabled={
+                                column.id !== "qty" && row.qty === 0
+                                  ? true
+                                  : false
+                              }
+                              InputProps={{
+                                sx: {
+                                  height: 40, // controls the total input height
+                                  fontSize: "0.8rem", // optional: controls text size
+                                  padding: "0 10px", // optional: padding inside input
+                                },
+                              }}
                             />
                           ) : column.editable === false &&
                             column.format &&

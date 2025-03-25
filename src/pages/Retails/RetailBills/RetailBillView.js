@@ -15,14 +15,14 @@ import CircularProgress from "@mui/material/CircularProgress";
 import TableItem from "../../../components/TableItem";
 import { makeStyles } from "@mui/styles";
 import {
-  billSendingForApproval,
   getSaleBillById,
   getSaleBillPaymentsById,
 } from "../../../services/Sales";
 import CloseIcon from "@mui/icons-material/Close";
 import { useHistory } from "react-router";
-import CustomerDataComponent from "../../../components/CustomerDataComponent";
 import PaymentList from "../../../components/PaymentList";
+import SalesmanDataComponent from "../../../components/SalesmanDataComponent";
+import { retailBillSendingForApproval } from "../../../services/RetailSales";
 
 const useStyles = makeStyles({
   container: {
@@ -37,8 +37,8 @@ const useStyles = makeStyles({
     marginBottom: "15px",
   },
   tableContainer: {
-    marginTop: "20px",
-    marginBottom: "20px",
+      marginTop: "20px",
+      marginBottom: "20px",
   },
   label: {
     fontWeight: 700,
@@ -48,11 +48,11 @@ const useStyles = makeStyles({
   },
 });
 
-function SaleBillView() {
+function RetailBillView() {
   const classes = useStyles();
   const history = useHistory();
   const { billId } = useParams();
-  const [saleBill, setSaleBill] = React.useState(null);
+  const [retailBill, setRetailBill] = React.useState(null);
   const [rows, setRows] = React.useState([]);
   const [isLoading, setLoading] = React.useState(false);
   const [errors, setErrors] = React.useState({});
@@ -65,7 +65,7 @@ function SaleBillView() {
     console.log(billPaymentResult);
 
     if (billResult !== "Something went wrong...") {
-      setSaleBill(billResult);
+      setRetailBill(billResult);
       const billItemSet = billResult.billItems || [];
 
       const itemRows = billItemSet.map((item) => ({
@@ -162,13 +162,15 @@ function SaleBillView() {
   const handleAction = async (event, id) => {
     console.log(
       "url: ",
-      "/template/sale_bill_item_view/" + id + "/" + saleBill.billNumber
+      "/template/sale_bill_item_view/" + id + "/" + retailBill.billNumber
     );
-    history.push(`/template/sale_bill_item_view/${id}/${saleBill.billNumber}`);
+    history.push(
+      `/template/sale_bill_item_view/${id}/${retailBill.billNumber}`
+    );
   };
 
   const sendingBillForApproval = async () => {
-    let result = await billSendingForApproval(billId);
+    let result = await retailBillSendingForApproval(billId);
   };
 
   return (
@@ -179,7 +181,7 @@ function SaleBillView() {
         >
           <CircularProgress />
         </Box>
-      ) : saleBill ? (
+      ) : retailBill ? (
         <>
           <Grid>
             <Tooltip title="Close">
@@ -198,7 +200,7 @@ function SaleBillView() {
             className={classes.sectionHeader}
             align="center"
           >
-            Sale Bill Details
+            Retail Bill Details
           </Typography>
           <Divider />
 
@@ -206,32 +208,32 @@ function SaleBillView() {
             <Grid item xs={6}>
               <Typography className={classes.label}>Bill No:</Typography>
               <Typography className={classes.value}>
-                {saleBill.billNumber}
+                {retailBill.billNumber}
               </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography className={classes.label}>Bill Date:</Typography>
               <Typography className={classes.value}>
-                {saleBill.sellingDate}
+                {retailBill.sellingDate}
               </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography className={classes.label}>Added By:</Typography>
               <Typography className={classes.value}>
-                {saleBill.addedBy}
+                {retailBill.addedBy}
               </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography className={classes.label}>Status:</Typography>
               <Typography className={classes.value}>
-                {saleBill.status}
+                {retailBill.status}
               </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography className={classes.label}>Customer:</Typography>
-              {saleBill.customer ? (
+              <Typography className={classes.label}>Sales Person:</Typography>
+              {retailBill.salesPerson ? (
                 <Grid item xs={12} sm={12} sx={12}>
-                  <CustomerDataComponent customer={saleBill.customer} />
+                  <SalesmanDataComponent salesman={retailBill.salesPerson} />
                 </Grid>
               ) : (
                 <Typography></Typography>
@@ -240,32 +242,35 @@ function SaleBillView() {
             <Grid item xs={6}>
               <Typography className={classes.label}>Discount:</Typography>
               <Typography className={classes.value}>
-                {saleBill.discount_percentage > 0.0
-                  ? saleBill.discount_percentage + "%"
-                  : "Rs: " + saleBill.discount_amount}
+                {retailBill.discount_percentage > 0.0
+                  ? retailBill.discount_percentage + "%"
+                  : "Rs: " + retailBill.discount_amount}
               </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography className={classes.label}>Total Profit:</Typography>
               <Typography className={classes.value}>
-                {saleBill.totalProfit}
+                {retailBill.totalProfit}
               </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography className={classes.label}>Total Amount:</Typography>
               <Typography className={classes.value}>
-                {saleBill.totalPrice}
+                {retailBill.totalPrice}
               </Typography>
             </Grid>
+
             <Grid item xs={6}>
               <Typography variant="h7" fontWeight="700">
                 Remaining Amount
               </Typography>
-              <Typography>{saleBill.remainingAmount}</Typography>
+              <Typography>{retailBill.remainingAmount}</Typography>
             </Grid>
             <Grid item xs={12}>
               <Typography className={classes.label}>Note:</Typography>
-              <Typography className={classes.value}>{saleBill.note}</Typography>
+              <Typography className={classes.value}>
+                {retailBill.note}
+              </Typography>
             </Grid>
           </Grid>
 
@@ -295,13 +300,13 @@ function SaleBillView() {
               </Grid>
             </Grid>
           ) : null}
-          {saleBill.status === "DRAFT" ? (
+          {/* {retailBill.status === "DRAFT" ? ( */}
             <Grid item xs={12} sm={4} sx={12}>
               <Button onClick={sendingBillForApproval} variant="outlined">
                 Send
               </Button>
             </Grid>
-          ) : null}
+          {/* ) : null} */}
         </>
       ) : (
         <Box sx={{ padding: "20px", textAlign: "center" }}>
@@ -312,8 +317,8 @@ function SaleBillView() {
   );
 }
 
-SaleBillView.propTypes = {
+RetailBillView.propTypes = {
   billId: PropTypes.any,
 };
 
-export default SaleBillView;
+export default RetailBillView;

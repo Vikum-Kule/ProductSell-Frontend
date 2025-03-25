@@ -50,12 +50,19 @@ function InputField({
           value={value}
           type={type}
           size="small"
+          // sx={{ height: '30px', fontSize: '5px' }}
           id="outlined-required"
           label={label}
           defaultValue={defaultValue ? defaultValue : null}
           onChange={handleChange}
           error={errorMsg}
           helperText={errorMsg}
+          InputProps={{
+            sx: {
+              height: 40, // controls the total input height
+              fontSize: '0.9rem', // optional: controls text size
+            },
+          }}
         />
       )}
     </div>

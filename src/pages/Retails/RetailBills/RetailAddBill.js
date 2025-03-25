@@ -18,12 +18,16 @@ import InputField from "../../../FormComponents/InputField";
 import { addSaleBill } from "../../../services/Sales";
 import ProfitCard from "../../../components/ProfitCard";
 import TableItem from "../../../components/TableItem";
-import SaleBillItemForm from "./SaleBillItemForm";
+import SaleBillItemForm from "../../Sales/SaleBill/SaleBillItemForm";
 import FormAlert from "../../../components/FormAlert";
 import { getCustomerById } from "../../../services/Customer";
 import CustomerDataComponent from "../../../components/CustomerDataComponent";
 import CustomerSelectingPopup from "../../../components/CustomerSelectingPopup";
 import PaymentOptions from "../../../components/PaymentOptions";
+import SalesmanSelectingPopup from "../../../components/SalesmanSelectingPopup";
+import { getSalesPersonById } from "../../../services/SalesPerson";
+import SalesmanDataComponent from "../../../components/SalesmanDataComponent";
+import { addRetailSaleBill } from "../../../services/RetailSales";
 
 const useStyles = makeStyles({
   categoryContainer: {
@@ -34,13 +38,13 @@ const useStyles = makeStyles({
   },
 });
 
-function SaleAddBill({ setOpenForm }) {
+function RetailAddBill({ setOpenForm }) {
   const classes = useStyles();
   const history = useHistory();
 
   const [value, setValue] = useState({
     _billNumber: "",
-    _customer: null,
+    _salesman: null,
     _paidStatus: "",
     _totalPrice: 0.0,
     _remainingAmount: 0.0,
@@ -54,7 +58,7 @@ function SaleAddBill({ setOpenForm }) {
   const resetValues = () => {
     setValue({
       _billNumber: "",
-      _customer: null,
+      _salesman: null,
       _paidStatus: "",
       _totalPrice: 0.0,
       _remainingAmount: 0.0,
@@ -70,8 +74,8 @@ function SaleAddBill({ setOpenForm }) {
     setDiscountVal(0.0);
     setSelectedProductRow(null);
     setRows([]);
-    setSelectedCustomer([]);
-    setSelectedCustomerData(null);
+    setSelectedSalesman([]);
+    setSelectedSalesmanData(null);
     setError({});
     setPaymentMethods([]);
   };
@@ -84,9 +88,9 @@ function SaleAddBill({ setOpenForm }) {
   const [selectedProductRow, setSelectedProductRow] = useState(null);
   const [discountType, setDiscountType] = useState("Percentage");
   const [discountVal, setDiscountVal] = useState(0.0);
-  const [openCustomerTable, setOpenCustomerTable] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState([]);
-  const [selectedCustomerData, setSelectedCustomerData] = useState(null);
+  const [openSalesmanTable, setOpenSalesmanTable] = useState(false);
+  const [selectedSalesman, setSelectedSalesman] = useState([]);
+  const [selectedSalesmanData, setSelectedSalesmanData] = useState(null);
   const [paymentMethods, setPaymentMethods] = useState([]);
 
   const discountTypes = [
@@ -121,15 +125,15 @@ function SaleAddBill({ setOpenForm }) {
   };
 
   const handleOpenCustomerTable = async () => {
-    setOpenCustomerTable(true);
+    setOpenSalesmanTable(true);
   };
 
   const handleTotalAmounts = () => {
     console.log("Setep in..");
     if (rows.length > 0) {
       let totalBillProfit = 0.0;
-      let remainingAmount = 0.0;
       let totalItemPrice = 0.0;
+      let remainingAmount = 0.0;
       let totalBillCost = 0.0;
       rows.map((row) => {
         if (row.totalCost != 0.0) {
@@ -153,9 +157,13 @@ function SaleAddBill({ setOpenForm }) {
       console.log("Total Bill Profit: ", totalBillProfit);
 
       //Calculate Remaining amounts
-      const totalPayment = paymentMethods?.reduce((sum, payment) => sum + parseFloat(payment.amount), 0);
-      console.log(totalPayment)
-      remainingAmount = totalItemPrice - totalPayment
+      const totalPayment = paymentMethods?.reduce(
+        (sum, payment) => sum + parseFloat(payment.amount),
+        0
+      );
+      console.log(totalPayment);
+      remainingAmount = totalItemPrice - totalPayment;
+
       setValue({
         ...value,
         _totalPrice: totalItemPrice,
@@ -210,26 +218,26 @@ function SaleAddBill({ setOpenForm }) {
   };
 
   const handleCloseCustomerTable = async () => {
-    if (selectedCustomer.length !== 0) {
-      console.log(selectedCustomer[0]);
-      const customerResponse = await getCustomerById(selectedCustomer[0]);
-      if (customerResponse == "Something went wrong...") {
+    if (selectedSalesman.length !== 0) {
+      console.log(selectedSalesman[0]);
+      const salesmanResponse = await getSalesPersonById(selectedSalesman[0]);
+      if (salesmanResponse == "Something went wrong...") {
         setError({
           ...error,
-          _customer: "Something went wrong...",
+          _salesman: "Something went wrong...",
         });
         return;
       } else {
-        console.log("Customer Data: " + customerResponse);
-        setSelectedCustomerData(customerResponse);
-        setOpenCustomerTable(false);
+        console.log("Salesman Data: " + salesmanResponse);
+        setSelectedSalesmanData(salesmanResponse);
+        setOpenSalesmanTable(false);
         setValue({
           ...value,
-          _customer: selectedCustomer[0],
+          _salesman: selectedSalesman[0],
         });
       }
     } else {
-      setOpenCustomerTable(false);
+      setOpenSalesmanTable(false);
     }
   };
 
@@ -249,7 +257,7 @@ function SaleAddBill({ setOpenForm }) {
   const [error, setError] = useState({
     _billNumber: "",
     _product: "",
-    _customer: "",
+    _salesman: "",
     _paidStatus: "",
     _totalPrice: "",
     _products: "",
@@ -278,10 +286,10 @@ function SaleAddBill({ setOpenForm }) {
     setError(Validation(value, rows));
     console.log("Selected Data: ", rows);
     console.log("Payment Data: ", paymentMethods);
+    console.log(error);
     if (
       !error._products &&
-      !error._customer &&
-      !error._paidStatus &&
+      !error._salesman &&
       !error._totalPrice &&
       !error._billNumber
     ) {
@@ -309,13 +317,14 @@ function SaleAddBill({ setOpenForm }) {
       }));
 
       console.log("bill List: ", billItemList);
-      let submitBill = await addSaleBill(saleBillData, billItemList);
+      console.log("bill data: ", saleBillData);
+      let submitBill = await addRetailSaleBill(saleBillData, billItemList);
 
       if (submitBill) {
         resetValues();
         setAlertData({
           type: "success",
-          message: "Item submitted..",
+          message: "Retail Bill submitted..",
         });
         setAlert(true);
       } else {
@@ -457,7 +466,7 @@ function SaleAddBill({ setOpenForm }) {
     <Grid container spacing={2}>
       <Grid item xs={12} sm={11} sx={12}>
         <Typography mt={1} variant="h6">
-          Add Sale Bill
+          Add Retail Bill
         </Typography>
       </Grid>
       <Grid item xs={12} sm={1} sx={12}>
@@ -487,17 +496,19 @@ function SaleAddBill({ setOpenForm }) {
               label="Bill Number"
             />
           </Grid>
-          {selectedCustomerData ? (
+
+          {selectedSalesmanData ? (
             <Grid item xs={12} sm={4} sx={12}>
-              <CustomerDataComponent customer={selectedCustomerData} />
+              <SalesmanDataComponent salesman={selectedSalesmanData} />
             </Grid>
           ) : (
             <Grid item xs={12} sm={4} sx={12}>
               <Button onClick={handleOpenCustomerTable} variant="outlined">
-                Select Customer
+                Select Salesman
               </Button>
             </Grid>
           )}
+
           <Grid item xs={12} sm={4} sx={12}>
             <Button onClick={handleOpenProductTable} variant="outlined">
               Select Product
@@ -539,6 +550,7 @@ function SaleAddBill({ setOpenForm }) {
         <PaymentOptions
           paymentMethods={paymentMethods}
           setPaymentMethods={setPaymentMethods}
+          isRetail={true}
         />
       </Grid>
       {selectedProductData.length != 0 ? (
@@ -594,7 +606,7 @@ function SaleAddBill({ setOpenForm }) {
             <Grid item>
               <InputField
                 name="_totalPrice"
-                errorMsg={error._totalPrice}
+                errorMsg={error._paidStatus}
                 value={value._totalPrice}
                 onChange={(event, newInputValue) =>
                   handleChange(event, newInputValue)
@@ -645,13 +657,13 @@ function SaleAddBill({ setOpenForm }) {
             isOneChoise={false}
           />
         ) : null}
-        {openCustomerTable ? (
-          <CustomerSelectingPopup
-            setOpenCustomerTable={setOpenCustomerTable}
-            openCustomerTable={openCustomerTable}
-            handleCloseCustomerTable={handleCloseCustomerTable}
-            setSelectedCustomer={setSelectedCustomer}
-            selectedCustomer={selectedCustomer}
+        {openSalesmanTable ? (
+          <SalesmanSelectingPopup
+            setOpenSalesmanTable={setOpenSalesmanTable}
+            openSalesmanTable={openSalesmanTable}
+            handleCloseSalesmanTable={handleCloseCustomerTable}
+            setSelectedSalesman={setSelectedSalesman}
+            selectedSalesman={selectedSalesman}
             isOneChoise={true}
           />
         ) : null}
@@ -660,4 +672,4 @@ function SaleAddBill({ setOpenForm }) {
   );
 }
 
-export default SaleAddBill;
+export default RetailAddBill;
