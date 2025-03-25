@@ -36,7 +36,7 @@ function BillWritableTable({ columns, rows, setRows, setTotalCount }) {
                 <TableCell
                   key={column.id}
                   align={column.align}
-                  style={{ minWidth: column.minWidth }}
+                  style={{ minWidth: column.minWidth, fontSize: "0.8rem" }}
                 >
                   {column.label}
                 </TableCell>

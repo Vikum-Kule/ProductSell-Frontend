@@ -39,6 +39,8 @@ function Im_stockUpdateForm({ setOpenForm }) {
     _pricePerItem: 0.0,
     _totalPrice: 0.0,
     _discount: 0.0,
+    _billUnit: "",
+    _itemUintsPerBillUnit: 0.0,
     _note: "",
   });
 
@@ -50,6 +52,8 @@ function Im_stockUpdateForm({ setOpenForm }) {
       _pricePerItem: 0.0,
       _totalPrice: 0.0,
       _discount: 0.0,
+      _billUnit: "",
+      _itemUintsPerBillUnit: 0.0,
       _note: "",
     });
     setSelectedItem([]);
@@ -125,8 +129,8 @@ function Im_stockUpdateForm({ setOpenForm }) {
           type: "success",
           message: "Item submitted..",
         });
-          setAlert(true);
-          setError({});
+        setAlert(true);
+        setError({});
       } else {
         setAlertData({
           type: "error",
@@ -134,8 +138,8 @@ function Im_stockUpdateForm({ setOpenForm }) {
         });
         setAlert(true);
       }
-        console.log("Submit Data: ", value);
-        setError({});
+      console.log("Submit Data: ", value);
+      setError({});
     }
   };
 
@@ -311,61 +315,90 @@ function Im_stockUpdateForm({ setOpenForm }) {
         </Grid>
       ) : null}
       <Grid item xs={12} sm={4} sx={12}>
-        <InputField
-          name="_importQty"
-          errorMsg={error._importQty}
-          value={value._importQty}
-          onChange={(event, newInputValue) =>
-            handleChange(event, newInputValue)
-          }
-          type="number"
-          label="Import Qty"
-        />
-      </Grid>
-      <Grid item xs={12} sm={4} sx={12}>
-        <InputField
-          name="_pricePerItem"
-          value={value._pricePerItem}
-          onChange={(event, newInputValue) =>
-            handleChange(event, newInputValue)
-          }
-          type="number"
-          label="Price Per Item"
-        />
-      </Grid>
-      <Grid item xs={12} sm={4} sx={12}>
-        <InputField
-          name="_discount"
-          value={value._discount}
-          onChange={(event, newInputValue) =>
-            handleChange(event, newInputValue)
-          }
-          type="number"
-          label="Discount"
-        />
-      </Grid>
-      <Grid item xs={12} sm={3} sx={12}>
-        <Tooltip title="Calculate">
-          <IconButton
-            onClick={priceDiscountOperations}
-            aria-label="calculate"
-            size="small"
-          >
-            <SyncIcon />
-          </IconButton>
-        </Tooltip>
-      </Grid>
-
-      <Grid item xs={12} sm={4} sx={12}>
-        <InputField
-          name="_totalPrice"
-          value={value._totalPrice}
-          onChange={(event, newInputValue) =>
-            handleChange(event, newInputValue)
-          }
-          type="number"
-          label="Total Price"
-        />
+        <Grid container direction="column" spacing={2}>
+          <Grid item>
+            <InputField
+              name="_billUnit"
+              value={value._billUnit}
+              onChange={(event, newInputValue) =>
+                handleChange(event, newInputValue)
+              }
+              type="text"
+              label="Intake Unit"
+            />
+          </Grid>
+          <Grid item>
+            <InputField
+              name="_itemUintsPerBillUnit"
+              value={value._itemUintsPerBillUnit}
+              onChange={(event, newInputValue) =>
+                handleChange(event, newInputValue)
+              }
+              type="number"
+              label="Item Units Per Bill Unit"
+            />
+          </Grid>
+          <Grid item>
+            <InputField
+              name="_importQty"
+              errorMsg={error._importQty}
+              value={value._importQty}
+              onChange={(event, newInputValue) =>
+                handleChange(event, newInputValue)
+              }
+              type="number"
+              label="Import Qty"
+            />
+          </Grid>
+          <Grid item>
+            <InputField
+              name="_pricePerItem"
+              value={value._pricePerItem}
+              onChange={(event, newInputValue) =>
+                handleChange(event, newInputValue)
+              }
+              type="number"
+              label="Price Per Item"
+            />
+          </Grid>
+          <Grid item>
+            <InputField
+              name="_discount"
+              value={value._discount}
+              onChange={(event, newInputValue) =>
+                handleChange(event, newInputValue)
+              }
+              type="number"
+              label="Discount"
+            />
+          </Grid>
+          <Grid item>
+            <Grid container justifyContent="space-between">
+              <Grid item xs={12} sm={11} sx={12}>
+                <InputField
+                  name="_totalPrice"
+                  value={value._totalPrice}
+                  onChange={(event, newInputValue) =>
+                    handleChange(event, newInputValue)
+                  }
+                  type="number"
+                  label="Total Price"
+                />
+              </Grid>
+              <Grid item xs={12} sm={1} sx={12}>
+                <Tooltip title="Calculate">
+                  <IconButton
+                    onClick={priceDiscountOperations}
+                    aria-label="calculate"
+                    size="small"
+                  >
+                    <SyncIcon />
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
       </Grid>
       <Grid item xs={12} sm={12} sx={12}>
         {displayAlert ? (

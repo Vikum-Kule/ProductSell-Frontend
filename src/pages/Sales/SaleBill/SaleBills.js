@@ -23,6 +23,7 @@ import ConfirmationPopup from "../../../components/ConfirmationPopup";
 import FormAlert from "../../../components/FormAlert";
 import Ex_ProductSelectingPopup from "../../../components/Ex_ProductSelectingPopup";
 import CustomerSelectingPopup from "../../../components/CustomerSelectingPopup";
+import BillListTable from "../../../components/BillListTable";
 
 const useStyles = makeStyles({
   container: {
@@ -435,7 +436,7 @@ function SaleBills() {
                   <CircularProgress />
                 </Box>
               ) : (
-                <TableItem
+                <BillListTable
                   columns={columns}
                   rows={rows}
                   page={page}
