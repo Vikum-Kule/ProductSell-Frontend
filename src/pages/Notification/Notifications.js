@@ -12,17 +12,15 @@ import {
   Button,
 } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
-import TableItem from "../../../components/TableItem";
 import { makeStyles } from "@mui/styles";
-import {
-  getSaleBillById,
-  getSaleBillPaymentsById,
-} from "../../../services/Sales";
 import CloseIcon from "@mui/icons-material/Close";
 import { useHistory } from "react-router";
-import PaymentList from "../../../components/PaymentList";
-import SalesmanDataComponent from "../../../components/SalesmanDataComponent";
-import { retailBillSendingForApproval } from "../../../services/RetailSales";
+import {
+  deleteNotificationById,
+  getNotificationData,
+  markNotificationById,
+} from "../../services/Notification";
+import NotificationComponent from "../../components/NotificationComponent";
 
 const useStyles = makeStyles({
   container: {
@@ -45,19 +43,49 @@ function Notifications() {
     status: "",
   });
 
+  useEffect(() => {
+    fetchData();
+    // console.log("notifications: ", notifications);
+  }, []);
+
   const fetchData = async () => {
     setLoading(true);
-    const notificationResult = await getSaleBillById(billId);
+    const notificationResult = await getNotificationData(
+      page,
+      rowsPerPage,
+      filter
+    );
     if (notificationResult !== "Something went wrong...") {
-      setNotifications(notificationResult);
+      console.log("Notification data: ", notificationResult);
+      let notificationList = notificationResult.content;
+      setNotifications(notificationList);
     }
-
+    console.log("notifications: ", notifications);
     setLoading(false);
   };
 
-  useEffect(() => {
+  const deleteNotification = async (id) => {
+    let result = await deleteNotificationById(id);
+    if (result) {
+      console.log("Notification deleted successfully");
+    } else {
+      console.log("Failed to delete notification");
+    }
+    console.log("Delete notification id: ", id);
     fetchData();
-  }, []);
+  };
+
+  const markAsRead = async (id, mark) => {
+    let result = await markNotificationById(id, mark);
+    if (result) {
+      console.log("Notification marked as read successfully");
+    } else {
+      console.log("Failed to mark notification as read");
+    }
+    console.log("Mark as read notification id: ", id);
+    console.log("Mark as read notification mark: ", mark);
+    fetchData();
+  };
 
   return (
     <Paper className={classes.container} elevation={8}>
@@ -67,7 +95,7 @@ function Notifications() {
         >
           <CircularProgress />
         </Box>
-      ) : retailBill ? (
+      ) : (
         <>
           <Grid>
             <Tooltip title="Close">
@@ -89,11 +117,27 @@ function Notifications() {
             Notifications
           </Typography>
           <Divider />
+          <Grid container spacing={2}>
+            {notifications.length > 0 ? (
+              notifications.map((notification) => (
+                <Grid item xs={12} sm={12} sx={12}>
+                  <Box sx={{ padding: "5px" }}>
+                    <NotificationComponent
+                      notificication={notification}
+                      deleteNotification={deleteNotification}
+                      markAsRead={markAsRead}
+                    />
+                  </Box>
+                </Grid>
+              ))
+            ) : (
+              <Box sx={{ padding: "20px", textAlign: "center" }}>
+                <Typography>No data available</Typography>
+              </Box>
+            )}
+            <Grid item xs={12} sm={12} sx={12}></Grid>
+          </Grid>
         </>
-      ) : (
-        <Box sx={{ padding: "20px", textAlign: "center" }}>
-          <Typography>No data available</Typography>
-        </Box>
       )}
     </Paper>
   );

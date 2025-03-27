@@ -38,6 +38,7 @@ import Retail_BillView from "./pages/Retails/RetailBills/RetailBillView"
 import Retail_BillEdit from "./pages/Retails/RetailBills/RetailBillUpdatePayments";
 import CustomerView from "./pages/Customers/CustomerView"
 import EmailAuthentication from "./components/EmailAuthentication";
+import Notifications from "./pages/Notification/Notifications";
 
 const theme = createTheme({
   palette: {
@@ -159,6 +160,9 @@ function App() {
                 </Route>
                 <Route path="/template/customer_view/:customerId">
                   <CustomerView />
+                </Route>
+                <Route path="/template/notifications">
+                  <Notifications />
                 </Route>
               </Switch>
             </Template>

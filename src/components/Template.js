@@ -189,6 +189,7 @@ function Template({ children }) {
               aria-label=""
               color="inherit"
               sx={{ color: "black" }}
+              onClick={() => history.push("/template/notifications")}
             >
               <Badge badgeContent={notificationCount} color="error">
                 <NotificationsIcon />
